@@ -1,0 +1,58 @@
+ Fatal error: Uncaught Error: Call to undefined function User() in /var/www/html/st/Smash-Hit-Lab-Site/data/action.php:7 Stack trace: #0 /var/www/html/st/Smash-Hit-Lab-Site/public_html/index.php(12): do_register() #1 /var/www/html/st/Smash-Hit-Lab-Site/public_html/index.php(23): main() #2 {main} thrown in /var/www/html/st/Smash-Hit-Lab-Site/data/action.php on line 7
+ 
+  Fatal error: Uncaught Error: Class 'Database' not found in /var/www/html/st/Smash-Hit-Lab-Site/data/user.php:37 Stack trace: #0 /var/www/html/st/Smash-Hit-Lab-Site/data/action.php(7): User->__construct() #1 /var/www/html/st/Smash-Hit-Lab-Site/public_html/index.php(12): do_register() #2 /var/www/html/st/Smash-Hit-Lab-Site/public_html/index.php(23): main() #3 {main} thrown in /var/www/html/st/Smash-Hit-Lab-Site/data/user.php on line 37
+  
+   Smash Hit Lab
+Home
+YouTube
+Discord
+|
+Log in
+Register
+
+Notice: Undefined variable: password in /var/www/html/st/Smash-Hit-Lab-Site/data/user.php on line 52
+PASSWORD IS: fClMWCrlF1uAsDq7N#u_m83g=
+Warning: fopen(./db/user/knot126): failed to open stream: No such file or directory in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 33
+
+Warning: fwrite() expects parameter 1 to be resource, bool given in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 34
+
+Warning: fclose() expects parameter 1 to be resource, bool given in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 35
+
+Notice: Undefined index: p in /var/www/html/st/Smash-Hit-Lab-Site/data/page.php on line 19
+
+
+ Smash Hit Lab
+Home
+YouTube
+Discord
+|
+Log in
+Register
+
+Warning: mkdir(): Permission denied in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 17
+PASSWORD IS: twXKpL7a7PGG1&Qh8!zlaKYPd
+Warning: mkdir(): Permission denied in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 17
+
+Warning: fopen(./db/user/knot126): failed to open stream: No such file or directory in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 35
+
+Warning: fwrite() expects parameter 1 to be resource, bool given in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 36
+
+Warning: fclose() expects parameter 1 to be resource, bool given in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 37
+
+ Smash Hit Lab
+Home
+YouTube
+Discord
+|
+Log in
+Register
+
+Warning: mkdir(): File exists in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 17
+PASSWORD IS: 3pRL!2A%91Ezrub*e00&PDtG_
+Warning: mkdir(): File exists in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 17
+
+Warning: fopen(../data/db/user/knot126): failed to open stream: Permission denied in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 35
+
+Warning: fwrite() expects parameter 1 to be resource, bool given in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 36
+
+Warning: fclose() expects parameter 1 to be resource, bool given in /var/www/html/st/Smash-Hit-Lab-Site/data/database.php on line 37

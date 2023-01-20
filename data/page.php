@@ -1,5 +1,7 @@
 <?php
 
+require_once "user.php";
+
 class Page {
 	public $name;
 	public $type;
@@ -14,7 +16,7 @@ class Page {
 }
 
 function get_page_name() {
-	return str_replace("/", ",", str_replace(".", ",", $_GET["page"]));
+	return str_replace("/", ",", str_replace(".", ",", $_GET["p"]));
 }
 
 function include_header() {
@@ -22,9 +24,21 @@ function include_header() {
 }
 
 function include_static_page() {
-	$page_name = get_page_name();
+	// If we have no static page then don't do anything.
+	if (!array_key_exists("p", $_GET)) {
+		return;
+	}
 	
-	readfile("../data/pages/static/" . $page_name . ".html");
+	$page_name = get_page_name();
+	$path = "../data/pages/static/" . $page_name . ".html";
+	
+	if (file_exists($path)) {
+		readfile($path);
+	}
+	else {
+		echo "<h1>Sorry</h1><p>That page does not exist!</p>";
+		echo "<p>VERBOSE: Tried to load from " . $path . "</p>";
+	}
 }
 
 function include_footer() {
