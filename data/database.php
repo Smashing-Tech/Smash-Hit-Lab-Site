@@ -14,7 +14,10 @@ class Database {
 		
 		$this->path = $database_path . $name . "/";
 		
-		mkdir($this->path, 0777, true);
+		// Make database folder if it doesn't exist
+		if (!file_exists($this->path)) {
+			mkdir($this->path, 0777, true);
+		}
 	}
 	
 	function get_item_path(string $item) : string {
