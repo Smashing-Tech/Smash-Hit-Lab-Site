@@ -4,8 +4,6 @@ require_once "../data/page.php";
 require_once "../data/action.php";
 
 function main() {
-	include_header();
-	
 	if (array_key_exists("a", $_GET)) {
 		switch ($_GET["a"]) {
 			case "register":
@@ -17,6 +15,9 @@ function main() {
 			default:
 				break;
 		}
+	}
+	else {
+		include_header();
 	}
 	
 	include_static_page();

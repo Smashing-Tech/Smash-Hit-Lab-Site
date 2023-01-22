@@ -1,4 +1,3 @@
-<!-- Contains user and auth things. -->
 <?php
 
 require_once "database.php";
@@ -71,7 +70,7 @@ class Token {
 		 * This returns the name of the issued token if it works.
 		 */
 		
-		if ($this->name == null) {
+		if ($this->user == null) {
 			$this->user = $user;
 			
 			$db = new Database("token");
@@ -200,6 +199,7 @@ class User {
 		$token = new Token();
 		$name = $token->set_user($this->name);
 		$this->tokens[] = $name;
+		$this->save();
 		
 		return $name;
 	}

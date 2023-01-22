@@ -3,6 +3,7 @@
 require_once "user.php";
 
 function login_error() {
+	include_header();
 	echo "<h1>Sorry</h1><p>There was an error during login. This could have been because your username or password was wrong, or there has been a server fault. If this continues to happen, please join our Discord for help on the site.</p>";
 }
 
@@ -34,6 +35,21 @@ function do_login() {
 	
 	// We should be able to log the user in
 	setcookie("tk", $token, time() + 60 * 60 * 24 * 14, "/");
+	
+	// Redirect to homepage
+	header("Location: /?p=home");
+	die();
+}
+
+function do_logout() {
+	// TODO Actually invalidate the token
+	
+	// Unset cookie
+	setcookie("tk", "badtoken", 1, "/");
+	
+	// Redirect to homepage
+	header("Location: /?p=home");
+	die();
 }
 
 function do_register() {
