@@ -14,7 +14,13 @@
 			<div class="cb-top-item"><a href="https://youtube.com/@SmashHitLab">YouTube</a></div>
 			<div class="cb-top-item"><a href="https://discord.gg/7kra7Z3UNn">Discord</a></div>
 			<div class="cb-top-item">|</div>
-			<div class="cb-top-item"><a href="./?p=login">Log in</a></div>
-			<div class="cb-top-item"><a href="./?p=register">Register</a></div>
+			<?php
+				if (array_key_exists("tk", $_COOKIE)) {
+					echo "<div class=\"cb-top-item\"><a href=\"./?p=logout\">Log out</a></div>";
+				} else {
+					echo "<div class=\"cb-top-item\"><a href=\"./?p=login\">Log in</a></div>";
+					echo "<div class=\"cb-top-item\"><a href=\"./?p=register\">Register</a></div>";
+				}
+			?>
 		</div>
 		<div class="main-section nc-top nc-bottom">

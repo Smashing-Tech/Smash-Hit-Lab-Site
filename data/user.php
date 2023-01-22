@@ -28,6 +28,87 @@ function random_password() : string {
 	return $pw;
 }
 
+class Token {
+	public $name; // Name of the token
+	public $user; // Name of the user
+	public $created; // Time the user logged in
+	public $expire; // Expiration date of the token
+	
+	function __construct(string $name = null) {
+		$db = new Database("token");
+		
+		// Generate new token name
+		// We just reroll until we get an unused one
+		if (!$name) {
+			do {
+				$name = random_hex();
+			} while ($db->has($name));
+		}
+		
+		// Load an existing token
+		if ($db->has($name)) {
+			$token = $db->load($name);
+			
+			$this->name = $token->name;
+			$this->user = $token->user;
+			$this->created = $token->created;
+			$this->expire = $token->expire;
+		}
+		// Create a new token
+		else {
+			$this->name = $name;
+			$this->user = null;
+			$this->created = time();
+			$this->expire = time() + 60 * 60 * 24 * 7 * 2; // Expire in 2 weeks
+		}
+	}
+	
+	function set_user(string $user) {
+		/**
+		 * Set who the token is for if not already set. We don't allow changing
+		 * the name once it is set for safety reasons.
+		 * 
+		 * This returns the name of the issued token if it works.
+		 */
+		
+		if ($this->name == null) {
+			$this->user = $user;
+			
+			$db = new Database("token");
+			
+			$db->save($this->name, $this);
+			
+			return $this->name;
+		}
+		
+		return null;
+	}
+	
+	function get_user() {
+		/**
+		 * Get the username with a token, or null if the token can't be used.
+		 */
+		
+		// Not initialised
+		if ($this->user == null) {
+			return null;
+		}
+		
+		// Expired
+		if (time() >= $this->expire) {
+			return null;
+		}
+		
+		// Too early
+		if (time() < $this->created) {
+			return null;
+		}
+		
+		// probably okay to use
+		return $this->user;
+	}
+}
+
 class User {
 	public $name; // Yes, it would probably be better to store users by ID.
 	public $password; // Password hash and salt
@@ -96,8 +177,61 @@ class User {
 		
 		$this->email = $email;
 	}
+	
+	function authinticate(string $password) : bool {
+		/**
+		 * Check the stored password against the given password.
+		 */
+		
+		return password_verify($password, $this->password);
+	}
+	
+	function issue_token(string $password) {
+		/**
+		 * Add a new token for this user and return its name.
+		 */
+		
+		// Check the password
+		if (!$this->authinticate($password)) {
+			return null;
+		}
+		
+		// Create a new token
+		$token = new Token();
+		$name = $token->set_user($this->name);
+		$this->tokens[] = $name;
+		
+		return $name;
+	}
 }
 
-class Token {
-	public $name; // Name of the user
+function user_exists(string $username) : bool {
+	/**
+	 * Check if a user exists in the database.
+	 */
+	
+	$db = new Database("user");
+	return $db->has($username);
+}
+
+function check_token(string $name) {
+	/**
+	 * Given the name of the token, get the user's assocaited name, or NULL if
+	 * the token is not valid.
+	 */
+	
+	$token = new Token($name);
+	return $token->get_user();
+}
+
+function get_name_if_authed() {
+	/**
+	 * Get the user's name if they are authed properly, otherwise do nothing.
+	 */
+	
+	if (!array_key_exists("tk", $_COOKIE)) {
+		return null;
+	}
+	
+	return check_token($_COOKIE["tk"]);
 }

@@ -1,4 +1,9 @@
 <?php
+/**
+ * TODO:
+ * 
+ * - Database locks. These are important!
+ */
 
 $database_path = "../data/db/";
 

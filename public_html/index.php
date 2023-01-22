@@ -11,6 +11,9 @@ function main() {
 			case "register":
 				do_register();
 				break;
+			case "login":
+				do_login();
+				break;
 			default:
 				break;
 		}

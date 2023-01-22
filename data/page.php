@@ -20,7 +20,7 @@ function get_page_name() {
 }
 
 function include_header() {
-	readfile("../data/_header.html");
+	require_once("../data/_header.html");
 }
 
 function include_static_page() {
