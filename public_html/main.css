@@ -37,7 +37,6 @@ code {
 
 .billboard {
 	border-radius: 0.5em;
-/* 	box-shadow: 0 0.2em 0.4em #0000003f; */
 }
 
 a {
@@ -78,6 +77,31 @@ body {
 	border-radius: 0.5em;
 }
 
+/* Interactive widgets */
+input[type=text], input[type=password], textaera {
+	background: var(--main-colour-bg-dark);
+	border: none;
+	border-radius: 0.5em;
+	caret-color: var(--main-colour);
+	color: var(--main-colour);
+	font-family: var(--font-face);
+	font-size: 14pt;
+	padding: 0.5em;
+	outline: none;
+	width: 30em;
+}
+
+input[type=submit] {
+	background: var(--main-colour);
+	border: none;
+	border-radius: 0.5em;
+	color: #000;
+	font-family: var(--font-face);
+	font-size: 14pt;
+	padding: 0.5em;
+	outline: none;
+}
+
 /* Warning */
 .warning-main {
 	background: var(--main-colour-bg-dark);
@@ -102,14 +126,6 @@ body {
 	float: right;
 	width: calc(100% - 32px - 1em);
 	padding-left: 1em;
-}
-
-/* NEW token */
-.new-token {
-	background: #0AFDEA;
-	border-radius: 10000em;
-	color: #000;
-	padding: 0 0.35em;
 }
 
 .navbar-section {
