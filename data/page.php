@@ -26,6 +26,7 @@ function include_header() {
 function include_static_page() {
 	// If we have no static page then don't do anything.
 	if (!array_key_exists("p", $_GET)) {
+		echo "<h1>Sorry</h1><p>That page does not exist!</p>";
 		return;
 	}
 	
@@ -37,7 +38,6 @@ function include_static_page() {
 	}
 	else {
 		echo "<h1>Sorry</h1><p>That page does not exist!</p>";
-		echo "<p>VERBOSE: Tried to load from " . $path . "</p>";
 	}
 }
 
