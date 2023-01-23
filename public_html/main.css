@@ -152,6 +152,7 @@ input[type=submit] {
 	border: 1px solid var(--main-colour);
 	border-radius: 0.5em;
 	padding: 0.5em;
+	margin-top: 1em;
 }
 
 .cb-top-item {
@@ -263,4 +264,32 @@ input[type=submit] {
 
 .small-text {
 	font-size: 10pt;
+}
+
+.mod-edit-property {
+	display: grid;
+	grid-template-columns: 35% auto;
+	margin-bottom: 2em;
+}
+
+.mod-edit-property-label {
+	grid-column: 1;
+}
+
+.mod-edit-property-data {
+	grid-column: 2;
+}
+
+.mod-property {
+	display: grid;
+	grid-template-columns: 25% auto;
+	margin-bottom: 2em;
+}
+
+.mod-property-label {
+	grid-column: 1;
+}
+
+.mod-property-data {
+	grid-column: 2;
 }

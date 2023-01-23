@@ -29,12 +29,32 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true) : void
 	echo "</div>";
 }
 
+function mod_property($title, $desc, $value) : void {
+	echo "<div class=\"mod-property\">";
+		echo "<div class=\"mod-property-label\">";
+			echo "<p><b>$title</b></p>";
+			echo "<p class=\"small-text\">$desc</p>";
+		echo "</div>";
+		echo "<div class=\"mod-property-data\">";
+			if (str_starts_with($value ? $value : "", "https://")) {
+				echo "<p><a href=\"$value\">" . $value . "</a></p>";
+			} else {
+				echo "<p>" . ($value ? "$value" : "<i>Not available</i>") . "</p>";
+			}
+		echo "</div>";
+	echo "</div>";
+}
+
 function parse_comma_array(string $s) : array {
 	return explode(",", $s);
 }
 
 function create_comma_array(array $s) : string {
 	return join(",", $s);
+}
+
+function create_comma_array_nice(array $s) : string {
+	return join(", ", $s);
 }
 
 class ModPage {
@@ -97,7 +117,17 @@ class ModPage {
 			echo "<p><a href=\"./?a=edit_mod&m=$this->package\">Edit mod info</a></p>";
 		}
 		
-		echo "<p>" . ($this->description) ? $this->description : "<i>No description yet.</i>" . "</p>";
+		echo "<p>" . (($this->description) ? $this->description : "<i>No description yet.</i>") . "</p>";
+		
+		mod_property("Download", "A link to where the mod can be downloaded.", $this->download);
+		mod_property("Version", "The latest version of this mod.", $this->version);
+		mod_property("Creators", "The people who created this mod.", create_comma_array_nice($this->creators));
+		mod_property("Security", "A short statement on this mod's security.", $this->security);
+		mod_property("Wiki article", "A relevant wiki article about the mod.", $this->wiki);
+		mod_property("Source code", "A link to where the source code for a mod can be found.", $this->code);
+		mod_property("Status", "A short description of the mod's development status.", $this->status);
+		mod_property("Package", "The name of the mod's APK or IPA file.", $this->package);
+		mod_property("Updated", "The unix timestamp for the last time this page was updated.", date("Y-m-d H:i:s", $this->updated));
 	}
 	
 	function display_edit() {
@@ -114,7 +144,7 @@ class ModPage {
 		edit_feild("version", "text", "Version", "The latest version of this mod.", $this->version);
 		edit_feild("updated", "text", "Updated", "The unix timestamp for the last time this page was updated.", date("Y-m-d H:i:s", $this->updated), false);
 		edit_feild("security", "text", "Security", "A short statement on this mod's security.", $this->security);
-		edit_feild("status", "text", "Status", "Cant be bothered to write a description right now.", $this->status);
+		edit_feild("status", "text", "Status", "A short description of the mod's development status.", $this->status);
 		echo "<input type=\"submit\" value=\"Save edits\"/>";
 		echo "</form>";
 	}
