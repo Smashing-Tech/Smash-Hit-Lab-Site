@@ -79,7 +79,7 @@ body {
 }
 
 /* Interactive widgets */
-input[type=text], input[type=password], textaera {
+input[type=text], input[type=password], textarea {
 	background: var(--main-colour-bg-dark);
 	border: none;
 	border-radius: 0.5em;
@@ -90,6 +90,10 @@ input[type=text], input[type=password], textaera {
 	padding: 0.5em;
 	outline: none;
 	width: 30em;
+}
+
+textarea {
+	height: 10em;
 }
 
 input[type=submit] {
