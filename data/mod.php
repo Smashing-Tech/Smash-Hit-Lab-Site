@@ -25,6 +25,9 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true) : void
 				default:
 					echo "$value";
 			}
+			if (!$enabled) {
+				echo "<p><i>This value is read-only.</i></p>";
+			}
 		echo "</div>";
 	echo "</div>";
 }
@@ -111,7 +114,7 @@ class ModPage {
 	}
 	
 	function display() {
-		echo "<h1>" . $this->name . "</h1>";
+		echo "<h1>" . ($this->name ? $this->name : $this->package) . "</h1>";
 		
 		if (get_name_if_authed()) {
 			echo "<p><a href=\"./?a=edit_mod&m=$this->package\">Edit mod info</a></p>";
