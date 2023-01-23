@@ -16,6 +16,12 @@ function main() {
 			case "logout":
 				do_logout();
 				break;
+			case "edit_mod":
+				edit_mod();
+				break;
+			case "save_mod":
+				save_mod();
+				break;
 			default:
 				break;
 		}
@@ -25,10 +31,15 @@ function main() {
 		display_mod($_GET["m"]);
 		include_footer();
 	}
-	else {
+	else if (array_key_exists("p", $_GET)) {
 		include_header();
 		include_static_page();
 		include_footer();
+	}
+	else {
+		// Redirect to home page
+		header("Location: /?p=home");
+		die();
 	}
 }
 

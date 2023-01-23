@@ -16,9 +16,12 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true) : void
 		echo "<div class=\"mod-edit-property-data\">";
 			switch ($type) {
 				case "text":
-					echo "<input type=\"text\" name=\"$name\" value=\"$value\"" . ($enabled) ? "" : " disabled" . "/>";
-				case "textaera":
-					echo "<textarea name=\"$name\">$value</textaera>";
+					$s = ($enabled) ? "" : " disabled";
+					echo "<input type=\"text\" name=\"$name\" value=\"$value\" $s/>";
+					break;
+				case "textarea":
+					echo "<textarea name=\"$name\">$value</textarea>";
+					break;
 				default:
 					echo "$value";
 			}
@@ -31,17 +34,17 @@ function parse_comma_array(string $s) {
 }
 
 class ModPage {
-	string $package;
-	string $name;
-	string $creators;
-	string $wiki;
-	string $description;
-	string $download;
-	string $code;
-	string $tags;
-	string $version;
-	string $updated;
-	string $security;
+	public $package;
+	public $name;
+	public $creators;
+	public $wiki;
+	public $description;
+	public $download;
+	public $code;
+	public $tags;
+	public $version;
+	public $updated;
+	public $security;
 	
 	function __construct(string $package) {
 		$db = new Database("mod");
@@ -75,8 +78,6 @@ class ModPage {
 			$this->updated = time();
 			$this->security = "No potentially insecure modifications";
 			$this->status = "Released";
-			
-			$db->save($package, $this);
 		}
 	}
 	
@@ -86,11 +87,18 @@ class ModPage {
 	}
 	
 	function display() {
-		echo "<p>MOD DESC: " . ($this->description) ? $this->description : "<i>No description yet.</i>" . "</p>";
+		echo "<h1>" . $this->name . "</h1>";
+		
+		if (get_name_if_authed()) {
+			echo "<p><a href=\"./?a=edit_mod&m=$this->package\">Edit mod info</a></p>";
+		}
+		
+		echo "<p>" . ($this->description) ? $this->description : "<i>No description yet.</i>" . "</p>";
 	}
 	
 	function display_edit() {
-		echo "<form action=\"./?a=save_mod&amp;m=" . $this->package . "\" method=\"post\">";
+		echo "<h1>Editing $this->name</h1>";
+		echo "<form action=\"./?a=save_mod&amp;m=$this->package\" method=\"post\">";
 		edit_feild("package", "text", "Package", "The name of the mod's APK or IPA file.", $this->package, false);
 		edit_feild("name", "text", "Name", "The name that will be displayed with the mod.", $this->name);
 		edit_feild("creators", "text", "Creators", "The people who created this mod.", $this->creators);
@@ -129,11 +137,49 @@ function display_mod(string $mod_name) : void {
 	$mod->display();
 }
 
-function edit_mod(string $mod_name) : void {
+function edit_mod() : void {
+	include_header();
+	
+	if (!array_key_exists("m", $_GET)) {
+		echo "<h1>Sorry</h1><p>Bad request.</p>";
+		include_footer();
+		return;
+	}
+	
+	$mod_name = $_GET["m"];
+	
 	if (!get_name_if_authed()) {
-		echo "<h1>Sorry</h1><p>You need to log in to edit pages.</p>";
+		echo "<h1>Sorry</h1><p>You need to <a href=\"./?p=login\">log in</a> or <a href=\"./?p=register\">create an account</a> to edit pages.</p>";
+		include_footer();
+		return;
 	}
 	
 	$mod = new ModPage($mod_name);
 	$mod->display_edit();
+	
+	include_footer();
+}
+
+function save_mod() : void {
+	if (!array_key_exists("m", $_GET)) {
+		include_header();
+		echo "<h1>Sorry</h1><p>Bad request.</p>";
+		include_footer();
+		return;
+	}
+	
+	$mod_name = $_GET["m"];
+	
+	if (!get_name_if_authed()) {
+		include_header();
+		echo "<h1>Sorry</h1><p>You need to <a href=\"./?p=login\">log in</a> or <a href=\"./?p=register\">create an account</a> to save pages.</p>";
+		include_footer();
+		return;
+	}
+	
+	$mod = new ModPage($mod_name);
+	$mod->save_edit();
+	
+	header("Location: /?m=$mod_name");
+	die();
 }
