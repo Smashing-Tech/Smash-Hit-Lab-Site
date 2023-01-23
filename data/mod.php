@@ -17,7 +17,7 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true) : void
 			switch ($type) {
 				case "text":
 					$s = ($enabled) ? "" : " disabled";
-					echo "<input type=\"text\" name=\"$name\" value=\"$value\" $s/>";
+					echo "<input type=\"text\" name=\"$name\" placeholder=\"$title\" value=\"$value\" $s/>";
 					break;
 				case "textarea":
 					echo "<textarea name=\"$name\">$value</textarea>";
@@ -29,8 +29,12 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true) : void
 	echo "</div>";
 }
 
-function parse_comma_array(string $s) {
+function parse_comma_array(string $s) : array {
 	return explode(",", $s);
+}
+
+function create_comma_array(array $s) : string {
+	return join(",", $s);
 }
 
 class ModPage {
@@ -101,12 +105,12 @@ class ModPage {
 		echo "<form action=\"./?a=save_mod&amp;m=$this->package\" method=\"post\">";
 		edit_feild("package", "text", "Package", "The name of the mod's APK or IPA file.", $this->package, false);
 		edit_feild("name", "text", "Name", "The name that will be displayed with the mod.", $this->name);
-		edit_feild("creators", "text", "Creators", "The people who created this mod.", $this->creators);
+		edit_feild("creators", "text", "Creators", "The people who created this mod.", create_comma_array($this->creators));
 		edit_feild("wiki", "text", "Wiki article", "A relevant wiki article about the mod.", $this->wiki);
 		edit_feild("description", "textarea", "Description", "One or two paragraphs that describe the mod.", $this->description);
 		edit_feild("download", "text", "Download", "A link to where the mod can be downloaded.", $this->download);
 		edit_feild("code", "text", "Source code", "A link to where the source code for a mod can be found.", $this->code);
-		edit_feild("tags", "text", "Tags", "Keywords and categorical description of this mod.", $this->tags);
+		edit_feild("tags", "text", "Tags", "Keywords and categorical description of this mod.", create_comma_array($this->tags));
 		edit_feild("version", "text", "Version", "The latest version of this mod.", $this->version);
 		edit_feild("updated", "text", "Updated", "The unix timestamp for the last time this page was updated.", date("Y-m-d H:i:s", $this->updated), false);
 		edit_feild("security", "text", "Security", "A short statement on this mod's security.", $this->security);
@@ -117,7 +121,7 @@ class ModPage {
 	
 	function save_edit() {
 		$this->name = htmlspecialchars($_POST["name"]);
-		$this->creators = parse_comma_array(htmlspecialchars($_POST["name"]));
+		$this->creators = parse_comma_array(htmlspecialchars($_POST["creators"]));
 		$this->wiki = htmlspecialchars($_POST["wiki"]);
 		$this->description = htmlspecialchars($_POST["description"]);
 		$this->download = htmlspecialchars($_POST["download"]);
