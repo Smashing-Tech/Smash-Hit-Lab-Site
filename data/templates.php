@@ -28,3 +28,8 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true) : void
 		echo "</div>";
 	echo "</div>";
 }
+
+function redirect(string $location) {
+	header("Location: $location");
+	die();
+}

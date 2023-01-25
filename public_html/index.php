@@ -25,6 +25,9 @@ function main() {
 			case "edit_account":
 				edit_account();
 				break;
+			case "save_account":
+				save_account();
+				break;
 			default:
 				break;
 		}

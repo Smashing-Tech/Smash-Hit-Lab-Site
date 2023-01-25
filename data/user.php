@@ -124,7 +124,7 @@ class User {
 			$info = $db->load($name);
 			
 			$this->name = $info->name;
-			$this->display = (property_exists($info, "display") ? $this->display : $this->name);
+			$this->display = (property_exists($info, "display") ? $info->display : $info->name);
 			$this->password = $info->password;
 			$this->tokens = $info->tokens;
 			$this->email = $info->email;
@@ -268,4 +268,26 @@ function edit_account() {
 	echo "</form>";
 	
 	include_footer();
+}
+
+function save_account() {
+	/**
+	 * Save account details
+	 */
+	
+	$user = get_name_if_authed();
+	
+	if (!$user) {
+		include_header();
+		echo "<h1>This is strange</h1><p>Please log in to edit your user preferences.</p>";
+		include_footer();
+		return;
+	}
+	
+	$user = new User($user);
+	$user->display = htmlspecialchars($_POST["display"]);
+	$user->email = htmlspecialchars($_POST["email"]);
+	$user->save();
+	
+	redirect("/?a=edit_account");
 }
