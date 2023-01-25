@@ -2,19 +2,6 @@
 
 require_once "user.php";
 
-class Page {
-	public $name;
-	public $type;
-	public $path;
-	public $title;
-	
-	private $data;
-	
-	function __construct(string $name) {
-		
-	}
-}
-
 function get_page_name() {
 	return str_replace("/", ",", str_replace(".", ",", $_GET["p"]));
 }

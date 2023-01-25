@@ -96,7 +96,7 @@ textarea {
 	height: 10em;
 }
 
-input[type=submit] {
+input[type=submit], button {
 	background: var(--main-colour);
 	border: none;
 	border-radius: 0.5em;
@@ -292,4 +292,20 @@ input[type=submit] {
 
 .mod-property-data {
 	grid-column: 2;
+}
+
+.header-container {
+	display: grid;
+	grid-template-columns: auto 30em;
+	padding-right: 1em;
+}
+
+.header-container-left {
+	grid-column: 1;
+}
+
+.header-container-right {
+	grid-column: 2;
+	text-align: right;
+	height: 100%;
 }

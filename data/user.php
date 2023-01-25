@@ -1,6 +1,7 @@
 <?php
 
 require_once "database.php";
+require_once "templates.php";
 
 function random_hex() : string {
 	/**
@@ -110,6 +111,7 @@ class Token {
 
 class User {
 	public $name; // Yes, it would probably be better to store users by ID.
+	public $display; // The display name of the user
 	public $password; // Password hash and salt
 	public $tokens; // Currently active tokens
 	public $email; // The user's email address
@@ -122,6 +124,7 @@ class User {
 			$info = $db->load($name);
 			
 			$this->name = $info->name;
+			$this->display = (property_exists($info, "display") ? $this->display : $this->name);
 			$this->password = $info->password;
 			$this->tokens = $info->tokens;
 			$this->email = $info->email;
@@ -129,6 +132,7 @@ class User {
 		}
 		else {
 			$this->name = $name;
+			$this->display = $name;
 			$this->password = null;
 			$this->tokens = array();
 			$this->email = null;
@@ -234,4 +238,34 @@ function get_name_if_authed() {
 	}
 	
 	return check_token($_COOKIE["tk"]);
+}
+
+function edit_account() {
+	/**
+	 * Display the account data editing page.
+	 */
+	
+	$user = get_name_if_authed();
+	
+	include_header();
+	
+	if (!$user) {
+		echo "<h1>This is strange</h1><p>Please log in to edit your user preferences.</p>";
+		include_footer();
+		return;
+	}
+	
+	$user = new User($user);
+	
+	echo "<h1>Account information</h1>";
+	echo "<form action=\"./?a=save_account\" method=\"post\">";
+	
+	edit_feild("name", "text", "Handle", "The string that idenifies you in the database.", $user->name, false);
+	edit_feild("display", "text", "Display name", "Choose the name that you prefer to be called.", $user->display);
+	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email);
+	
+	echo "<input type=\"submit\" value=\"Save details\"/>";
+	echo "</form>";
+	
+	include_footer();
 }

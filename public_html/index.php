@@ -22,6 +22,9 @@ function main() {
 			case "save_mod":
 				save_mod();
 				break;
+			case "edit_account":
+				edit_account();
+				break;
 			default:
 				break;
 		}

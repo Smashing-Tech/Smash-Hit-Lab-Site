@@ -2,35 +2,7 @@
 
 require_once "database.php";
 require_once "user.php";
-
-function edit_feild($name, $type, $title, $desc, $value, $enabled = true) : void {
-	if (!$value) {
-		$value = "";
-	}
-	
-	echo "<div class=\"mod-edit-property\">";
-		echo "<div class=\"mod-edit-property-label\">";
-			echo "<h4>$title</h4>";
-			echo "<p>$desc</p>";
-		echo "</div>";
-		echo "<div class=\"mod-edit-property-data\">";
-			switch ($type) {
-				case "text":
-					$s = ($enabled) ? "" : " disabled";
-					echo "<input type=\"text\" name=\"$name\" placeholder=\"$title\" value=\"$value\" $s/>";
-					break;
-				case "textarea":
-					echo "<textarea name=\"$name\">$value</textarea>";
-					break;
-				default:
-					echo "$value";
-			}
-			if (!$enabled) {
-				echo "<p><i>This value is read-only.</i></p>";
-			}
-		echo "</div>";
-	echo "</div>";
-}
+require_once "templates.php";
 
 function mod_property($title, $desc, $value) : void {
 	echo "<div class=\"mod-property\">";
@@ -117,30 +89,36 @@ class ModPage {
 		echo "<h1>" . ($this->name ? $this->name : $this->package) . "</h1>";
 		
 		if (get_name_if_authed()) {
-			echo "<p><a href=\"./?a=edit_mod&m=$this->package\">Edit mod info</a></p>";
+			echo "<p><a href=\"./?a=edit_mod&m=$this->package\"><button>Edit mod info</button></a></p>";
 		}
 		
+		echo "<h4>Description</h4>";
 		echo "<p>" . (($this->description) ? $this->description : "<i>No description yet.</i>") . "</p>";
 		
+		echo "<h4>Other info</h4>";
 		mod_property("Download", "A link to where the mod can be downloaded.", $this->download);
 		mod_property("Version", "The latest version of this mod.", $this->version);
 		mod_property("Creators", "The people who created this mod.", create_comma_array_nice($this->creators));
 		mod_property("Security", "A short statement on this mod's security.", $this->security);
-		mod_property("Wiki article", "A relevant wiki article about the mod.", $this->wiki);
-		mod_property("Source code", "A link to where the source code for a mod can be found.", $this->code);
+		if ($this->wiki) {
+			mod_property("Wiki article", "A relevant wiki article about the mod.", $this->wiki);
+		}
+		if ($this->code) {
+			mod_property("Source code", "A link to where the source code for a mod can be found.", $this->code);
+		}
 		mod_property("Status", "A short description of the mod's development status.", $this->status);
 		mod_property("Package", "The name of the mod's APK or IPA file.", $this->package);
 		mod_property("Updated", "The unix timestamp for the last time this page was updated.", date("Y-m-d H:i:s", $this->updated));
 	}
 	
 	function display_edit() {
-		echo "<h1>Editing $this->name</h1>";
+		echo "<h1>Editing " . ($this->name ? $this->name : $this->package) . "</h1>";
 		echo "<form action=\"./?a=save_mod&amp;m=$this->package\" method=\"post\">";
 		edit_feild("package", "text", "Package", "The name of the mod's APK or IPA file.", $this->package, false);
 		edit_feild("name", "text", "Name", "The name that will be displayed with the mod.", $this->name);
 		edit_feild("creators", "text", "Creators", "The people who created this mod.", create_comma_array($this->creators));
 		edit_feild("wiki", "text", "Wiki article", "A relevant wiki article about the mod.", $this->wiki);
-		edit_feild("description", "textarea", "Description", "One or two paragraphs that describe the mod.", $this->description);
+		edit_feild("description", "textarea", "Description", "One or two paragraphs that describe the mod.", str_replace("<br/>", "\n", $this->description));
 		edit_feild("download", "text", "Download", "A link to where the mod can be downloaded.", $this->download);
 		edit_feild("code", "text", "Source code", "A link to where the source code for a mod can be found.", $this->code);
 		edit_feild("tags", "text", "Tags", "Keywords and categorical description of this mod.", create_comma_array($this->tags));
@@ -156,7 +134,7 @@ class ModPage {
 		$this->name = htmlspecialchars($_POST["name"]);
 		$this->creators = parse_comma_array(htmlspecialchars($_POST["creators"]));
 		$this->wiki = htmlspecialchars($_POST["wiki"]);
-		$this->description = htmlspecialchars($_POST["description"]);
+		$this->description = str_replace("\n", "<br/>", htmlspecialchars($_POST["description"]));
 		$this->download = htmlspecialchars($_POST["download"]);
 		$this->code = htmlspecialchars($_POST["code"]);
 		$this->tags = parse_comma_array(htmlspecialchars($_POST["tags"]));
