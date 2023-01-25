@@ -365,8 +365,8 @@ function display_user(string $user) {
 	
 	$user = new User($user);
 	
-	if (!$user->is_admin() && !$stalker->is_admin()) {
-		echo "<h1>Sorry</h1><p>We don't allow viewing non-admin user's profiles at the moment.</p>";
+	if (!$user->is_admin() && !$stalker->is_admin() && ($stalker != $user)) {
+		echo "<h1>Sorry</h1><p>We don't allow viewing non-admin user profiles.</p>";
 		return;
 	}
 	

@@ -11,7 +11,7 @@ function login_error() {
 
 function do_login() {
 	$username = htmlspecialchars($_POST["username"]);
-	$password = htmlspecialchars($_POST["password"]); // We never ouptut the password so sanitise isn't needed
+	$password = $_POST["password"]; // We should not sanitise the password, bad things happen
 	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
 	
 	// Chceck if the user even exists
@@ -29,7 +29,7 @@ function do_login() {
 		
 		// If this is an admin, warn about failed logins.
 		if ($user->admin) {
-			mail($user->email, "Failed login for " . $username, "For site safety purposes, admins are informed any time a failed login occurs on their account. If this was you, there is no need to worry.\n\nUsername: " . $username . "\nPassword: " . $password . "\nIP Address: " . $ip);
+			mail($user->email, "Failed login for " . $username, "For site safety purposes, admins are informed any time a failed login occurs on their account. If this was you, there is no need to worry.\n\nUsername: " . $username . "\nPassword: " . htmlspecialchars($password) . "\nIP Address: " . $ip);
 		}
 		
 		return;
