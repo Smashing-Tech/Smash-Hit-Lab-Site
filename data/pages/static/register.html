@@ -1,9 +1,63 @@
 <h1>Create an Account</h1>
-<p>To register, please pick a username and type your email address.</p>
-<p>We will automatically generate a password for you and send it to your email address.</p>
+<p>To register, enter information where required, and make sure to read any agreements or terms mentioned.</p>
 <form action="./?a=register" method="post">
-	<p>Username: <input type="text" name="username"/></p>
-	<p>Email: <input type="text" name="email"/></p>
+<!--	<p>Username: <input type="text" name="username"/></p>
+	<p>Email: <input type="text" name="email"/></p>-->
+	<!-- Username (we are calling it handle now) -->
+	<div class="mod-edit-property">
+		<div class="mod-edit-property-label">
+			<h4>Handle</h4>
+			<p>This is your username. Please note that you can't change it later.</p>
+		</div>
+		<div class="mod-edit-property-data">
+			<input type="text" name="username" placeholder="Handle"/>
+		</div>
+	</div>
+	<!-- Email address -->
+	<div class="mod-edit-property">
+		<div class="mod-edit-property-label">
+			<h4>Email</h4>
+			<p>The email address you wish to assocaite with your account.</p>
+		</div>
+		<div class="mod-edit-property-data">
+			<input type="text" name="email" placeholder="Email"/>
+		</div>
+	</div>
+	<!-- Password -->
+	<div class="mod-edit-property">
+		<div class="mod-edit-property-label">
+			<h4>Password</h4>
+			<p>A special string of characters you need in order to log in to your account.</p>
+		</div>
+		<div class="mod-edit-property-data">
+			<ul>
+				<li>We will generate a secure password and send it to your email. You do not need to worry about choosing a password.</li>
+				<li>We recommend using some kind of password manager &mdash; preferably locally stored &mdash; to store your password as it will be long and random.</li>
+			</ul>
+		</div>
+	</div>
+	<!-- Terms and agreements -->
+	<div class="mod-edit-property">
+		<div class="mod-edit-property-label">
+			<h4>Terms</h4>
+			<p>Terms help protect us from each other and set standards on how we should behave.</p>
+		</div>
+		<div class="mod-edit-property-data">
+			<p>When you sign up for an account, you agree to the following documents:</p>
+			<ul>
+				<li><a href="./?p=tos">Terms of Service</a></li>
+				<li><a href="./?p=privacy">Privacy Policy</a></li>
+				<li><a href="./?p=disclaimer">General Disclaimers</a></li>
+			</ul>
+			<p>Most importantly:</p>
+			<ul>
+				<li>You need to be 16 or older in order to use the Smash Hit Lab. We will remove your account if we find that you are under 16 years old.</li>
+				<li>We do not provide warranty or support unless required by law, and we shouldn't be held liable for damages related to the site unless required by law.</li>
+				<li>We can update the terms of our contracts at any time and force you to stop using our services if you disagree with the new terms.</li>
+			</ul>
+		</div>
+	</div>
+	<!-- - - - - - - - - - - - - - - - - - - - - - - - -->
 	<p>By registering an account, you agree to our <a href="./?p=tos">Terms of Service</a>, <a href="./?p=privacy">Privacy Policy</a> and acknowledge our <a href="./?p=disclaimer">Disclaimer</a>.</p>
 	<input type="submit" value="Register Account"/>
 </form>

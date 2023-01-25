@@ -115,6 +115,7 @@ class User {
 	public $password; // Password hash and salt
 	public $tokens; // Currently active tokens
 	public $email; // The user's email address
+	public $created; // The time the user joined our site
 	public $admin; // If the user is an admin
 	
 	function __construct(string $name) {
@@ -128,6 +129,7 @@ class User {
 			$this->password = $info->password;
 			$this->tokens = $info->tokens;
 			$this->email = $info->email;
+			$this->created = (property_exists($info, "created") ? $info->created : time());
 			$this->admin = $info->admin;
 		}
 		else {
@@ -136,6 +138,7 @@ class User {
 			$this->password = null;
 			$this->tokens = array();
 			$this->email = null;
+			$this->created = time();
 			$this->admin = false;
 		}
 	}
@@ -206,6 +209,14 @@ class User {
 		$this->save();
 		
 		return $name;
+	}
+	
+	function is_admin() {
+		/**
+		 * Check if the user can preform administrative tasks.
+		 */
+		
+		return $this->admin;
 	}
 }
 
@@ -290,4 +301,53 @@ function save_account() {
 	$user->save();
 	
 	redirect("/?a=edit_account");
+}
+
+function display_user(string $user) {
+	/**
+	 * Display user account info
+	 */
+	
+	$stalker = get_name_if_authed();
+	
+	if (!$stalker) {
+		include_header();
+		echo "<h1>Sorry</h1><p>Only logged in users can view profile pages.</p>";
+		include_footer();
+		return;
+	}
+	
+	// We need this so admins can have some extra options like banning users
+	$stalker = new User($stalker);
+	
+	if (!user_exists($user)) {
+		echo "<h1>Sorry</h1><p>We could not find that user in our database.</p>";
+		return;
+	}
+	
+	$user = new User($user);
+	
+	if (!$user->is_admin() && !$stalker->is_admin()) {
+		echo "<h1>Sorry</h1><p>We don't allow viewing non-admin user's profiles at the moment.</p>";
+		return;
+	}
+	
+	// If these contains have passed, we can view the user page
+	$display_name = $user->display ? $user->display : $user->name;
+	echo "<h1>$display_name</h1><h2>($user->name)</h2>";
+	
+	mod_property("Join date", "The date that the user joined the Smash Hit Lab.", Date("Y-m-d", $user->created));
+	
+	// Show if this user is an admin
+	if ($user->is_admin()) {
+		mod_property("Rank", "The offical position this user holds at the Smash Hit Lab.", "Staff and Administrators");
+	}
+	
+	// Admins can view some extra data like emails
+	if ($stalker->is_admin()) {
+		echo "<h3>Admin-only info and actions</h3>";
+		
+		mod_property("Email", "This user's email address.", $user->email);
+		mod_property("Token count", "The number of currently active tokens this user has.", sizeof($user->tokens));
+	}
 }

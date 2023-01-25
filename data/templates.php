@@ -29,6 +29,22 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true) : void
 	echo "</div>";
 }
 
+function mod_property($title, $desc, $value) : void {
+	echo "<div class=\"mod-property\">";
+		echo "<div class=\"mod-property-label\">";
+			echo "<p><b>$title</b></p>";
+			echo "<p class=\"small-text\">$desc</p>";
+		echo "</div>";
+		echo "<div class=\"mod-property-data\">";
+			if (str_starts_with($value ? $value : "", "https://")) {
+				echo "<p><a href=\"$value\">" . $value . "</a></p>";
+			} else {
+				echo "<p>" . ($value ? "$value" : "<i>Not available</i>") . "</p>";
+			}
+		echo "</div>";
+	echo "</div>";
+}
+
 function redirect(string $location) {
 	header("Location: $location");
 	die();

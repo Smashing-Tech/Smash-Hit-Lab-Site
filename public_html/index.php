@@ -37,6 +37,11 @@ function main() {
 		display_mod($_GET["m"]);
 		include_footer();
 	}
+	else if (array_key_exists("u", $_GET)) {
+		include_header();
+		display_user($_GET["u"]);
+		include_footer();
+	}
 	else if (array_key_exists("p", $_GET)) {
 		include_header();
 		include_static_page();

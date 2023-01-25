@@ -7,6 +7,35 @@
 
 $database_path = "../data/db/";
 
+/*class RdbObjectContainer {
+	/**
+	 * RevisionDB object container
+	 *
+	
+	public $revisions;
+	public $rdb_;
+	
+	function __construct(object $source) {
+		// Check if RevisionDB is already supported. If not enable it.
+		if (property_exists($source, "rdb_")) {
+			$this->revisions = $source->revisions;
+			$this->rdb_ = 1;
+		}
+		else {
+			$this->revisions = array($source);
+			$this->rdb_ = 1;
+		}
+	}
+	
+	function top() {
+		return $this->revisions[];
+	}
+	
+	function add(object $item) {
+		$this->revisions[] = $item;
+	}
+}*/
+
 class Database {
 	/**
 	 * "Connection" to the database.
@@ -23,6 +52,8 @@ class Database {
 		if (!file_exists($this->path)) {
 			mkdir($this->path, 0777, true);
 		}
+		
+		// Force RevisionDB
 	}
 	
 	function get_item_path(string $item) : string {

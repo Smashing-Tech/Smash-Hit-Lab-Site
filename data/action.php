@@ -1,10 +1,12 @@
 <?php
 
 require_once "user.php";
+require_once "templates.php";
 
 function login_error() {
 	include_header();
 	echo "<h1>Sorry</h1><p>There was an error during login. This could have been because your username or password was wrong, or there has been a server fault. If this continues to happen, please join our Discord for help on the site.</p>";
+	include_footer();
 }
 
 function do_login() {
@@ -59,7 +61,9 @@ function do_register() {
 	
 	// Check if the user already exists
 	if (user_exists($username)) {
+		include_header();
 		echo "<h1>Sorry</h1><p>This username is already taken. Please try again.</p>";
+		include_footer();
 		return;
 	}
 	
@@ -76,7 +80,9 @@ function do_register() {
 	mail($email, "Smash Hit Lab Registration", $body);
 	
 	// Print message
+	include_header();
 	echo "<h1>Account created!</h1>";
 	echo "<p>We sent an email to " . $email . " that contains your username and password.</p>";
+	include_footer();
 	$user->save();
 }
