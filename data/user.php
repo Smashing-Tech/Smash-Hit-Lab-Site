@@ -251,6 +251,44 @@ function get_name_if_authed() {
 	return check_token($_COOKIE["tk"]);
 }
 
+function get_display_name_if_authed() {
+	/**
+	 * Get the user's preferred disply name if authed.
+	 */
+	
+	$user = get_name_if_authed();
+	
+	if (!$user) {
+		return null;
+	}
+	
+	$user = new User($user);
+	return $user->display ? $user->display : $user->name;
+}
+
+function get_nice_display_name(string $user) {
+	/**
+	 * Get a nicely formatted display name for any user.
+	 */
+	
+	$user = new User($user);
+	
+	$string = "";
+	
+	if ($user->name == $user->display) {
+		$string = "<a href=\"./?u=$user->name\">$user->name</a>";
+	}
+	else {
+		$string = "<a href=\"./?u=$user->name\">$user->display</a>";//<span class=\"small-text\"> [$user->name]</span>";
+	}
+	
+	if ($user->admin) {
+		$string = $string . " <span class=\"small-text staff-badge\">staff</span>";
+	}
+	
+	return $string;
+}
+
 function edit_account() {
 	/**
 	 * Display the account data editing page.

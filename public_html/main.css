@@ -133,6 +133,14 @@ input[type=submit], button {
 	padding-left: 1em;
 }
 
+.staff-badge {
+	background: #261e00;
+	border-radius: 1em;
+	color: #efbf00;
+	padding: 0.0625em 0.25em;
+}
+
+/* Navbar */
 .navbar-section {
 /* 	-webkit-backdrop-filter: blur(1.25em); */
 /* 	backdrop-filter: blur(1.25em); */
@@ -296,7 +304,7 @@ input[type=submit], button {
 
 .header-container {
 	display: grid;
-	grid-template-columns: auto 30em;
+	grid-template-columns: auto 45em;
 	padding-right: 1em;
 }
 

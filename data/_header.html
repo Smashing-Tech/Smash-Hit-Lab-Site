@@ -19,6 +19,10 @@
 					<div class="cb-logo-item"> </div>
 					<?php
 						if (array_key_exists("tk", $_COOKIE)) {
+							//$currentUserName = get_display_name_if_authed();
+							
+							//echo "<div class=\"cb-top-item\"><a href=\"./?u=$currentUserName\">$currentUserName</a></div>";
+							echo "<div class=\"cb-top-item\">" . get_nice_display_name(get_name_if_authed()) . "</div>";
 							echo "<div class=\"cb-top-item\"><a href=\"./?a=edit_account\">Account</a></div>";
 							echo "<div class=\"cb-top-item\"><a href=\"./?a=logout\">Log out</a></div>";
 						} else {
