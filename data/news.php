@@ -206,13 +206,32 @@ class Article {
 		
 		echo "<h1>$this->title</h1>";
 		
+		// Edit button for article
 		show_news_edit_button($this->name);
 		
 		echo "<div class=\"article-body\">";
 		echo $this->get_html();
 		echo "</div>";
 		
-		echo "<p class=\"small-text\"><i>Created on " . date("Y-m-d H:m", $this->created) . ", updated at " . date("Y-m-d H:m", $this->updated) . ".</i></p>";
+		// Display article creation date
+		echo "<p class=\"small-text\">Created on " . date("Y-m-d H:i", $this->created) . " and last updated at " . date("Y-m-d H:i", $this->updated) . "</p>";
+		
+		// Display article editors
+		echo "<p class=\"small-text\">This article was edited by ";
+		
+		for ($i = 0; $i < sizeof($this->authors); $i++) {
+			echo get_nice_display_name($this->authors[$i]);
+			
+			// Nice ands and commas
+			if (($i + 2) == sizeof($this->authors)) {
+				echo " and ";
+			}
+			else if (($i + 1) != sizeof($this->authors)) {
+				echo ", ";
+			}
+		}
+		
+		echo "</p>";
 	}
 }
 
