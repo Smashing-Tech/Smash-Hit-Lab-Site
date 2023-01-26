@@ -141,6 +141,38 @@ class Article {
 				
 				$code = !$code;
 			}
+			else if (str_starts_with($s, "{{")) {
+				$end = strpos($s, "}}");
+				
+				// oH FUCK  so much indentation
+				if ($end < 0) {
+					$body = $body . "{";
+				}
+				else {
+					$length = $end;
+					$url = substr($s, 2, $end - 2);
+					
+					// Yay, a database lookup during parsing ...
+					$db = new Database("article");
+					
+					// If this is an article reference ...
+					if ($db->has($url)) {
+						$art = $db->load($url);
+						
+						$title = $art->title;
+						$date = "Last updated " . date("Y-m-d H:i", $art->updated);
+						$text = htmlspecialchars(str_replace("\n", " ", substr($art->body, 0, 100))) . "...";
+						
+						$body = $body . "<div class=\"news-article-card\"><h4><a href=\"./?n=$url\">$title</a></h4><p class=\"small-text\">$date</p><p>$text</p></a></div>";
+					}
+					// Otherwise this is just a bare URL ...
+					else {
+						$body = $body . "<a href=\"$url\" rel=\"nofollow\">$url</a>";
+					}
+					
+					$i += $end + 3; // Skip the unneeded chars
+				}
+			}
 			else {
 				$body = $body . $filtered[$i];
 			}

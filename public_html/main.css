@@ -6,6 +6,7 @@
 	margin: 0;
 	padding: 0;
 	--main-colour: #0AFDEA;
+	--main-colour-bg-bright: #004741;
 	--main-colour-bg: #002624;
 	--main-colour-bg-dark: #001917;
 	--font-face: "Titillium Web", sans-serif;
@@ -133,6 +134,13 @@ input[type=submit], button {
 	padding-left: 1em;
 }
 
+.news-article-card {
+	background: var(--main-colour-bg-bright);
+	border-radius: 0.5em;
+	overflow: auto;
+	padding: 0.5em;
+}
+
 .staff-badge {
 	background: #261e00;
 	border-radius: 1em;
@@ -142,8 +150,6 @@ input[type=submit], button {
 
 /* Navbar */
 .navbar-section {
-/* 	-webkit-backdrop-filter: blur(1.25em); */
-/* 	backdrop-filter: blur(1.25em); */
 	background: var(--main-colour-bg-dark);
 	border: none;
 	padding: 1em;
