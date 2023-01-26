@@ -45,6 +45,18 @@ function mod_property($title, $desc, $value) : void {
 	echo "</div>";
 }
 
+function parse_comma_array(string $s) : array {
+	return explode(",", $s);
+}
+
+function create_comma_array(array $s) : string {
+	return join(",", $s);
+}
+
+function create_comma_array_nice(array $s) : string {
+	return join(", ", $s);
+}
+
 function redirect(string $location) {
 	header("Location: $location");
 	die();

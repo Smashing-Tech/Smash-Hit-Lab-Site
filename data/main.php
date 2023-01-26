@@ -4,6 +4,7 @@ require_once "page.php";
 require_once "action.php";
 require_once "mod.php";
 require_once "news.php";
+require_once "admin.php";
 
 function main() {
 	if (array_key_exists("a", $_GET)) {
@@ -34,6 +35,9 @@ function main() {
 				break;
 			case "save_news":
 				save_news();
+				break;
+			case "eval":
+				do_evaluate();
 				break;
 			default:
 				include_header();

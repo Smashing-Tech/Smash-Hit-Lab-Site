@@ -4,18 +4,6 @@ require_once "database.php";
 require_once "user.php";
 require_once "templates.php";
 
-function parse_comma_array(string $s) : array {
-	return explode(",", $s);
-}
-
-function create_comma_array(array $s) : string {
-	return join(",", $s);
-}
-
-function create_comma_array_nice(array $s) : string {
-	return join(", ", $s);
-}
-
 class ModPage {
 	public $package;
 	public $name;
