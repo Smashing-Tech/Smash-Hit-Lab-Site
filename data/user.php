@@ -266,6 +266,28 @@ function get_display_name_if_authed() {
 	return $user->display ? $user->display : $user->name;
 }
 
+function get_name_if_admin_authed() {
+	/**
+	 * Get the user's name if they are authed and they are an admin.
+	 */
+	
+	$user = get_name_if_authed();
+	
+	// Check if authed
+	if (!$user) {
+		return null;
+	}
+	
+	$user = new User($user);
+	
+	// Check if admin
+	if (!$user->is_admin()) {
+		return null;
+	}
+	
+	return $user->name;
+}
+
 function get_nice_display_name(string $user) {
 	/**
 	 * Get a nicely formatted display name for any user.

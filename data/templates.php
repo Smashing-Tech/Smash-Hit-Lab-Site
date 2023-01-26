@@ -1,6 +1,6 @@
 <?php
 
-function edit_feild($name, $type, $title, $desc, $value, $enabled = true) : void {
+function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $options = null) : void {
 	if (!$value) {
 		$value = "";
 	}
@@ -19,8 +19,23 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true) : void
 				case "textarea":
 					echo "<textarea name=\"$name\">$value</textarea>";
 					break;
+				case "select":
+					echo "<select name=\"$name\">";
+					$k = array_keys($options);
+					
+					for ($i = 0; $i < sizeof($k); $i++) {
+						$key = $k[$i];
+						$val = $options[$k[$i]];
+						$selected = ($key == $value) ? "selected" : "";
+						
+						echo "<option value=\"$key\" $selected>$val</option>";
+					}
+					
+					echo "</select>";
+					break;
 				default:
 					echo "$value";
+					break;
 			}
 			if (!$enabled) {
 				echo "<p><i>This value is read-only.</i></p>";

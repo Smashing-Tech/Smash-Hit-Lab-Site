@@ -57,23 +57,50 @@ class Database {
 	}
 	
 	function get_item_path(string $item) : string {
+		/**
+		 * Get the path to the file in the database.
+		 */
+		
 		return $this->path . str_replace("/", ".", $item);
 	}
 	
 	function load(string $item) : object | array {
+		/**
+		 * Load a database object
+		 */
+		
 		$path = $this->get_item_path($item);
 		
 		$file = fopen($path, "r");
-		$data = json_decode(fread($file, filesize($path)));
+		
+		// Need to clear cache to make sure things work; otherwise there are bugs.
+		clearstatcache();
+		
+		$json_data = fread($file, filesize($path));
+		
+		$data = json_decode($json_data);
+		
 		fclose($file);
 		
 		return $data;
 	}
 	
 	function save(string $item, $data) : void {
+		/**
+		 * Save a database object
+		 */
+		
 		$file = fopen($this->get_item_path($item), "w");
 		fwrite($file, json_encode($data));
 		fclose($file);
+	}
+	
+	function delete(string $item) : void {
+		/**
+		 * Remove a database object
+		 */
+		
+		unlink($this->get_item_path($item));
 	}
 	
 	function has(string $item) : bool {

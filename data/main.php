@@ -39,6 +39,9 @@ function main() {
 			case "eval":
 				do_evaluate();
 				break;
+			case "site_config":
+				do_site_config();
+				break;
 			default:
 				include_header();
 				echo "<h1>Sorry</h1><p>The action you have requested is not currently implemented.</p>";
