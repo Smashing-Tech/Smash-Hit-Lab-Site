@@ -165,6 +165,12 @@ class Article {
 						
 						$body = $body . "<div class=\"news-article-card\"><h4><a href=\"./?n=$url\">$title</a></h4><p class=\"small-text\">$date</p><p>$text</p></a></div>";
 					}
+					// Otherwise try for a youtube embed URL ...
+					else if (str_starts_with($url, "yt:")) {
+						$url = substr($url, 3);
+						
+						$body = $body . "<iframe width=\"100%\" height=\"600px\" src=\"https://www.youtube-nocookie.com/embed/$url\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" style=\"border-radius: 0.5em;\" allowfullscreen></iframe>";
+					}
 					// Otherwise this is just a bare URL ...
 					else {
 						$body = $body . "<a href=\"$url\" rel=\"nofollow\">$url</a>";
@@ -204,7 +210,7 @@ class Article {
 	}
 	
 	function update(string $title, string $content, string $whom = "") {
-		$this->title = $title;
+		$this->title = htmlspecialchars($title);
 		$this->body = $content;
 		$this->updated = time();
 		
