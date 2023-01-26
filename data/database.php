@@ -60,7 +60,7 @@ class Database {
 		return $this->path . str_replace("/", ".", $item);
 	}
 	
-	function load(string $item) : object {
+	function load(string $item) : object | array {
 		$path = $this->get_item_path($item);
 		
 		$file = fopen($path, "r");

@@ -317,3 +317,8 @@ input[type=submit], button {
 	text-align: right;
 	height: 100%;
 }
+
+.article-body p {
+	font-size: 16pt !important;
+	line-height: 1.5;
+}
