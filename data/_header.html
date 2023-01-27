@@ -21,8 +21,9 @@
 				<div class="header-container-right">
 					<div class="cb-logo-item"> </div>
 					<?php
-						if (array_key_exists("tk", $_COOKIE)) {
-							$user_name = get_name_if_authed();
+						$user_name = get_name_if_authed();
+						
+						if ($user_name) {
 							display_notification_charm($user_name);
 							echo "<div class=\"cb-top-item\">" . get_nice_display_name($user_name) . "</div>";
 							echo "<div class=\"cb-top-item\"><a href=\"./?a=edit_account\">Account</a></div>";
