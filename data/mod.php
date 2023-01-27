@@ -37,10 +37,10 @@ class ModPage {
 			$this->updated = $mod->updated;
 			$this->security = $mod->security;
 			$this->status = $mod->status;
-			$this->reviews = property_exists($info, "reviews") ? $info->reviews : random_discussion_name();
+			$this->reviews = property_exists($mod, "reviews") ? $mod->reviews : random_discussion_name();
 			
 			// If there weren't discussions before, save them now.
-			if (!property_exists($info, "reviews")) {
+			if (!property_exists($mod, "reviews")) {
 				$this->save();
 			}
 		}
