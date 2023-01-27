@@ -82,6 +82,7 @@ function do_register() {
 	$username = htmlspecialchars($_POST["username"]);
 	$email = htmlspecialchars($_POST["email"]);
 	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
+	$birthdate = strtotime($_POST["day"] . "-" . $_POST["month"] . "-" . $_POST["year"]);
 	
 	// Check if registering is enabled.
 	switch (get_config("register", "anyone")) {
@@ -109,6 +110,14 @@ function do_register() {
 	if (user_exists($username)) {
 		include_header();
 		echo "<h1>Sorry</h1><p>This username is already taken. Please try again.</p>";
+		include_footer();
+		return;
+	}
+	
+	// Check if the user is of age
+	if ($birthdate > (time() - 60 * 60 * 24 * 365 * 16)) {
+		include_header();
+		echo "<h1>Sorry</h1><p>You are not old enough to use this website.</p>";
 		include_footer();
 		return;
 	}
