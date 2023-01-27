@@ -4,6 +4,7 @@
  */
 
 require_once "user.php";
+require_once "notifications.php";
 require_once "templates.php";
 
 function random_discussion_name() : string {
@@ -86,6 +87,7 @@ class Discussion {
 	 */
 	
 	public $id;
+	public $followers;
 	public $comments;
 	
 	function __construct(string $id) {
@@ -95,6 +97,7 @@ class Discussion {
 			$info = $db->load($id);
 			
 			$this->id = $info->id;
+			$this->followers = property_exists($info, "followers") ? $info->followers : array();
 			$this->comments = $info->comments;
 			
 			// Make sure that comments are Comment type objects
@@ -104,6 +107,7 @@ class Discussion {
 		}
 		else {
 			$this->id = $id;
+			$this->followers = array();
 			$this->comments = array();
 		}
 	}
@@ -117,9 +121,42 @@ class Discussion {
 		return (sizeof($this->comments) > 0) ? $this->id : null;
 	}
 	
+	function is_following(string $user) {
+		/**
+		 * Check if a user is following a discussion.
+		 */
+		
+		return array_search($user, $this->followers, true) !== false;
+	}
+	
+	function toggle_follow(string $user) {
+		/**
+		 * Toggle the given user's follow status for this discussion.
+		 */
+		
+		// Remove the follower status
+		if (($index = array_search($user, $this->followers, true)) !== false) {
+			array_splice($this->followers, $index, 1);
+		}
+		// Add the follower status
+		else {
+			$this->followers[] = $user;
+		}
+		
+		$this->save();
+	}
+	
 	function add_comment(string $author, string $body) {
 		$this->comments[] = (new Comment())->create($author, $body);
 		$this->save();
+		
+		// Notify users
+		// I hate having to use &after= on this, but it's really the only
+		// way to do things without having each discussion assocaited with a
+		// URL (which is probably a good idea, actually).
+		// HACK I think if we start with "./" for now, it should be secure
+		// enough.
+		notify_many($this->followers, "New message from $author", "./" . $_GET['after']);
 	}
 	
 	function update_comment(int $index, string $author, string $body) {
@@ -183,6 +220,17 @@ class Discussion {
 		echo "<h4>$title (" . sizeof($this->comments) . ")</h4>";
 	}
 	
+	function display_follow() {
+		$name = get_name_if_admin_authed();
+		
+		if ($name) {
+			$follow = ($this->is_following($name)) ? "Unfollow" : "Follow";
+			$url = $_SERVER['REQUEST_URI'];
+			
+			echo "<p><a href=\"./?a=discussion_follow&id=$this->id&after=$url\"><button>$follow this discussion</button></a></p>";
+		}
+	}
+	
 	function display_hidden() {
 		$hidden = $this->enumerate_hidden();
 		
@@ -202,6 +250,7 @@ class Discussion {
 	
 	function display(string $title = "Discussion", string $url = "") {
 		$this->display_title($title);
+		$this->display_follow();
 		$this->display_hidden();
 		$this->display_comments();
 		$this->display_edit(-1, $url);
@@ -212,6 +261,7 @@ class Discussion {
 		$this->display_edit(-1, $url);
 		$this->display_comments(true);
 		$this->display_hidden();
+		$this->display_follow();
 	}
 }
 
@@ -286,6 +336,31 @@ function discussion_hide() {
 	$discussion = new Discussion($discussion);
 	
 	$discussion->hide_comment($index);
+	
+	if (array_key_exists("after", $_GET)) {
+		redirect($_GET["after"]);
+	}
+	else {
+		sorry("It's done but no clue what page you were on...");
+	}
+}
+
+function discussion_follow() {
+	$user = get_name_if_authed();
+	
+	if (!$user) {
+		sorry("You need to be logged in to follow discussions.");
+	}
+	
+	$user = new User($user);
+	
+	if (!array_key_exists("id", $_GET)) {
+		sorry("Need an id to follow.");
+	}
+	
+	$discussion = $_GET["id"];
+	$discussion = new Discussion($discussion);
+	$discussion->toggle_follow($user->name);
 	
 	if (array_key_exists("after", $_GET)) {
 		redirect($_GET["after"]);

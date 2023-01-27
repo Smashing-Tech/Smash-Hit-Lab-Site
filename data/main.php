@@ -48,6 +48,12 @@ function main() {
 			case "discussion_hide":
 				discussion_hide();
 				break;
+			case "discussion_follow":
+				discussion_follow();
+				break;
+			case "notifications":
+				check_notifications();
+				break;
 			default:
 				include_header();
 				echo "<h1>Sorry</h1><p>The action you have requested is not currently implemented.</p>";

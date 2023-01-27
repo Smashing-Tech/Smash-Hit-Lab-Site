@@ -159,6 +159,10 @@ class User {
 			$this->created = time();
 			$this->admin = false;
 			$this->wall = random_discussion_name();
+			
+			// Make sure the new user is following their wall by default.
+			$d = new Discussion($this->wall);
+			$d->toggle_follow($this->name);
 		}
 	}
 	
