@@ -131,6 +131,12 @@ class User {
 			$this->email = $info->email;
 			$this->created = (property_exists($info, "created") ? $info->created : time());
 			$this->admin = $info->admin;
+			$this->wall = property_exists($info, "wall") ? $info->wall : random_discussion_name();
+			
+			// If there weren't discussions before, save them now.
+			if (!property_exists($info, "wall")) {
+				$this->save();
+			}
 		}
 		else {
 			$this->name = $name;
@@ -140,6 +146,7 @@ class User {
 			$this->email = null;
 			$this->created = time();
 			$this->admin = false;
+			$this->wall = random_discussion_name();
 		}
 	}
 	
@@ -410,4 +417,9 @@ function display_user(string $user) {
 		mod_property("Email", "This user's email address.", $user->email);
 		mod_property("Token count", "The number of currently active tokens this user has.", sizeof($user->tokens));
 	}
+	
+	// Finally the message wall for this user
+	// Display comments
+	$disc = new Discussion($user->wall);
+	$disc->display_reverse("Message wall", "./?u=" . $user->name);
 }
