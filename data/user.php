@@ -63,6 +63,18 @@ class Token {
 		}
 	}
 	
+	function delete() {
+		/**
+		 * Delete the token so it can't be used anymore.
+		 */
+		
+		$db = new Database("token");
+		
+		if ($db->has($this->name)) {
+			$db->delete($this->name);
+		}
+	}
+	
 	function set_user(string $user) {
 		/**
 		 * Set who the token is for if not already set. We don't allow changing
@@ -156,6 +168,41 @@ class User {
 		$db->save($this->name, $this);
 	}
 	
+	function delete() : void {
+		$db = new Database("user");
+		
+		$db->delete($this->name);
+	}
+	
+	function clean_foreign_tokens() : void {
+		/**
+		 * Clean the any tokens this user claims to have but does not
+		 * actually have.
+		 */
+		
+		$db = new Database("token");
+		$valid = array();
+		
+		// TODO Yes, I really shouldn't work with database primitives here, but
+		// I can't find what I called the standard functions to do this stuff.
+		for ($i = 0; $i < sizeof($this->tokens); $i++) {
+			if ($db->has($this->tokens[$i])) {
+				$token = new Token($this->tokens[$i]);
+				
+				if ($token->get_user() === $this->name) {
+					// It should be a good token.
+					$valid[] = $this->tokens[$i];
+				}
+				else {
+					// It's a dirty one!
+					$token->delete();
+				}
+			}
+		}
+		
+		$this->tokens = $valid;
+	}
+	
 	function set_password(string $password) : bool {
 		/**
 		 * Set the user's password.
@@ -203,6 +250,9 @@ class User {
 		/**
 		 * Add a new token for this user and return its name.
 		 */
+		
+		// First, run maintanance
+		$this->clean_foreign_tokens();
 		
 		// Check the password
 		if (!$this->authinticate($password)) {
