@@ -410,14 +410,16 @@ function save_account() {
 	$user = get_name_if_authed();
 	
 	if (!$user) {
-		include_header();
-		echo "<h1>This is strange</h1><p>Please log in to edit your user preferences.</p>";
-		include_footer();
-		return;
+		sorry("Please log in to edit your user preferences.");
 	}
 	
 	$user = new User($user);
 	$user->display = htmlspecialchars($_POST["display"]);
+	
+	if (($user->display != $user->name) && user_exists($user->display)) {
+		sorry("You cannot set your display name to that of another user's handle.");
+	}
+	
 	$user->email = htmlspecialchars($_POST["email"]);
 	$user->save();
 	

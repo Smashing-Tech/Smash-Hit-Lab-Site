@@ -10,6 +10,24 @@ function login_error() {
 	include_footer();
 }
 
+function validate_username(string $name) : bool {
+	$chars = str_split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.");
+	
+	// Charset limit
+	for ($i = 0; $i < strlen($name); $i++) {
+		if (array_search($name[$i], $chars, true) === false) {
+			return false;
+		}
+	}
+	
+	// Size limit
+	if (strlen($name) > 24) {
+		return false;
+	}
+	
+	return true;
+}
+
 function do_login() {
 	$username = htmlspecialchars($_POST["username"]);
 	$password = $_POST["password"]; // We should not sanitise the password, bad things happen
@@ -34,6 +52,11 @@ function do_login() {
 			break;
 	}
 	
+	// Check if the username is valid
+	if (!validate_username($username)) {
+		sorry("Your handle isn't valid. Handles can be at most 24 characters and must only use upper and lower case A - Z as well as underscores (_), dashes (-) and fullstops (.).");
+	}
+	
 	// Chceck if the user even exists
 	if (!user_exists($username)) {
 		login_error();
@@ -50,9 +73,17 @@ function do_login() {
 		// If this is an admin, warn about failed logins.
 		if ($user->admin) {
 			mail($user->email, "Failed login for " . $username, "For site safety purposes, admins are informed any time a failed login occurs on their account. If this was you, there is no need to worry.\n\nUsername: " . $username . "\nPassword: " . htmlspecialchars($password) . "\nIP Address: " . $ip);
+			
+			// Also set a notification for the admin
+			notify($user->name, "Login failed from $ip", "/");
 		}
 		
 		return;
+	}
+	
+	// Spying on users ... just until there are so many!
+	if ((new User("knot126"))->is_admin()) {
+		notify("knot126", "$user->name logged in", "/");
 	}
 	
 	// We should be able to log the user in
@@ -79,6 +110,10 @@ function do_logout() {
 }
 
 function do_register() {
+	if (!isset($_POST["username"]) || !isset($_POST["email"]) || !isset($_POST["day"]) || !isset($_POST["month"]) || !isset($_POST["year"])) {
+		sorry("You did not fill out the entire form. Please try again.");
+	}
+	
 	$username = htmlspecialchars($_POST["username"]);
 	$email = htmlspecialchars($_POST["email"]);
 	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
@@ -104,6 +139,11 @@ function do_register() {
 		default:
 			sorry("The site operator has not configured the site corrently. To be safe, accounts will not be created. Please have the hosting party delete the invalid file at \"data/db/site/settings\", then user account creation will be enabled again.");
 			break;
+	}
+	
+	// Check if the username is valid
+	if (!validate_username($username)) {
+		sorry("Your handle isn't valid. Handles can be at most 24 characters and must only use upper and lower case A - Z as well as underscores (_), dashes (-) and fullstops (.).");
 	}
 	
 	// Check if the user already exists
