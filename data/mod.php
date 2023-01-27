@@ -3,6 +3,7 @@
 require_once "database.php";
 require_once "user.php";
 require_once "templates.php";
+require_once "discussion.php";
 
 class ModPage {
 	public $package;
@@ -16,6 +17,7 @@ class ModPage {
 	public $version;
 	public $updated;
 	public $security;
+	public $reviews;
 	
 	function __construct(string $package) {
 		$db = new Database("mod");
@@ -35,6 +37,12 @@ class ModPage {
 			$this->updated = $mod->updated;
 			$this->security = $mod->security;
 			$this->status = $mod->status;
+			$this->reviews = property_exists($info, "reviews") ? $info->reviews : random_discussion_name();
+			
+			// If there weren't discussions before, save them now.
+			if (!property_exists($info, "reviews")) {
+				$this->save();
+			}
 		}
 		else {
 			$this->package = $package;
@@ -49,6 +57,7 @@ class ModPage {
 			$this->updated = time();
 			$this->security = "No potentially insecure modifications";
 			$this->status = "Released";
+			$this->reviews = random_discussion_name();
 		}
 	}
 	
@@ -81,6 +90,9 @@ class ModPage {
 		mod_property("Status", "A short description of the mod's development status.", $this->status);
 		mod_property("Package", "The name of the mod's APK or IPA file.", $this->package);
 		mod_property("Updated", "The unix timestamp for the last time this page was updated.", date("Y-m-d H:i:s", $this->updated));
+		
+		$disc = new Discussion($this->reviews);
+		$disc->display_reverse("Reviews", "./?m=" . $this->package);
 	}
 	
 	function display_edit() {
