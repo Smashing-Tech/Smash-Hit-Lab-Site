@@ -6,6 +6,7 @@
 require_once "user.php";
 require_once "notifications.php";
 require_once "templates.php";
+require_once "config.php";
 
 function random_discussion_name() : string {
 	/**
@@ -199,21 +200,36 @@ class Discussion {
 		 * Display the comment edit box.
 		 */
 		
-		if (!get_name_if_authed()) {
-			echo "<div class=\"news-article-card comment-edit\"><p>Want to leave a comment? <a href=\"./?a=login\">Log in</a> or <a href=\"./?a=register\">create an account</a> to share your thoughts!</p></div>";
-			return;
+		$enabled = get_config("enable_discussions", "enabled");
+		
+		switch ($enabled) {
+			case "enabled": {
+				if (!get_name_if_authed()) {
+					echo "<div class=\"news-article-card comment-edit\"><p>Want to leave a comment? <a href=\"./?a=login\">Log in</a> or <a href=\"./?a=register\">create an account</a> to share your thoughts!</p></div>";
+					return;
+				}
+				
+				$comment = new Comment();
+				
+				if ($index >= 0) {
+					$comment = $this->comments[$index];
+				}
+				
+				$url = htmlspecialchars($_SERVER['REQUEST_URI']); // Yes this should be sanitised for mod pages
+				$body = htmlspecialchars($comment->body);
+				
+				echo "<div class=\"news-article-card comment-edit\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><h4>Add your comment</h4><p><textarea style=\"width: calc(100% - 1em);\" name=\"body\">$body</textarea></p><p><input type=\"submit\" value=\"Post comment\"></p></form></div>";
+				break;
+			}
+			case "closed": {
+				echo "<div class=\"news-article-card comment-edit\"><p>Discussions have been closed sitewide. You can chat on our Discord server for now!</p></div>";
+				break;
+			}
+			// If they are fully disabled there should be a message about it.
+			default: {
+				break;
+			}
 		}
-		
-		$comment = new Comment();
-		
-		if ($index >= 0) {
-			$comment = $this->comments[$index];
-		}
-		
-		$url = htmlspecialchars($_SERVER['REQUEST_URI']); // Yes this should be sanitised for mod pages
-		$body = htmlspecialchars($comment->body);
-		
-		echo "<div class=\"news-article-card comment-edit\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><h4>Add your comment</h4><p><textarea style=\"width: calc(100% - 1em);\" name=\"body\">$body</textarea></p><p><input type=\"submit\" value=\"Post comment\"></p></form></div>";
 	}
 	
 	function display_title(string $title) {
@@ -244,12 +260,24 @@ class Discussion {
 		$size = sizeof($this->comments);
 		
 		for ($i = 0; $i < $size; $i++) {
-			echo $this->comments[($reverse ? ($size - $i - 1) : $i)]->render($this->id, $i);
+			$j = ($reverse ? ($size - $i - 1) : $i);
+			echo $this->comments[$j]->render($this->id, $j);
 		}
+	}
+	
+	function display_disabled() : bool {
+		$disabled = (get_config("enable_discussions", "enabled") === "disabled");
+		
+		if ($disabled) {
+			echo "<div class=\"news-article-card comment-edit\"><p>Discussions have been disabled sitewide. Existing comments are not shown, but will return when discussions are enabled again.</p></div>";
+		}
+		
+		return $disabled;
 	}
 	
 	function display(string $title = "Discussion", string $url = "") {
 		$this->display_title($title);
+		if ($this->display_disabled()) { return; }
 		$this->display_follow();
 		$this->display_hidden();
 		$this->display_comments();
@@ -258,6 +286,7 @@ class Discussion {
 	
 	function display_reverse(string $title = "Discussion", string $url = "") {
 		$this->display_title($title);
+		if ($this->display_disabled()) { return; }
 		$this->display_edit(-1, $url);
 		$this->display_comments(true);
 		$this->display_hidden();
@@ -275,6 +304,10 @@ function discussion_update() {
 	
 	if (!$user) {
 		sorry("You need to be logged in to post comments.");
+	}
+	
+	if (get_config("enable_discussions", "enabled") !== "enabled") {
+		sorry("Updating discussions has been disabled.");
 	}
 	
 	$user = new User($user);
@@ -321,6 +354,10 @@ function discussion_hide() {
 	
 	$user = new User($user);
 	
+	if (get_config("enable_discussions", "enabled") === "disabled") {
+		sorry("Updating discussions has been disabled.");
+	}
+	
 	if (!array_key_exists("id", $_GET)) {
 		sorry("Need an id to update.");
 	}
@@ -350,6 +387,10 @@ function discussion_follow() {
 	
 	if (!$user) {
 		sorry("You need to be logged in to follow discussions.");
+	}
+	
+	if (get_config("enable_discussions", "enabled") !== "enabled") {
+		sorry("There is no reason to follow a discussion which has been closed.");
 	}
 	
 	$user = new User($user);
