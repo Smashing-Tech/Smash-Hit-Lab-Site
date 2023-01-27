@@ -45,6 +45,9 @@ function main() {
 			case "discussion_update":
 				discussion_update();
 				break;
+			case "discussion_hide":
+				discussion_hide();
+				break;
 			default:
 				include_header();
 				echo "<h1>Sorry</h1><p>The action you have requested is not currently implemented.</p>";

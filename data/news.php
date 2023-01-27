@@ -241,6 +241,7 @@ class Article {
 		edit_feild("body", "textarea", "Body", "The actual article's contents.</p><p>**bold** = <b>bold</b><br/>__italic__ = <i>italic</i><br/>`code` = <code>code</code><br/>Two newlines = New paragraph<br/>One newline = linebreak", $this->body);
 		edit_feild("created", "text", "Created", "When the article was made.", date("Y-m-d H:m:s", $this->created), false);
 		edit_feild("updated", "text", "Updated", "When the article was edited.", date("Y-m-d H:m:s", $this->updated), false);
+		edit_feild("comments", "text", "Discussion", "The Discussion ID for this article's comments.", $this->comments, false);
 		echo "<p><b>Warning:</b> By updating this article, your name will be added to the update list and it will be pushed to the top of the site. Please think carefully before continuing.</p>";
 		echo "<input type=\"submit\" value=\"Save article\"/>";
 		echo "</form>";
