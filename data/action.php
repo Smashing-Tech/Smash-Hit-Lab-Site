@@ -2,6 +2,7 @@
 
 require_once "user.php";
 require_once "templates.php";
+require_once "config.php";
 
 function login_error() {
 	include_header();
@@ -13,6 +14,25 @@ function do_login() {
 	$username = htmlspecialchars($_POST["username"]);
 	$password = $_POST["password"]; // We should not sanitise the password, bad things happen
 	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
+	
+	// Check if logins are enabled
+	switch (get_config("enable_login", "users")) {
+		case "closed":
+			sorry("Logging in has been disabled. Please check Discord for updates.");
+			break;
+		case "admins":
+			$u = new User($username);
+			
+			if (!$u->is_admin()) {
+				sorry("We have disabled logging in for most users at the moment. Please join our Discord for any updates.");
+			}
+			break;
+		case "users":
+			break;
+		default:
+			sorry("The site operator has not configured the site corrently. To be safe, no one is allowed to log in. Please have the hosting party delete the invalid file at \"data/db/site/settings\", then logins will be enabled again.");
+			break;
+	}
 	
 	// Chceck if the user even exists
 	if (!user_exists($username)) {
@@ -58,6 +78,28 @@ function do_register() {
 	$username = htmlspecialchars($_POST["username"]);
 	$email = htmlspecialchars($_POST["email"]);
 	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
+	
+	// Check if registering is enabled.
+	switch (get_config("register", "anyone")) {
+		case "closed":
+			sorry("User account registration has been disabled for the moment. Please try again later and make sure to join the Discord for updates.");
+			break;
+		case "admins":
+			if (!get_name_if_admin_authed()) {
+				sorry("We have disabled new account creation for most users at the moment. Please join our Discord and contact an admin to have them create an account for you.");
+			}
+			break;
+		case "users":
+			if (!get_name_if_authed()) {
+				sorry("Only existing users can create new accounts at the moment. If you have a friend who uses this site, have them enter your desired username and email for you. Otherwise, please ask staff to create an account for you.");
+			}
+			break;
+		case "anyone":
+			break;
+		default:
+			sorry("The site operator has not configured the site corrently. To be safe, accounts will not be created. Please have the hosting party delete the invalid file at \"data/db/site/settings\", then user account creation will be enabled again.");
+			break;
+	}
 	
 	// Check if the user already exists
 	if (user_exists($username)) {

@@ -80,7 +80,7 @@ body {
 }
 
 /* Interactive widgets */
-input[type=text], input[type=password], textarea {
+input[type=text], input[type=password], textarea, select {
 	background: var(--main-colour-bg-dark);
 	border: none;
 	border-radius: 0.5em;

@@ -60,6 +60,13 @@ function mod_property($title, $desc, $value) : void {
 	echo "</div>";
 }
 
+function sorry(string $why = "There was a problem.") {
+	include_header();
+	echo "<h1>Sorry</h1><p>$why</p>";
+	include_footer();
+	die();
+}
+
 function parse_comma_array(string $s) : array {
 	return explode(",", $s);
 }
