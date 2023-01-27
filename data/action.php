@@ -64,7 +64,11 @@ function do_login() {
 }
 
 function do_logout() {
-	// TODO Actually invalidate the token
+	// Delete the token on the server
+	$db = new Database("token");
+	$db->delete($_COOKIE["tk"]);
+	
+	// TODO Remove the token from the user
 	
 	// Unset cookie
 	setcookie("tk", "badtoken", 1, "/");

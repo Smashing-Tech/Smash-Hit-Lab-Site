@@ -42,6 +42,9 @@ function main() {
 			case "site_config":
 				do_site_config();
 				break;
+			case "discussion_update":
+				discussion_update();
+				break;
 			default:
 				include_header();
 				echo "<h1>Sorry</h1><p>The action you have requested is not currently implemented.</p>";

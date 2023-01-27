@@ -3,6 +3,7 @@
 require_once "database.php";
 require_once "templates.php";
 require_once "user.php";
+require_once "discussion.php";
 
 function push_recent(string $name) {
 	/**
@@ -60,6 +61,7 @@ class Article {
 	public $created;
 	public $updated;
 	public $authors;
+	public $comments;
 	
 	function __construct(string $name) {
 		$db = new Database("article");
@@ -73,6 +75,12 @@ class Article {
 			$this->created = $info->created;
 			$this->updated = $info->updated;
 			$this->authors = $info->authors;
+			$this->comments = property_exists($info, "comments") ? $info->comments : random_discussion_name();
+			
+			// If there weren't discussions before, save them now.
+			if (!property_exists($info, "comments")) {
+				$this->save();
+			}
 		}
 		else {
 			$this->name = $name;
@@ -81,6 +89,7 @@ class Article {
 			$this->created = time();
 			$this->updated = time();
 			$this->authors = array();
+			$this->comments = random_discussion_name();
 		}
 	}
 	
@@ -270,6 +279,10 @@ class Article {
 		}
 		
 		echo "</p>";
+		
+		// Display comments
+		$disc = new Discussion($this->comments);
+		$disc->display("Comments", "./?n=" . $this->name);
 	}
 }
 

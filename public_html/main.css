@@ -97,6 +97,10 @@ textarea {
 	height: 10em;
 }
 
+.comment-edit textarea {
+	width: 100%;
+}
+
 input[type=submit], button {
 	background: var(--main-colour);
 	border: none;
@@ -139,6 +143,7 @@ input[type=submit], button {
 	border-radius: 0.5em;
 	overflow: auto;
 	padding: 0.5em;
+	margin: 1em 0;
 }
 
 .staff-badge {
