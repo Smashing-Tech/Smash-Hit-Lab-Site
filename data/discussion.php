@@ -162,6 +162,11 @@ class Discussion {
 		 * Display the comment edit box.
 		 */
 		
+		if (!get_name_if_authed()) {
+			echo "<div class=\"news-article-card comment-edit\"><p>Want to leave a comment? <a href=\"./?a=login\">Log in</a> or <a href=\"./?a=register\">create an account</a> to share your thoughts!</p></div>";
+			return;
+		}
+		
 		$comment = new Comment();
 		
 		if ($index >= 0) {
