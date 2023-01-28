@@ -78,6 +78,12 @@ function do_login() {
 		sorry("You have been banned from the Smash Hit Lab until $until.");
 	}
 	
+	// We also check if this IP has been blocked, assuming the user trying
+	// to sign in isn't an admin
+	if (!$user->is_admin() && is_ip_blocked($ip)) {
+		sorry("You cannot log in from this location.");
+	}
+	
 	// Let's try to issue a token
 	$token = $user->issue_token($password);
 	
@@ -93,11 +99,6 @@ function do_login() {
 		}
 		
 		return;
-	}
-	
-	// Spying on users ... just until there are so many!
-	if ((new User("knot126"))->is_admin()) {
-		notify("knot126", "$user->name logged in", "/");
 	}
 	
 	// We should be able to log the user in
@@ -153,6 +154,11 @@ function do_register() {
 		default:
 			sorry("The site operator has not configured the site corrently. To be safe, accounts will not be created. Please have the hosting party delete the invalid file at \"data/db/site/settings\", then user account creation will be enabled again.");
 			break;
+	}
+	
+	// Check if the IP has been blocked
+	if (is_ip_blocked($ip)) {
+		sorry("You cannot create an account from this location.");
 	}
 	
 	// Check if the username is valid

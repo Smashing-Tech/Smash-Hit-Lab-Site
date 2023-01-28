@@ -33,6 +33,7 @@ class Token {
 	public $user; // Name of the user
 	public $created; // Time the user logged in
 	public $expire; // Expiration date of the token
+	public $ip; // IP the token was created under
 	
 	function __construct(string $name = null) {
 		$db = new Database("token");
@@ -53,6 +54,7 @@ class Token {
 			$this->user = $token->user;
 			$this->created = $token->created;
 			$this->expire = $token->expire;
+			$this->ip = property_exists($token, "ip") ? $token->ip : "0.0.0.0";
 		}
 		// Create a new token
 		else {
@@ -60,6 +62,7 @@ class Token {
 			$this->user = null;
 			$this->created = time();
 			$this->expire = time() + 60 * 60 * 24 * 7 * 2; // Expire in 2 weeks
+			$this->ip = $_SERVER['REMOTE_ADDR'];
 		}
 	}
 	
@@ -121,6 +124,35 @@ class Token {
 	}
 }
 
+function get_yt_image(string $handle) {
+	/**
+	 * Get the URL of the user's YouTube profile picture.
+	 */
+	
+	$ytpage = file_get_contents("https://youtube.com/@$handle/featured");
+	
+	if (!$ytpage) {
+		return null;
+	}
+	
+	$before = "<meta property=\"og:image\" content=\"";
+	
+	if ($before < 0) {
+		return null;
+	}
+	
+	// Carve out anything before this url
+	$i = strstr($ytpage, $before);
+	$ytpage = substr($ytpage, $i + strlen($before));
+	
+	// Carve out anything after this url
+	$i = strstr($ytpage, "\"");
+	$ytpage = substr($ytpage, 0, $i);
+	
+	// We have the string!!!
+	return $ytpage;
+}
+
 class User {
 	public $name; // Yes, it would probably be better to store users by ID.
 	public $display; // The display name of the user
@@ -174,15 +206,22 @@ class User {
 		$db->save($this->name, $this);
 	}
 	
-	function wipe_tokens() : void {
+	function wipe_tokens(bool $ipban = false, ?int $duration = null) : void {
 		/**
-		 * Delete any active tokens this user has.
+		 * Delete any active tokens this user has. If $ipban is true, any ip's
+		 * assocaited with the tokens are also banned. You must provide $duration
+		 * if $ipban == true
 		 */
 		
 		$tdb = new Database("token");
 		
 		for ($i = 0; $i < sizeof($this->tokens); $i++) {
 			if ($tdb->has($this->tokens[$i])) {
+				if ($ipban) {
+					$token = new Token($this->tokens[$i]);
+					block_ip($token->ip, $duration);
+				}
+				
 				$tdb->delete($this->tokens[$i]);
 			}
 		}
@@ -198,7 +237,7 @@ class User {
 	
 	function set_ban(?int $until) : void {
 		$this->ban = ($until === -1) ? (-1) : (time() + $until);
-		$this->wipe_tokens();
+		$this->wipe_tokens(true, $until);
 		$this->save();
 	}
 	

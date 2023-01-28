@@ -7,6 +7,7 @@ require_once "database.php";
 require_once "config.php";
 require_once "templates.php";
 require_once "user.php";
+require_once "block.php";
 
 function do_evaluate() {
 	/**
@@ -80,7 +81,7 @@ function do_admin_dashboard() {
 		echo "<h1>Admin dashboard</h1>";
 		
 		echo "<h3>Actions</h3>";
-		echo "<ul><li><a href=\"./?a=site_config\">Site configuration</a> &mdash; very basic site options</li><li><a href=\"./?a=site_config\">Ban user</a> &mdash; user banning form</li></ul>";
+		echo "<ul><li><a href=\"./?a=site_config\">Site configuration</a> &mdash; very basic site options</li><li><a href=\"./?a=user_ban\">Ban user</a> &mdash; user banning form</li></ul>";
 		
 		echo "<h3>Alerts</h3>";
 		$un = new UserNotifications($user, "alert");
@@ -108,7 +109,8 @@ function do_user_ban() {
 			
 			form_start("./?a=user_ban");
 			edit_feild("handle", "text", "Handle", "Handle or username of the user to ban.", "");
-			edit_feild("duration", "select", "Duration", "How long to ban this user.", "1w", true, array("86400" => "1 Day", "604800" => "1 Week", "2678400" => "1 Month", "31536000" => "1 Year", "-1" => "Forever"));
+			edit_feild("duration", "select", "Duration", "How long to ban this user.", "1w", true, array("21600" => "6 Hours", "86400" => "1 Day", "604800" => "1 Week", "2678400" => "1 Month", "31536000" => "1 Year", "-1" => "Forever", "1" => "Remove ban"));
+			echo "<p><b>Note:</b> Any IP addresses assocaited with this user will be blocked for the set duration, up to 3 months.</p>";
 			form_end("Ban user");
 			
 			include_footer();
