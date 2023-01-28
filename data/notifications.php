@@ -184,7 +184,7 @@ function alert(string $title, string $url = "") {
 	$users = get_config("admins", array());
 	
 	for ($i = 0; $i < sizeof($users); $i++) {
-		$un = new UserNotifications($user, "alert");
+		$un = new UserNotifications($users[$i], "alert");
 		$un->notify($title, $url);
 	}
 }

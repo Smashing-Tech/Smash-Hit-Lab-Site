@@ -63,8 +63,22 @@ function do_login() {
 		return;
 	}
 	
-	// Let's try to issue a token
+	// Finally open the user file
 	$user = new User($username);
+	
+	// Check if they are banned first. If so then we don't do the token.
+	// Note that admins can bypass blocks.
+	if (!$user->is_admin() && $user->is_banned()) {
+		$until = $user->unban_date();
+		
+		if ($until == "forever") {
+			sorry("You have been banned from the Smash Hit Lab.");
+		}
+		
+		sorry("You have been banned from the Smash Hit Lab until $until.");
+	}
+	
+	// Let's try to issue a token
 	$token = $user->issue_token($password);
 	
 	if (!$token) {

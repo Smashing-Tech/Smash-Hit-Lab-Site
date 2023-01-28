@@ -70,7 +70,7 @@ function do_site_config() {
 
 function do_admin_dashboard() {
 	/**
-	 * This is *only* for Knot126 to use :)
+	 * Our really lovely admin dashboard!
 	 */
 	
 	$user = get_name_if_admin_authed();
@@ -88,6 +88,46 @@ function do_admin_dashboard() {
 		$un->clear();
 		
 		include_footer();
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
+}
+
+function do_user_ban() {
+	/**
+	 * This is *only* for Knot126 to use :)
+	 */
+	
+	$user = get_name_if_admin_authed();
+	
+	if ($user) {
+		if (!array_key_exists($_POST, "handle")) {
+			include_header();
+			echo "<h1>Ban user</h1>";
+			
+			form_start("./?a=user_ban");
+			edit_feild("handle", "text", "Handle", "Handle or username of the user to ban.", "");
+			edit_feild("duration", "select", "Duration", "How long to ban this user.", "1w", true, array("86400" => "1 Day", "604800" => "1 Week", "2678400" => "1 Month", "31536000" => "1 Year", "-1" => "Forever"));
+			form_end("Ban user");
+			
+			include_footer();
+		}
+		else {
+			$handle = $_POST["handle"];
+			$duration = intval($_POST["duration"]);
+			
+			$user = new User($handle);
+			$user->set_ban($duration);
+			
+			$duration = $user->unban_date();
+			
+			// Display success page
+			include_header();
+			echo "<h1>Account banned</h1><p>The account $handle was successfully banned until $duration.</p>";
+			include_footer();
+		}
+		
 	}
 	else {
 		sorry("The action you have requested is not currently implemented.");

@@ -182,7 +182,7 @@ function save_mod() : void {
 	// Admin alert!
 	alert("Mod page $mod_name updated by $user", "./?m=$mod_name");
 	
-	redirect("Location: /?m=$mod_name");
+	redirect("./?m=$mod_name");
 }
 
 function delete_mod() : void {

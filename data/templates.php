@@ -46,6 +46,15 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $optio
 	echo "</div>";
 }
 
+function form_start(string $url, string $method = "post") {
+	echo "<form action=\"$url\" method=\"$method\">";
+}
+
+function form_end(string $submit_text = "Submit form") {
+	echo "<input type=\"submit\" value=\"$submit_text\"/>";
+	echo "</form>";
+}
+
 function mod_property($title, $desc, $value) : void {
 	echo "<div class=\"mod-property\">";
 		echo "<div class=\"mod-property-label\">";

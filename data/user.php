@@ -143,6 +143,7 @@ class User {
 			$this->email = $info->email;
 			$this->created = (property_exists($info, "created") ? $info->created : time());
 			$this->admin = $info->admin;
+			$this->ban = property_exists($info, "ban") ? $info->ban : null;
 			$this->wall = property_exists($info, "wall") ? $info->wall : random_discussion_name();
 			
 			// If there weren't discussions before, save them now.
@@ -158,6 +159,7 @@ class User {
 			$this->email = null;
 			$this->created = time();
 			$this->admin = false;
+			$this->ban = null;
 			$this->wall = random_discussion_name();
 			
 			// Make sure the new user is following their wall by default.
@@ -176,6 +178,45 @@ class User {
 		$db = new Database("user");
 		
 		$db->delete($this->name);
+	}
+	
+	function set_ban(?int $until) : void {
+		$this->ban = $until;
+		$this->save();
+	}
+	
+	function unset_ban() : void {
+		$this->ban = null;
+		$this->save();
+	}
+	
+	function ban_expired() : bool {
+		return ($this->ban !== -1) && (time() > $this->ban);
+	}
+	
+	function is_banned() : bool {
+		/**
+		 * Update banned status and check if the user is banned.
+		 */
+		
+		if ($this->ban_expired()) {
+			$this->unset_ban();
+		}
+		
+		return ($this->ban !== null);
+	}
+	
+	function unban_date() : string {
+		/**
+		 * The user must be banned for this to return a value.
+		 */
+		
+		if ($this->ban > 0) {
+			return date("M-d-y H:i:s", $this->ban);
+		}
+		else {
+			return "forever";
+		}
 	}
 	
 	function clean_foreign_tokens() : void {
