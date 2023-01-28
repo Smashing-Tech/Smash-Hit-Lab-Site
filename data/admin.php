@@ -80,7 +80,7 @@ function do_admin_dashboard() {
 		echo "<h1>Admin dashboard</h1>";
 		
 		echo "<h3>Actions</h3>";
-		echo "<ul><li><a href=\"./?a=site_config\">Site configuration</a> &mdash; very basic site options</li></ul>";
+		echo "<ul><li><a href=\"./?a=site_config\">Site configuration</a> &mdash; very basic site options</li><li><a href=\"./?a=site_config\">Ban user</a> &mdash; user banning form</li></ul>";
 		
 		echo "<h3>Alerts</h3>";
 		$un = new UserNotifications($user, "alert");
@@ -102,7 +102,7 @@ function do_user_ban() {
 	$user = get_name_if_admin_authed();
 	
 	if ($user) {
-		if (!array_key_exists($_POST, "handle")) {
+		if (!array_key_exists("handle", $_POST)) {
 			include_header();
 			echo "<h1>Ban user</h1>";
 			

@@ -174,6 +174,22 @@ class User {
 		$db->save($this->name, $this);
 	}
 	
+	function wipe_tokens() : void {
+		/**
+		 * Delete any active tokens this user has.
+		 */
+		
+		$tdb = new Database("token");
+		
+		for ($i = 0; $i < sizeof($this->tokens); $i++) {
+			if ($tdb->has($this->tokens[$i])) {
+				$tdb->delete($this->tokens[$i]);
+			}
+		}
+		
+		$this->tokens = array();
+	}
+	
 	function delete() : void {
 		$db = new Database("user");
 		
@@ -181,7 +197,8 @@ class User {
 	}
 	
 	function set_ban(?int $until) : void {
-		$this->ban = $until;
+		$this->ban = ($until === -1) ? (-1) : (time() + $until);
+		$this->wipe_tokens();
 		$this->save();
 	}
 	
@@ -212,7 +229,7 @@ class User {
 		 */
 		
 		if ($this->ban > 0) {
-			return date("M-d-y H:i:s", $this->ban);
+			return date("Y-m-d H:i:s", $this->ban);
 		}
 		else {
 			return "forever";
