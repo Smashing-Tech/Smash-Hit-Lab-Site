@@ -106,4 +106,11 @@ class Database {
 	function has(string $item) : bool {
 		return file_exists($this->get_item_path($item));
 	}
+	
+	function enumerate() : array {
+		$array = scandir($this->get_item_path(""));
+		array_shift($array);
+		array_shift($array);
+		return $array;
+	}
 }

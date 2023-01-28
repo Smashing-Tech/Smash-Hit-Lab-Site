@@ -201,3 +201,23 @@ function delete_mod() : void {
 	
 	redirect("/");
 }
+
+function list_mods() : void {
+	$db = new Database("mod");
+	
+	$list = $db->enumerate();
+	
+	include_header();
+	echo "<h1>List of Mods</h1><ul>";
+	
+	// HACK vvv
+	for ($i = 0; $i < sizeof($list); $i++) {
+		$mp = new ModPage($list[$i]);
+		$title = $mp->name ? $mp->name : $mp->package;
+		$url = "./?m=" . htmlspecialchars($mp->package);
+		echo "<li><a href=\"$url\">$title</li>";
+	}
+	
+	echo "</ul>";
+	include_footer();
+}

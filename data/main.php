@@ -27,6 +27,9 @@ function main() {
 			case "delete_mod":
 				delete_mod();
 				break;
+			case "list_mods":
+				list_mods();
+				break;
 			case "edit_account":
 				edit_account();
 				break;
