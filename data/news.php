@@ -61,6 +61,7 @@ class Article {
 	public $created;
 	public $updated;
 	public $authors;
+	public $permissions;
 	public $comments;
 	
 	function __construct(string $name) {
@@ -75,6 +76,7 @@ class Article {
 			$this->created = $info->created;
 			$this->updated = $info->updated;
 			$this->authors = $info->authors;
+			$this->permissions = property_exists($info, "permissions") ? $info->permissions : "private";
 			$this->comments = property_exists($info, "comments") ? $info->comments : random_discussion_name();
 			
 			// If there weren't discussions before, save them now.
@@ -89,6 +91,7 @@ class Article {
 			$this->created = time();
 			$this->updated = time();
 			$this->authors = array();
+			$this->permissions = "private";
 			$this->comments = random_discussion_name();
 		}
 	}
@@ -233,6 +236,11 @@ class Article {
 		$this->save();
 	}
 	
+	function set_permissions(string $name) {
+		$this->permissions = $name;
+		$this->save();
+	}
+	
 	function display_update() {
 		echo "<h1>Editing $this->title</h1>";
 		echo "<form action=\"./?a=save_news&amp;n=$this->name\" method=\"post\">";
@@ -242,6 +250,7 @@ class Article {
 		edit_feild("created", "text", "Created", "When the article was made.", date("Y-m-d H:m:s", $this->created), false);
 		edit_feild("updated", "text", "Updated", "When the article was edited.", date("Y-m-d H:m:s", $this->updated), false);
 		edit_feild("comments", "text", "Discussion", "The Discussion ID for this article's comments.", $this->comments, false);
+		edit_feild("permissions", "select", "Visibility", "Controls weather the article can be seen by the public or not.", $this->permissions, true, array("private" => "Private", "public" => "Public"));
 		echo "<p><b>Warning:</b> By updating this article, your name will be added to the update list and it will be pushed to the top of the site. Please think carefully before continuing.</p>";
 		echo "<input type=\"submit\" value=\"Save article\"/>";
 		echo "</form>";
@@ -308,7 +317,15 @@ function display_news(string $name) : void {
 	}
 	
 	$article = new Article($name);
-	$article->display();
+	
+	if (($article->permissions == "public") || (get_name_if_admin_authed() != null)) {
+		$article->display();
+	}
+	else {
+		echo "<h1>Sorry</h1><p>It seems like we don't have a news article by that name.</p>";
+		show_news_edit_button($name);
+		return;
+	}
 }
 
 function pretend_error() : void {
@@ -318,16 +335,9 @@ function pretend_error() : void {
 }
 
 function update_news() : void {
-	$user = get_name_if_authed();
+	$user = get_name_if_admin_authed();
 	
 	if (!$user || !array_key_exists("n", $_GET)) {
-		pretend_error();
-		return;
-	}
-	
-	$user = new User($user);
-	
-	if (!$user->is_admin()) {
 		pretend_error();
 		return;
 	}
@@ -341,23 +351,17 @@ function update_news() : void {
 }
 
 function save_news() : void {
-	$user = get_name_if_authed();
+	$user = get_name_if_admin_authed();
 	
 	if (!$user || !array_key_exists("n", $_GET)) {
 		pretend_error();
 		return;
 	}
 	
-	$user = new User($user);
-	
-	if (!$user->is_admin()) {
-		pretend_error();
-		return;
-	}
-	
 	// We are allowed to update the article ...
 	$article = new Article($_GET["n"]);
-	$article->update($_POST["title"], $_POST["body"], $user->name);
+	$article->update($_POST["title"], $_POST["body"], $user);
+	$article->set_permissions($_POST["permissions"]);
 	
 	redirect("./?n=$article->name");
 }
