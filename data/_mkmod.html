@@ -1,0 +1,10 @@
+<script>
+	function openModPage() {
+		let e = document.getElementById("create-mod");
+		window.open("./?a=edit_mod&m=" + e.value);
+	}
+</script>
+<div>
+	<input id="create-mod" type="text" placeholder="Package name"/>
+	<button onclick="openModPage()">Create page</button>
+</div>

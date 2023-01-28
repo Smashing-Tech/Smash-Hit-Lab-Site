@@ -208,14 +208,25 @@ function list_mods() : void {
 	$list = $db->enumerate();
 	
 	include_header();
-	echo "<h1>List of Mods</h1><ul>";
+	echo "<h1>List of Mods</h1>";
 	
-	// HACK vvv
+	if (get_name_if_authed()) {
+		readfile("../data/_mkmod.html");
+	}
+	
+	echo "<ul>";
+	
 	for ($i = 0; $i < sizeof($list); $i++) {
 		$mp = new ModPage($list[$i]);
 		$title = $mp->name ? $mp->name : $mp->package;
+		$desc = htmlspecialchars(substr($mp->description, 0, 100));
+		
+		if (strlen($desc) >= 100) {
+			$desc = $desc . "...";
+		}
+		
 		$url = "./?m=" . htmlspecialchars($mp->package);
-		echo "<li><a href=\"$url\">$title</li>";
+		echo "<li><a href=\"$url\">$title</a><br/>$desc</li>";
 	}
 	
 	echo "</ul>";
