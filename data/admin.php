@@ -33,9 +33,7 @@ function do_evaluate() {
 		}
 	}
 	else {
-		include_header();
-		echo "<h1>Sorry</h1><p>The action you have requested is not currently implemented.</p>";
-		include_footer();
+		sorry("The action you have requested is not currently implemented.");
 	}
 }
 
@@ -66,8 +64,32 @@ function do_site_config() {
 		}
 	}
 	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
+}
+
+function do_admin_dashboard() {
+	/**
+	 * This is *only* for Knot126 to use :)
+	 */
+	
+	$user = get_name_if_admin_authed();
+	
+	if ($user) {
 		include_header();
-		echo "<h1>Sorry</h1><p>The action you have requested is not currently implemented.</p>";
+		echo "<h1>Admin dashboard</h1>";
+		
+		echo "<h3>Actions</h3>";
+		echo "<ul><li><a href=\"./?a=site_config\">Site configuration</a> &mdash; very basic site options</li></ul>";
+		
+		echo "<h3>Alerts</h3>";
+		$un = new UserNotifications($user, "alert");
+		$un->display("");
+		$un->clear();
+		
 		include_footer();
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
 	}
 }

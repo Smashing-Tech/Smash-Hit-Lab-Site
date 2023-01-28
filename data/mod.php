@@ -129,6 +129,11 @@ class ModPage {
 		
 		$this->save();
 	}
+	
+	function delete() {
+		$db = new Database("mod");
+		$db->delete($this->package);
+	}
 }
 
 function display_mod(string $mod_name) : void {
@@ -161,24 +166,38 @@ function edit_mod() : void {
 
 function save_mod() : void {
 	if (!array_key_exists("m", $_GET)) {
-		include_header();
-		echo "<h1>Sorry</h1><p>Bad request.</p>";
-		include_footer();
-		return;
+		sorry("Malformed request.");
 	}
 	
 	$mod_name = $_GET["m"];
+	$user = get_name_if_authed();
 	
-	if (!get_name_if_authed()) {
-		include_header();
-		echo "<h1>Sorry</h1><p>You need to <a href=\"./?p=login\">log in</a> or <a href=\"./?p=register\">create an account</a> to save pages.</p>";
-		include_footer();
-		return;
+	if (!$user) {
+		sorry("You need to <a href=\"./?p=login\">log in</a> or <a href=\"./?p=register\">create an account</a> to save pages.");
 	}
 	
 	$mod = new ModPage($mod_name);
 	$mod->save_edit();
 	
-	header("Location: /?m=$mod_name");
-	die();
+	// Admin alert!
+	alert("Mod page $mod_name updated by $user", "./?m=$mod_name");
+	
+	redirect("Location: /?m=$mod_name");
+}
+
+function delete_mod() : void {
+	if (!array_key_exists("m", $_GET)) {
+		sorry("The action you have requested is not currently implemented.");
+	}
+	
+	$mod_name = $_GET["m"];
+	
+	if (!get_name_if_admin_authed()) {
+		sorry("The action you have requested is not currently implemented.");
+	}
+	
+	$mod = new ModPage($mod_name);
+	$mod->delete();
+	
+	redirect("/");
 }

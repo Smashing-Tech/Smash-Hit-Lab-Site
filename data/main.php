@@ -24,6 +24,9 @@ function main() {
 			case "save_mod":
 				save_mod();
 				break;
+			case "delete_mod":
+				delete_mod();
+				break;
 			case "edit_account":
 				edit_account();
 				break;
@@ -42,6 +45,9 @@ function main() {
 			case "site_config":
 				do_site_config();
 				break;
+			case "admin_dashboard":
+				do_admin_dashboard();
+				break;
 			case "discussion_update":
 				discussion_update();
 				break;
@@ -55,9 +61,7 @@ function main() {
 				check_notifications();
 				break;
 			default:
-				include_header();
-				echo "<h1>Sorry</h1><p>The action you have requested is not currently implemented.</p>";
-				include_footer();
+				sorry("The action you have requested is not currently implemented.");
 				break;
 		}
 	}

@@ -158,6 +158,9 @@ class Discussion {
 		// HACK I think if we start with "./" for now, it should be secure
 		// enough.
 		notify_many($this->followers, "New message from $author", "./" . $_GET['after']);
+		
+		// Admin alert!
+		alert("Discssion $this->id updated by $author", "./" . $_GET['after']);
 	}
 	
 	function update_comment(int $index, string $author, string $body) {

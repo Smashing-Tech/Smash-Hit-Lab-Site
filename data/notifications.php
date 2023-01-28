@@ -5,6 +5,7 @@
 
 require_once "user.php";
 require_once "templates.php";
+require_once "config.php"; // For admin alerts
 
 class Notification {
 	/**
@@ -43,7 +44,8 @@ class Notification {
 		$title = htmlspecialchars($this->title);
 		$url = htmlspecialchars($this->url);
 		$date = date("Y-m-d H:i:s", $this->created);
-		return "<li>$date &mdash; <a href=\"$url\">$title</a></li>";
+		
+		return ($url) ? "<li>$date &mdash; <a href=\"$url\">$title</a></li>" : "<li>$date &mdash $title</li>";
 	}
 }
 
@@ -54,9 +56,10 @@ class UserNotifications {
 	
 	public $name; // Name of the user
 	public $notifications; // The user's noifications
+	public $db_name; // The database to use (default: notify)
 	
-	function __construct(string $name) {
-		$db = new Database("notify");
+	function __construct(string $name, string $db_name = "notify") {
+		$db = new Database($db_name);
 		
 		if ($db->has($name)) {
 			$info = $db->load($name);
@@ -74,10 +77,12 @@ class UserNotifications {
 			$this->name = $name;
 			$this->notifications = array();
 		}
+		
+		$this->db_name = $db_name;
 	}
 	
 	function save() {
-		$db = new Database("notify");
+		$db = new Database($this->db_name);
 		$db->save($this->name, $this);
 	}
 	
@@ -86,7 +91,7 @@ class UserNotifications {
 		$this->save();
 	}
 	
-	function notify(string $title, string $url) {
+	function notify(string $title, string $url = "") {
 		$this->notifications[] = (new Notification())->set($title, $url);
 		$this->save();
 	}
@@ -95,8 +100,10 @@ class UserNotifications {
 		return sizeof($this->notifications);
 	}
 	
-	function display() {
-		echo "<h1>Notifications</h1>";
+	function display($title = "Notifications") {
+		if ($title) {
+			echo "<h1>$title</h1>";
+		}
 		
 		if (sizeof($this->notifications) === 0) {
 			echo "<p><i>No new notifications!</i></p>";
@@ -162,5 +169,22 @@ function display_notification_charm(string $name) {
 	
 	if ($count) {
 		echo "<div class=\"cb-top-item\"><a href=\"./?a=notifications\">Notifications ($count)</a></div>";
+	}
+}
+
+/**
+ * ADMIN ALERTS
+ */
+
+function alert(string $title, string $url = "") {
+	/**
+	 * Add a notification to a user's inbox.
+	 */
+	
+	$users = get_config("admins", array());
+	
+	for ($i = 0; $i < sizeof($users); $i++) {
+		$un = new UserNotifications($user, "alert");
+		$un->notify($title, $url);
 	}
 }

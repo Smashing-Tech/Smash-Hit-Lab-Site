@@ -26,6 +26,9 @@
 						if ($user_name) {
 							display_notification_charm($user_name);
 							echo "<div class=\"cb-top-item\">" . get_nice_display_name($user_name) . "</div>";
+							if (get_name_if_admin_authed()) {
+								echo "<div class=\"cb-top-item\"><a href=\"./?a=admin_dashboard\">Admin</a></div>";
+							}
 							echo "<div class=\"cb-top-item\"><a href=\"./?a=edit_account\">Account</a></div>";
 							echo "<div class=\"cb-top-item\"><a href=\"./?a=logout\">Log out</a></div>";
 						} else {
