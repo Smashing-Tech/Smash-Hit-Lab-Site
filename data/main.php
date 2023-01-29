@@ -72,6 +72,9 @@ function main() {
 			case "notifications":
 				check_notifications();
 				break;
+			case "send_notification":
+				do_send_notification();
+				break;
 			default:
 				sorry("The action you have requested is not currently implemented.");
 				break;

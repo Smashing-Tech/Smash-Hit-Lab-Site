@@ -199,7 +199,7 @@ function rich_format(string $base, bool $trusted = false) : string {
 					$date = "Last updated " . date("Y-m-d H:i", $art->updated);
 					$text = htmlspecialchars(str_replace(array("\n", "_", "*", "`", "{", "}"), " ", substr($art->body, 0, 100))) . "...";
 					
-					$body = $body . "<div class=\"news-article-card\"><h4><a href=\"./?n=$url\">$title</a></h4><p class=\"small-text\">$date</p><p>$text</p></a></div>";
+					$body = $body . "<div class=\"new-news-article-card\"><h4><a href=\"./?n=$url\">$title</a></h4><p class=\"small-text\">$date</p><p>$text</p></a></div>";
 				}
 				// Otherwise try for a youtube embed URL ...
 				else if (str_starts_with($url, "yt:")) {

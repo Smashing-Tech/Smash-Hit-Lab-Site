@@ -40,7 +40,7 @@ function do_evaluate() {
 
 function do_site_config() {
 	/**
-	 * This is *only* for Knot126 to use :)
+	 * Site config form
 	 */
 	
 	$user = get_name_if_admin_authed();
@@ -82,7 +82,18 @@ function do_admin_dashboard() {
 		echo "<h1>Admin dashboard</h1>";
 		
 		echo "<h3>Actions</h3>";
-		echo "<ul><li><a href=\"./?a=site_config\">Site configuration</a> &mdash; very basic site options</li><li><a href=\"./?a=user_ban\">Ban user</a> &mdash; user banning form</li><li><a href=\"./?a=delete_mod\">Delete mod page</a> &mdash; remove a mod page from the site</li></ul>";
+		
+		echo "<h4>Site and maintanance</h4>";
+		echo "<ul>";
+		echo "<li><a href=\"./?a=site_config\">Site configuration</a> &mdash; very basic site options</li>";
+		echo "<li><a href=\"./?a=send_notification\">Send notification</a> &mdash; send a notification to everyone</li>";
+		echo "</ul>";
+		
+		echo "<h4>Users and content</h4>";
+		echo "<ul>";
+		echo "<li><a href=\"./?a=user_ban\">Ban user</a> &mdash; user banning form</li>";
+		echo "<li><a href=\"./?a=delete_mod\">Delete mod page</a> &mdash; remove a mod page from the site</li>";
+		echo "</ul>";
 		
 		echo "<h3>Alerts</h3>";
 		$un = new UserNotifications($user, "alert");
@@ -156,6 +167,39 @@ function do_user_ban() {
 			}
 		}
 		
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
+}
+
+function do_send_notification() {
+	/**
+	 * Send a notification to everyone who uses the website.
+	 */
+	
+	$user = get_name_if_admin_authed();
+	
+	if ($user) {
+		if (!array_key_exists("submit", $_GET)) {
+			include_header();
+			echo "<h1>Send notification</h1>";
+			form_start("./?a=send_notification&submit=1");
+			edit_feild("title", "text", "Title", "Title of the notification to send to users.", "");
+			edit_feild("url", "text", "Link", "The URL that the notification should lead to.", "");
+			echo "<p><b>Warning:</b> This notification will be sent to everyone who has an account! Please think carefully before using this feature.</p>";
+			form_end("Send notification");
+			include_footer();
+		}
+		else {
+			$db = new Database("user");
+			$users = $db->enumerate();
+			
+			notify_many($users, $_POST["title"], $_POST["url"]);
+			
+			alert("Global notification sent by $user", "./?u=$user");
+			redirect("./?a=send_notification");
+		}
 	}
 	else {
 		sorry("The action you have requested is not currently implemented.");

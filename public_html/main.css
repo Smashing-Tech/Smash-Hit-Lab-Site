@@ -153,6 +153,17 @@ input[type=submit]:hover, button:hover {
 	margin: 1em 0;
 }
 
+/* Since I am using the news-article-card for others things that might break if
+ * I change this, I am just putting this here... */
+.new-news-article-card {
+	background: var(--main-colour-bg-bright);
+	border-radius: 0.5em;
+	box-shadow: 0 0 3em #00474140;
+	overflow: auto;
+	padding: 1em;
+	margin: 0.25em 0.75em;
+}
+
 .staff-badge {
 	background: #261e00;
 	border-radius: 1em;
