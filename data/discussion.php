@@ -310,7 +310,7 @@ class Discussion {
 		
 		if ($hidden > 0 && get_name_if_admin_authed()) {
 			$s = ($hidden == 1) ? " was" : "s were";
-			echo "<p><i>Please note that $hidden other comment$s hidden by staff.</i></p>";
+			echo "<p><i>Please note that $hidden other comment$s hidden.</i></p>";
 		}
 	}
 	

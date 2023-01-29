@@ -7,7 +7,7 @@
 
 $database_path = "../data/db/";
 
-/*class RdbObjectContainer {
+/*class RDBObject {
 	/**
 	 * RevisionDB object container
 	 *

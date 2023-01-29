@@ -207,12 +207,18 @@ function rich_format(string $base, bool $trusted = false) : string {
 					
 					$body = $body . "<iframe width=\"100%\" height=\"600px\" src=\"https://www.youtube-nocookie.com/embed/$url\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" style=\"border-radius: 0.5em;\" allowfullscreen></iframe>";
 				}
+				// Try for an image...
+				else if (str_starts_with($url, "img:")) {
+					$url = substr($url, 4);
+					
+					$body = $body . "</p><img class=\"billboard\" src=\"$url\"/><p>";
+				}
 				// Otherwise this is just a bare URL ...
 				else {
 					$body = $body . "<a href=\"$url\" rel=\"nofollow\">$url</a>";
 				}
 				
-				$i += $end + 3; // Skip the unneeded chars
+				$i += $end + 1; // Skip the unneeded chars
 			}
 		}
 		else {

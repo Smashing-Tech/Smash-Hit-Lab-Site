@@ -16,6 +16,8 @@ class ModPage {
 	public $tags;
 	public $version;
 	public $updated;
+	public $created;
+	public $author;
 	public $security;
 	public $reviews;
 	
@@ -35,6 +37,8 @@ class ModPage {
 			$this->tags = $mod->tags;
 			$this->version = $mod->version;
 			$this->updated = $mod->updated;
+			$this->created = property_exists($mod, "created") ? $mod->created : time();
+			$this->author = property_exists($mod, "author") ? $mod->author : "";
 			$this->security = $mod->security;
 			$this->status = $mod->status;
 			$this->reviews = property_exists($mod, "reviews") ? $mod->reviews : random_discussion_name();
@@ -55,6 +59,7 @@ class ModPage {
 			$this->tags = array();
 			$this->version = null;
 			$this->updated = time();
+			$this->created = time();
 			$this->security = "No potentially insecure modifications";
 			$this->status = "Released";
 			$this->reviews = random_discussion_name();
@@ -108,13 +113,15 @@ class ModPage {
 		edit_feild("tags", "text", "Tags", "Keywords and categorical description of this mod.", create_comma_array($this->tags));
 		edit_feild("version", "text", "Version", "The latest version of this mod.", $this->version);
 		edit_feild("updated", "text", "Updated", "The unix timestamp for the last time this page was updated.", date("Y-m-d H:i:s", $this->updated), false);
+		edit_feild("created", "text", "Created", "The time when this page was first created.", date("Y-m-d H:i:s", $this->created), false);
+		edit_feild("author", "text", "Author", "The person who edited this page before you.", $this->author, false);
 		edit_feild("security", "text", "Security", "A short statement on this mod's security.", $this->security);
 		edit_feild("status", "text", "Status", "A short description of the mod's development status.", $this->status);
 		echo "<input type=\"submit\" value=\"Save edits\"/>";
 		echo "</form>";
 	}
 	
-	function save_edit() {
+	function save_edit(string $whom) {
 		$this->name = htmlspecialchars($_POST["name"]);
 		$this->creators = parse_comma_array(htmlspecialchars($_POST["creators"]));
 		$this->wiki = htmlspecialchars($_POST["wiki"]);
@@ -124,6 +131,7 @@ class ModPage {
 		$this->tags = parse_comma_array(htmlspecialchars($_POST["tags"]));
 		$this->version = htmlspecialchars($_POST["version"]);
 		$this->updated = time();
+		$this->author = $whom;
 		$this->security = htmlspecialchars($_POST["security"]);
 		$this->status = htmlspecialchars($_POST["status"]);
 		
@@ -192,7 +200,7 @@ function save_mod() : void {
 	}
 	
 	$mod = new ModPage($mod_name);
-	$mod->save_edit();
+	$mod->save_edit($user);
 	
 	// Admin alert!
 	alert("Mod page $mod_name updated by $user", "./?m=$mod_name");
