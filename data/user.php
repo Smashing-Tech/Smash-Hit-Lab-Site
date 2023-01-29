@@ -129,28 +129,33 @@ function get_yt_image(string $handle) : string {
 	 * Get the URL of the user's YouTube profile picture.
 	 */
 	
-	$ytpage = file_get_contents("https://youtube.com/@$handle/featured");
-	
-	if (!$ytpage) {
+	try {
+		$ytpage = file_get_contents("https://youtube.com/@$handle/featured");
+		
+		if (!$ytpage) {
+			return "";
+		}
+		
+		$before = "<meta property=\"og:image\" content=\"";
+		
+		if ($before < 0) {
+			return "";
+		}
+		
+		// Carve out anything before this url
+		$i = strpos($ytpage, $before);
+		$ytpage = substr($ytpage, $i + strlen($before));
+		
+		// Carve out anything after this url
+		$i = strpos($ytpage, "\"");
+		$ytpage = substr($ytpage, 0, $i);
+		
+		// We have the string!!!
+		return $ytpage;
+	}
+	catch (Exception $e) {
 		return "";
 	}
-	
-	$before = "<meta property=\"og:image\" content=\"";
-	
-	if ($before < 0) {
-		return "";
-	}
-	
-	// Carve out anything before this url
-	$i = strpos($ytpage, $before);
-	$ytpage = substr($ytpage, $i + strlen($before));
-	
-	// Carve out anything after this url
-	$i = strpos($ytpage, "\"");
-	$ytpage = substr($ytpage, 0, $i);
-	
-	// We have the string!!!
-	return $ytpage;
 }
 
 class User {
@@ -531,7 +536,7 @@ function edit_account() {
 	edit_feild("name", "text", "Handle", "The string that idenifies you in the database.", $user->name, false);
 	edit_feild("display", "text", "Display name", "Choose the name that you prefer to be called.", $user->display);
 	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email);
-	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account. We will use this account to give you a profile picture.", $user->youtube);
+	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, not including the at sign (@). We will use this account to give you a profile picture.", $user->youtube);
 	
 	echo "<input type=\"submit\" value=\"Save details\"/>";
 	echo "</form>";
@@ -559,6 +564,12 @@ function save_account() {
 	
 	$user->email = htmlspecialchars($_POST["email"]);
 	$user->youtube = htmlspecialchars($_POST["youtube"]);
+	
+	// If the user started it with an @ then we will try to make it okay for
+	// them.
+	if (str_starts_with($user->youtube, "@")) {
+		$user->youtube = substr($user->youtube, 1);
+	}
 	
 	if ($user->youtube) {
 		$user->ytimg = get_yt_image($user->youtube);
@@ -593,11 +604,6 @@ function display_user(string $user) {
 	global $gTitle; $gTitle = ($user->display ? $user->display : $user->name) . " (@$user->name)";
 	
 	include_header();
-	
-	// if (!$user->is_admin() && !$stalker->is_admin() && ($stalker != $user)) {
-	// 	echo "<h1>Sorry</h1><p>We don't allow viewing non-admin user profiles.</p>";
-	// 	return;
-	// }
 	
 	// If the user has a YouTube PFP, then display it large!
 	if ($user->ytimg) {
