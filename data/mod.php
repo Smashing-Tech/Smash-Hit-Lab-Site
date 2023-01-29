@@ -133,6 +133,7 @@ class ModPage {
 	function delete() {
 		$db = new Database("mod");
 		$db->delete($this->package);
+		discussion_delete_given_id($this->reviews);
 	}
 }
 
@@ -200,20 +201,38 @@ function save_mod() : void {
 }
 
 function delete_mod() : void {
-	if (!array_key_exists("m", $_GET)) {
+	$user = get_name_if_admin_authed();
+	
+	if ($user) {
+		if (!array_key_exists("page", $_POST)) {
+			include_header();
+			
+			echo "<h1>Delete mod page</h1>";
+			
+			form_start("./?a=delete_mod");
+			edit_feild("page", "text", "Page name", "The name of the page to delete. This is the same as the mod's package name.", "");
+			edit_feild("reason", "text", "Reason", "Type a short reason that you would like to delete this page (optional).", "");
+			form_end("Delete mod page");
+			
+			include_footer();
+		}
+		else {
+			$mod = htmlspecialchars($_POST["page"]);
+			$reason = htmlspecialchars($_POST["reason"]);
+			
+			$mod = new ModPage($mod);
+			$mod->delete();
+			
+			alert("Mod page $mod->package deleted by $name: $reason");
+			
+			include_header();
+			echo "<h1>Page was deleted!</h1><p>The mod page and assocaited discussion was deleted successfully.</p>";
+			include_footer();
+		}
+	}
+	else {
 		sorry("The action you have requested is not currently implemented.");
 	}
-	
-	$mod_name = $_GET["m"];
-	
-	if (!get_name_if_admin_authed()) {
-		sorry("The action you have requested is not currently implemented.");
-	}
-	
-	$mod = new ModPage($mod_name);
-	$mod->delete();
-	
-	redirect("/");
 }
 
 function list_mods() : void {

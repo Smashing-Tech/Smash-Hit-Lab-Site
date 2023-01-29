@@ -71,12 +71,13 @@ function mod_property($title, $desc, $value) : void {
 	echo "</div>";
 }
 
-function sorry(string $why = "There was a problem.") {
+function sorry(string $why = "There was a problem.", string $extra = "") {
 	global $gTitle;
 	$gTitle = "There was an error !!!";
 	
 	include_header();
 	echo "<h1>Sorry</h1><p>$why</p>";
+	echo $extra;
 	include_footer();
 	die();
 }

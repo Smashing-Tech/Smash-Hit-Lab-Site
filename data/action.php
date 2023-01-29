@@ -198,6 +198,9 @@ function do_register() {
 	
 	mail($email, "Smash Hit Lab Registration", $body);
 	
+	// Alert the admins of the new account
+	alert("New user account $username was registered", "./?u=$username");
+	
 	// Print message
 	include_header();
 	echo "<h1>Account created!</h1>";

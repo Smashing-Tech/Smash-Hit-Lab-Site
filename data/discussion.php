@@ -85,7 +85,8 @@ class Comment {
 		$img = "<img src=\"$img\"/>";
 		$text = rich_format($this->body);
 		$after = htmlspecialchars($_SERVER['REQUEST_URI']);
-		$actions = (get_name_if_admin_authed()) ? "<p><a href=\"./?a=discussion_hide&id=$id&index=$index&after=$after\">Hide comment</a></p>" : "";
+		$hidden_text = ($this->is_hidden()) ? "Unhide" : "Hide";
+		$actions = (get_name_if_admin_authed()) ? "<p><a href=\"./?a=discussion_hide&id=$id&index=$index&after=$after\">$hidden_text comment</a></p>" : "";
 		
 		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\">$img</div><div class=\"comment-card-inner-right\"><p>$name</p><p class=\"small-text\">$date</p><p>$text</p>$actions</div></div></div>";
 	}
@@ -127,6 +128,11 @@ class Discussion {
 		$db->save($this->id, $this);
 	}
 	
+	function delete() {
+		$db = new Database("discussion");
+		$db->delete($this->id);
+	}
+	
 	function get_id() {
 		return (sizeof($this->comments) > 0) ? $this->id : null;
 	}
@@ -166,10 +172,16 @@ class Discussion {
 		// URL (which is probably a good idea, actually).
 		// HACK I think if we start with "./" for now, it should be secure
 		// enough.
-		notify_many($this->followers, "New message from $author", "./" . $_GET['after']);
+		$url = $_GET['after'];
+		
+		if (!str_starts_with($url, "./") || !str_starts_with($url, "/")) {
+			$url = "./" . $url;
+		}
+		
+		notify_many($this->followers, "New message from $author", $url);
 		
 		// Admin alert!
-		alert("Discssion $this->id updated by $author", "./" . $_GET['after']);
+		alert("Discssion $this->id updated by $author", "./" . $url);
 	}
 	
 	function update_comment(int $index, string $author, string $body) {
@@ -207,6 +219,14 @@ class Discussion {
 		return $hidden;
 	}
 	
+	function enumerate_shown() {
+		/**
+		 * Return the number of shown comments.
+		 */
+		
+		return sizeof($this->comments) - $this->enumerate_hidden();
+	}
+	
 	function display_edit(int $index, string $url = "") {
 		/**
 		 * Display the comment edit box.
@@ -227,6 +247,7 @@ class Discussion {
 					$comment = $this->comments[$index];
 				}
 				
+				$name = get_nice_display_name(get_name_if_authed());
 				$url = htmlspecialchars($_SERVER['REQUEST_URI']); // Yes this should be sanitised for mod pages
 				$body = htmlspecialchars($comment->body);
 				$img = get_profile_image(get_name_if_authed());
@@ -235,7 +256,7 @@ class Discussion {
 					$img = "./icon.png";
 				}
 				
-				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><h4>Add your comment</h4><p><textarea style=\"width: calc(100% - 1em);\" name=\"body\">$body</textarea></p><p><input type=\"submit\" value=\"Post comment\"></p></form></div></div></div>";
+				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><p>$name</p><p><textarea style=\"width: calc(100% - 1em); background: transparent; padding: 0;\" name=\"body\" placeholder=\"Add your comment...\">$body</textarea></p><p><input type=\"submit\" value=\"Post comment\"></p></form></div></div></div>";
 				break;
 			}
 			case "closed": {
@@ -250,7 +271,7 @@ class Discussion {
 	}
 	
 	function display_title(string $title) {
-		echo "<h4>$title (" . sizeof($this->comments) . ")</h4>";
+		echo "<h4>$title (" . $this->enumerate_shown() . ")</h4>";
 	}
 	
 	function display_follow() {
@@ -267,9 +288,9 @@ class Discussion {
 	function display_hidden() {
 		$hidden = $this->enumerate_hidden();
 		
-		if ($hidden > 0) {
+		if ($hidden > 0 && get_name_if_admin_authed()) {
 			$s = ($hidden == 1) ? " was" : "s were";
-			echo "<p><i>Please note that $hidden comment$s hidden by staff.</i></p>";
+			echo "<p><i>Please note that $hidden other comment$s hidden by staff.</i></p>";
 		}
 	}
 	
@@ -314,6 +335,11 @@ class Discussion {
 function discussion_exists(string $name) {
 	$db = new Database("discussion");
 	return $db->has($name);
+}
+
+function discussion_delete_given_id(string $id) {
+	$d = new Discussion($id);
+	$d->delete();
 }
 
 function discussion_update() {

@@ -42,16 +42,22 @@ function get_recent() {
 	}
 }
 
-function show_news_edit_button(string $name) : void {
+function get_news_edit_button(string $name) : string {
 	$user = get_name_if_authed();
 	
 	if ($user) {
 		$user = new User($user);
 		
 		if ($user->is_admin()) {
-			echo "<p><a href=\"./?a=update_news&n=$name\"><button>Edit this article</button></a></p>";
+			return "<p><a href=\"./?a=update_news&n=$name\"><button>Edit this article</button></a></p>";
 		}
 	}
+	
+	return "";
+}
+
+function show_news_edit_button(string $name) : void {
+	echo get_news_edit_button($name);
 }
 
 class Article {
@@ -311,9 +317,7 @@ function display_news(string $name) : void {
 	 */
 	
 	if (!article_exists($name)) {
-		echo "<h1>Sorry</h1><p>It seems like we don't have a news article by that name.</p>";
-		show_news_edit_button($name);
-		return;
+		sorry("It seems like we don't have a news article by that name.", get_news_edit_button($name));
 	}
 	
 	$article = new Article($name);
@@ -327,9 +331,7 @@ function display_news(string $name) : void {
 		$article->display();
 	}
 	else {
-		echo "<h1>Sorry</h1><p>It seems like we don't have a news article by that name.</p>";
-		show_news_edit_button($name);
-		return;
+		sorry("It seems like we don't have a news article by that name.", get_news_edit_button($name));
 	}
 	
 	include_footer();

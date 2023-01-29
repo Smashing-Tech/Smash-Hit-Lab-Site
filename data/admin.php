@@ -43,7 +43,9 @@ function do_site_config() {
 	 * This is *only* for Knot126 to use :)
 	 */
 	
-	if (get_name_if_admin_authed()) {
+	$user = get_name_if_admin_authed();
+	
+	if ($user) {
 		if (!array_key_exists("submit", $_GET)) {
 			include_header();
 			echo "<h1>Site configuration</h1>";
@@ -51,7 +53,6 @@ function do_site_config() {
 			edit_feild("enable_discussions", "select", "Discussions", "If discussions should be enabled, disabled or closed sitewide. Closed will disable new comments but still show old ones, while disabled will stop showing them entirely. Comments can still be marked as hidden when closed, but cannot when disabled.", get_config("enable_discussions", "enabled"), true, array("enabled" => "Enabled", "disabled" => "Disabled", "closed" => "Closed"));
 			edit_feild("register", "select", "Enable registering", "Weather registering of new accounts should be limited or not.", get_config("register", "anyone"), true, array("anyone" => "Anyone can register", "users" => "Only users can register", "admins" => "Only admins can register", "closed" => "Registering is disabled"));
 			edit_feild("enable_login", "select", "Enable logins", "Allow users to log in to the stie.</p><p><b>Warning:</b> If you set this to completely disabled and all admins are logged out, then you need to wait for Knot126 to fix the site.", get_config("enable_login", "users"), true, array("users" => "All users can log in", "admins" => "Only admins can log in", "closed" => "Logging in is disabled"));
-			edit_feild("static_mode", "select", "Static mode", "Disable database edits of mod and wiki pages by users.", get_config("static_mode", "disabled"), true, array("enabled" => "Static mode is enabled", "disabled" => "Static mode is disabled"));
 			echo "<input type=\"submit\" value=\"Save settings\"/>";
 			echo "</form>";
 			include_footer();
@@ -60,7 +61,7 @@ function do_site_config() {
 			set_config("enable_discussions", $_POST["enable_discussions"], array("enabled", "disabled", "closed"));
 			set_config("register", $_POST["register"], array("anyone", "users", "admins", "closed"));
 			set_config("enable_login", $_POST["enable_login"], array("users", "admins", "closed"));
-			set_config("static_mode", $_POST["enable_login"], array("enabled", "disabled"));
+			alert("Site config was updated by $user", "./?a=site_config");
 			redirect("./?a=site_config");
 		}
 	}
@@ -81,7 +82,7 @@ function do_admin_dashboard() {
 		echo "<h1>Admin dashboard</h1>";
 		
 		echo "<h3>Actions</h3>";
-		echo "<ul><li><a href=\"./?a=site_config\">Site configuration</a> &mdash; very basic site options</li><li><a href=\"./?a=user_ban\">Ban user</a> &mdash; user banning form</li></ul>";
+		echo "<ul><li><a href=\"./?a=site_config\">Site configuration</a> &mdash; very basic site options</li><li><a href=\"./?a=user_ban\">Ban user</a> &mdash; user banning form</li><li><a href=\"./?a=delete_mod\">Delete mod page</a> &mdash; remove a mod page from the site</li></ul>";
 		
 		echo "<h3>Alerts</h3>";
 		$un = new UserNotifications($user, "alert");
@@ -96,13 +97,9 @@ function do_admin_dashboard() {
 }
 
 function do_user_ban() {
-	/**
-	 * This is *only* for Knot126 to use :)
-	 */
+	$banner = get_name_if_admin_authed();
 	
-	$user = get_name_if_admin_authed();
-	
-	if ($user) {
+	if ($banner) {
 		if (!array_key_exists("handle", $_POST)) {
 			include_header();
 			echo "<h1>Ban user</h1>";
@@ -110,19 +107,23 @@ function do_user_ban() {
 			form_start("./?a=user_ban");
 			edit_feild("handle", "text", "Handle", "Handle or username of the user to ban.", "");
 			edit_feild("duration", "select", "Duration", "How long to ban this user.", "1w", true, array("21600" => "6 Hours", "86400" => "1 Day", "604800" => "1 Week", "2678400" => "1 Month", "31536000" => "1 Year", "-1" => "Forever", "1" => "Remove ban"));
+			edit_feild("reason", "text", "Reason", "Type a short reason why you want to ban this user (optional). <b>This message is not shown to the user at the moment and is for audit logs only.</b>", "");
 			echo "<p><b>Note:</b> Any IP addresses assocaited with this user will be blocked for the set duration, up to 3 months.</p>";
 			form_end("Ban user");
 			
 			include_footer();
 		}
 		else {
-			$handle = $_POST["handle"];
+			$handle = htmlspecialchars($_POST["handle"]);
 			$duration = intval($_POST["duration"]);
+			$reason = htmlspecialchars($_POST["reason"]);
 			
 			$user = new User($handle);
 			$user->set_ban($duration);
 			
 			$duration = $user->unban_date();
+			
+			alert("User $user->name banned by $banner: $reason", "./?u=$user->name");
 			
 			// Display success page
 			include_header();
