@@ -51,6 +51,9 @@ function main() {
 			case "user_ban":
 				do_user_ban();
 				break;
+			case "user_verify":
+				user_verify();
+				break;
 			case "admin_dashboard":
 				do_admin_dashboard();
 				break;

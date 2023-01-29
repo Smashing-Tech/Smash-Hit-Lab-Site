@@ -35,6 +35,21 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $optio
 					
 					echo "</select>";
 					break;
+				case "button":
+					$k = array_keys($options);
+					
+					echo "<div id=\"$name\">";
+					
+					for ($i = 0; $i < sizeof($k); $i++) {
+						$key = $k[$i];
+						$val = $options[$k[$i]];
+						
+						echo "<p><a href=\"$key\"><button>$val</button></a></p>";
+					}
+					
+					echo "</div>";
+					
+					break;
 				default:
 					echo "$value";
 					break;

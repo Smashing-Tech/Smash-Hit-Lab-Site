@@ -154,6 +154,8 @@ function get_yt_image(string $handle) : string {
 }
 
 class User {
+	// NOTE These are not updated and since I don't have to add them I'm not
+	//      going to do that.
 	public $name; // Yes, it would probably be better to store users by ID.
 	public $display; // The display name of the user
 	public $password; // Password hash and salt
@@ -174,6 +176,7 @@ class User {
 			$this->tokens = $info->tokens;
 			$this->email = $info->email;
 			$this->created = (property_exists($info, "created") ? $info->created : time());
+			$this->verified = property_exists($info, "verified") ? $info->verified : null;
 			$this->admin = $info->admin;
 			$this->ban = property_exists($info, "ban") ? $info->ban : null;
 			$this->wall = property_exists($info, "wall") ? $info->wall : random_discussion_name();
@@ -192,6 +195,7 @@ class User {
 			$this->tokens = array();
 			$this->email = null;
 			$this->created = time();
+			$this->verified = null;
 			$this->admin = false;
 			$this->ban = null;
 			$this->wall = random_discussion_name();
@@ -264,6 +268,10 @@ class User {
 		}
 		
 		return ($this->ban !== null);
+	}
+	
+	function is_verified() : bool {
+		return ($this->verified != null);
 	}
 	
 	function unban_date() : string {
@@ -373,6 +381,11 @@ class User {
 		return $name;
 	}
 	
+	function verify(string $verifier) {
+		$this->verified = $verifier;
+		$this->save();
+	}
+	
 	function is_admin() {
 		/**
 		 * Check if the user can preform administrative tasks.
@@ -455,6 +468,10 @@ function get_nice_display_name(string $user) {
 	 * Get a nicely formatted display name for any user.
 	 */
 	
+	if (!user_exists($user)) {
+		return "Deleted user";
+	}
+	
 	$user = new User($user);
 	
 	$string = "";
@@ -463,11 +480,17 @@ function get_nice_display_name(string $user) {
 		$string = "<a href=\"./?u=$user->name\">$user->name</a>";
 	}
 	else {
-		$string = "<a href=\"./?u=$user->name\">$user->display</a>";//<span class=\"small-text\"> [$user->name]</span>";
+		$string = "<a href=\"./?u=$user->name\">$user->display</a>";
 	}
 	
-	if ($user->admin) {
+	if ($user->is_admin()) {
 		$string = $string . " <span class=\"small-text staff-badge\">staff</span>";
+	}
+	else if ($user->is_banned()) {
+		$string = $string . " <span class=\"small-text banned-badge\">banned</span>";
+	}
+	else if ($user->is_verified()) {
+		$string = $string . " <span class=\"small-text verified-badge\">verified</span>";
 	}
 	
 	return $string;
@@ -595,12 +618,19 @@ function display_user(string $user) {
 		mod_property("YouTube", "This user's YouTube account.", "<a href=\"https://youtube.com/@$user->youtube\">@$user->youtube</a>");
 	}
 	
+	// Show if the user is verified
+	if ($user->is_verified()) {
+		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "Verified by $user->verified");
+	}
+	
 	// Admins can view some extra data like emails
 	if ($stalker->is_admin()) {
 		echo "<h3>Admin-only info and actions</h3>";
 		
 		mod_property("Email", "This user's email address.", $user->email);
 		mod_property("Token count", "The number of currently active tokens this user has.", sizeof($user->tokens));
+		mod_property("Ban status", "When this user will be unbanned, if banned.", ( $user->is_banned() ? $user->unban_date() : "Not banned" ));
+		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "<a href=\"./?a=user_verify&handle=$user->name\"><button>Toggle verified status</button></a>");
 	}
 	
 	// Finally the message wall for this user
@@ -610,4 +640,28 @@ function display_user(string $user) {
 	
 	// Footer
 	include_footer();
+}
+
+function user_verify() {
+	$verifier = get_name_if_admin_authed();
+	
+	if ($verifier) {
+		$handle = htmlspecialchars($_GET["handle"]);
+		
+		$user = new User($handle);
+		
+		if ($user->is_verified()) {
+			$user->verify(null);
+		}
+		else {
+			$user->verify($verifier);
+		}
+		
+		alert("User $user->name was marked verified", "./?u=$user->name");
+		
+		redirect("./?u=$user->name");
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
 }

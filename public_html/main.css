@@ -28,6 +28,8 @@ ul { margin-left: 1em; }
 
 code {
 	background: #8883;
+	border-radius: 0.325em;
+	padding: 0.325em;
 }
 
 .billboard {
@@ -145,6 +147,20 @@ input[type=submit], button {
 	background: #261e00;
 	border-radius: 1em;
 	color: #efbf00;
+	padding: 0.0625em 0.25em;
+}
+
+.banned-badge {
+	background: #260a00;
+	border-radius: 1em;
+	color: #ef4700;
+	padding: 0.0625em 0.25em;
+}
+
+.verified-badge {
+	background: #1b2600;
+	border-radius: 1em;
+	color: #a7ef00;
 	padding: 0.0625em 0.25em;
 }
 
