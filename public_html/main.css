@@ -333,3 +333,31 @@ input[type=submit], button {
 	font-size: 16pt !important;
 	line-height: 1.5;
 }
+
+.comment-card {
+	background: var(--main-colour-bg-bright);
+	border-radius: 0.5em;
+	overflow: auto;
+	padding: 1em;
+	margin: 1em 0;
+}
+
+.comment-card-inner {
+	display: grid;
+	grid-template-columns: 56px auto;
+}
+
+.comment-card-inner-left {
+	grid-column: 1;
+}
+
+.comment-card-inner-left img {
+	width: 56px;
+	height: 56px;
+	border-radius: 28px;
+}
+
+.comment-card-inner-right {
+	grid-column: 2;
+	margin-left: 1em;
+}

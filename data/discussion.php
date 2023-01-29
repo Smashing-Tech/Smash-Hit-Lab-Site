@@ -75,10 +75,19 @@ class Comment {
 		
 		$date = date("Y-m-d H:i:s", $this->created);
 		$name = get_nice_display_name($this->author);
+		$img = get_profile_image($this->author);
+		
+		// Default PFP
+		if (!$img) {
+			$img = "./icon.png";
+		}
+		
+		$img = "<img src=\"$img\"/>";
 		$text = rich_format($this->body);
 		$after = htmlspecialchars($_SERVER['REQUEST_URI']);
 		$actions = (get_name_if_admin_authed()) ? "<p><a href=\"./?a=discussion_hide&id=$id&index=$index&after=$after\">Hide comment</a></p>" : "";
-		return "<div class=\"news-article-card\"><p>$name</p><p class=\"small-text\">$date</p><p>$text</p>$actions</div>";
+		
+		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\">$img</div><div class=\"comment-card-inner-right\"><p>$name</p><p class=\"small-text\">$date</p><p>$text</p>$actions</div></div></div>";
 	}
 }
 
@@ -208,7 +217,7 @@ class Discussion {
 		switch ($enabled) {
 			case "enabled": {
 				if (!get_name_if_authed()) {
-					echo "<div class=\"news-article-card comment-edit\"><p>Want to leave a comment? <a href=\"./?a=login\">Log in</a> or <a href=\"./?a=register\">create an account</a> to share your thoughts!</p></div>";
+					echo "<div class=\"comment-card comment-edit\"><p>Want to leave a comment? <a href=\"./?a=login\">Log in</a> or <a href=\"./?a=register\">create an account</a> to share your thoughts!</p></div>";
 					return;
 				}
 				
@@ -220,12 +229,17 @@ class Discussion {
 				
 				$url = htmlspecialchars($_SERVER['REQUEST_URI']); // Yes this should be sanitised for mod pages
 				$body = htmlspecialchars($comment->body);
+				$img = get_profile_image(get_name_if_authed());
 				
-				echo "<div class=\"news-article-card comment-edit\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><h4>Add your comment</h4><p><textarea style=\"width: calc(100% - 1em);\" name=\"body\">$body</textarea></p><p><input type=\"submit\" value=\"Post comment\"></p></form></div>";
+				if (!$img) {
+					$img = "./icon.png";
+				}
+				
+				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><h4>Add your comment</h4><p><textarea style=\"width: calc(100% - 1em);\" name=\"body\">$body</textarea></p><p><input type=\"submit\" value=\"Post comment\"></p></form></div></div></div>";
 				break;
 			}
 			case "closed": {
-				echo "<div class=\"news-article-card comment-edit\"><p>Discussions have been closed sitewide. You can chat on our Discord server for now!</p></div>";
+				echo "<div class=\"comment-card comment-edit\"><p>Discussions have been closed sitewide. You can chat on our Discord server for now!</p></div>";
 				break;
 			}
 			// If they are fully disabled there should be a message about it.
@@ -272,7 +286,7 @@ class Discussion {
 		$disabled = (get_config("enable_discussions", "enabled") === "disabled");
 		
 		if ($disabled) {
-			echo "<div class=\"news-article-card comment-edit\"><p>Discussions have been disabled sitewide. Existing comments are not shown, but will return when discussions are enabled again.</p></div>";
+			echo "<div class=\"comment-card comment-edit\"><p>Discussions have been disabled sitewide. Existing comments are not shown, but will return when discussions are enabled again.</p></div>";
 		}
 		
 		return $disabled;

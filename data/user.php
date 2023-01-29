@@ -124,7 +124,7 @@ class Token {
 	}
 }
 
-function get_yt_image(string $handle) {
+function get_yt_image(string $handle) : string {
 	/**
 	 * Get the URL of the user's YouTube profile picture.
 	 */
@@ -132,21 +132,21 @@ function get_yt_image(string $handle) {
 	$ytpage = file_get_contents("https://youtube.com/@$handle/featured");
 	
 	if (!$ytpage) {
-		return null;
+		return "";
 	}
 	
 	$before = "<meta property=\"og:image\" content=\"";
 	
 	if ($before < 0) {
-		return null;
+		return "";
 	}
 	
 	// Carve out anything before this url
-	$i = strstr($ytpage, $before);
+	$i = strpos($ytpage, $before);
 	$ytpage = substr($ytpage, $i + strlen($before));
 	
 	// Carve out anything after this url
-	$i = strstr($ytpage, "\"");
+	$i = strpos($ytpage, "\"");
 	$ytpage = substr($ytpage, 0, $i);
 	
 	// We have the string!!!
@@ -177,6 +177,8 @@ class User {
 			$this->admin = $info->admin;
 			$this->ban = property_exists($info, "ban") ? $info->ban : null;
 			$this->wall = property_exists($info, "wall") ? $info->wall : random_discussion_name();
+			$this->youtube = property_exists($info, "youtube") ? $info->youtube : "";
+			$this->ytimg = property_exists($info, "ytimg") ? $info->ytimg : "";
 			
 			// If there weren't discussions before, save them now.
 			if (!property_exists($info, "wall")) {
@@ -193,6 +195,8 @@ class User {
 			$this->admin = false;
 			$this->ban = null;
 			$this->wall = random_discussion_name();
+			$this->youtube = "";
+			$this->ytimg = "";
 			
 			// Make sure the new user is following their wall by default.
 			$d = new Discussion($this->wall);
@@ -469,6 +473,16 @@ function get_nice_display_name(string $user) {
 	return $string;
 }
 
+function get_profile_image(string $user) {
+	/**
+	 * Get the URL to a user's profile image.
+	 */
+	
+	$user = new User($user);
+	
+	return $user->ytimg;
+}
+
 function edit_account() {
 	/**
 	 * Display the account data editing page.
@@ -492,6 +506,7 @@ function edit_account() {
 	edit_feild("name", "text", "Handle", "The string that idenifies you in the database.", $user->name, false);
 	edit_feild("display", "text", "Display name", "Choose the name that you prefer to be called.", $user->display);
 	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email);
+	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account.", $user->youtube);
 	
 	echo "<input type=\"submit\" value=\"Save details\"/>";
 	echo "</form>";
@@ -518,6 +533,12 @@ function save_account() {
 	}
 	
 	$user->email = htmlspecialchars($_POST["email"]);
+	$user->youtube = htmlspecialchars($_POST["youtube"]);
+	
+	if ($user->youtube) {
+		$user->ytimg = get_yt_image($user->youtube);
+	}
+	
 	$user->save();
 	
 	redirect("/?a=edit_account");
@@ -561,6 +582,11 @@ function display_user(string $user) {
 	// Show if this user is an admin
 	if ($user->is_admin()) {
 		mod_property("Rank", "The offical position this user holds at the Smash Hit Lab.", "Staff and Administrators");
+	}
+	
+	// Maybe show youtube?
+	if ($user->youtube) {
+		mod_property("YouTube", "This user's YouTube account.", "<a href=\"https://youtube.com/@$user->youtube\">@$user->youtube</a>");
 	}
 	
 	// Admins can view some extra data like emails
