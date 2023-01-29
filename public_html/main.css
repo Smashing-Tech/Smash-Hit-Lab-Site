@@ -160,7 +160,7 @@ input[type=submit], button {
 	padding: 1em;
 	position: fixed;
 	top: 0;
-	width: 100%;
+	width: calc(100vw - 32px);
 }
 
 .post-navbar-padding {
@@ -183,6 +183,11 @@ input[type=submit], button {
 	vertical-align: middle;
 	font-family: var(--font-face);
 	max-height: 64px; /* Why did this fix it? */
+}
+
+.toleft {
+	margin-right: 0;
+	margin-left: 1.0em;
 }
 
 .cb-logo-item {

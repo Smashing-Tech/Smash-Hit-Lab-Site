@@ -19,21 +19,21 @@
 					<div class="cb-top-item"><a href="https://discord.gg/7kra7Z3UNn">Discord</a></div>
 				</div>
 				<div class="header-container-right">
-					<div class="cb-logo-item"> </div>
+					<div class="cb-logo-item">&ZeroWidthSpace;</div><!--amazing hack-->
 					<?php
 						$user_name = get_name_if_authed();
 						
 						if ($user_name) {
 							display_notification_charm($user_name);
-							echo "<div class=\"cb-top-item\">" . get_nice_display_name($user_name) . "</div>";
+							echo "<div class=\"cb-top-item toleft\">" . get_nice_display_name($user_name) . "</div>";
 							if (get_name_if_admin_authed()) {
-								echo "<div class=\"cb-top-item\"><a href=\"./?a=admin_dashboard\">Admin</a></div>";
+								echo "<div class=\"cb-top-item toleft\"><a href=\"./?a=admin_dashboard\">Admin</a></div>";
 							}
-							echo "<div class=\"cb-top-item\"><a href=\"./?a=edit_account\">Account</a></div>";
-							echo "<div class=\"cb-top-item\"><a href=\"./?a=logout\">Log out</a></div>";
+							echo "<div class=\"cb-top-item toleft\"><a href=\"./?a=edit_account\">Account</a></div>";
+							echo "<div class=\"cb-top-item toleft\"><a href=\"./?a=logout\">Log out</a></div>";
 						} else {
-							echo "<div class=\"cb-top-item\"><a href=\"./?p=login\">Log in</a></div>";
-							echo "<div class=\"cb-top-item\"><a href=\"./?p=register\">Register</a></div>";
+							echo "<div class=\"cb-top-item toleft\"><a href=\"./?p=login\">Log in</a></div>";
+							echo "<div class=\"cb-top-item toleft\"><a href=\"./?p=register\">Register</a></div>";
 						}
 					?>
 				</div>
