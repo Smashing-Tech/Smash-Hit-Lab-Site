@@ -45,7 +45,7 @@ class Notification {
 		$url = htmlspecialchars($this->url);
 		$date = date("Y-m-d H:i:s", $this->created);
 		
-		return ($url) ? "<li>$date &mdash; <a href=\"$url\">$title</a></li>" : "<li>$date &mdash $title</li>";
+		return ($url) ? "<li>$date &mdash; <a href=\"$url\">$title</a></li>" : "<li>$date &mdash; $title</li>";
 	}
 }
 

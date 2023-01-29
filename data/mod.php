@@ -220,10 +220,12 @@ function delete_mod() : void {
 			$mod = htmlspecialchars($_POST["page"]);
 			$reason = htmlspecialchars($_POST["reason"]);
 			
+			if (!$reason) { $reason = "<i>No reason given</i>"; }
+			
 			$mod = new ModPage($mod);
 			$mod->delete();
 			
-			alert("Mod page $mod->package deleted by $name: $reason");
+			alert("Mod page $mod->package deleted by $user: $reason");
 			
 			include_header();
 			echo "<h1>Page was deleted!</h1><p>The mod page and assocaited discussion was deleted successfully.</p>";
