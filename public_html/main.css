@@ -30,14 +30,9 @@ code {
 	background: #8883;
 }
 
-.feature {
-	font-size: 19pt;
-	text-align: center;
-	padding-bottom: 0.75em;
-}
-
 .billboard {
-	border-radius: 0.5em;
+	border-radius: 1.0em;
+	width: 100%;
 }
 
 a {
@@ -320,7 +315,7 @@ input[type=submit], button {
 
 .header-container {
 	display: grid;
-	grid-template-columns: auto 45em;
+	grid-template-columns: auto auto;
 	padding-right: 1em;
 }
 

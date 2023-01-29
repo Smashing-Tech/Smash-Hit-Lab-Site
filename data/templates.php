@@ -72,6 +72,9 @@ function mod_property($title, $desc, $value) : void {
 }
 
 function sorry(string $why = "There was a problem.") {
+	global $gTitle;
+	$gTitle = "There was an error !!!";
+	
 	include_header();
 	echo "<h1>Sorry</h1><p>$why</p>";
 	include_footer();

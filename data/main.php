@@ -72,19 +72,13 @@ function main() {
 		}
 	}
 	else if (array_key_exists("m", $_GET)) {
-		include_header();
-		display_mod($_GET["m"]);
-		include_footer();
+		display_mod();
 	}
 	else if (array_key_exists("u", $_GET)) {
-		include_header();
 		display_user($_GET["u"]);
-		include_footer();
 	}
 	else if (array_key_exists("n", $_GET)) {
-		include_header();
 		display_news($_GET["n"]);
-		include_footer();
 	}
 	else if (array_key_exists("p", $_GET)) {
 		include_header();

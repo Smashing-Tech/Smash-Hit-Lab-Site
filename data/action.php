@@ -33,6 +33,10 @@ function do_login() {
 	$password = $_POST["password"]; // We should not sanitise the password, bad things happen
 	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
 	
+	if (!isset($_POST["username"]) || !isset($_POST["password"]) || !$_POST["username"] || !$_POST["password"]) {
+		sorry("You did not fill out the entire form. Please try again.");
+	}
+	
 	// Check if logins are enabled
 	switch (get_config("enable_login", "users")) {
 		case "closed":

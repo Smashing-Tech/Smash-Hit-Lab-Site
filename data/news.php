@@ -318,6 +318,11 @@ function display_news(string $name) : void {
 	
 	$article = new Article($name);
 	
+	// HACK for article titles
+	global $gTitle; $gTitle = $article->title;
+	
+	include_header();
+	
 	if (($article->permissions == "public") || (get_name_if_admin_authed() != null)) {
 		$article->display();
 	}
@@ -326,6 +331,8 @@ function display_news(string $name) : void {
 		show_news_edit_button($name);
 		return;
 	}
+	
+	include_footer();
 }
 
 function pretend_error() : void {

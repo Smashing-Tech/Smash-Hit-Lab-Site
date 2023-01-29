@@ -1,10 +1,23 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="utf-8"/>
+		<meta charset="utf-8">
+		<meta name="description" content="A passionate community of creators, programmers and players of the mobile game Smash Hit.">
+		<meta name="keywords" content="smash hit, smash, hit, mobile, game, mobile game, glass, glass game, break glass, break glass game, break, destruction, destruction game, modding, mods, mod, modification, smash hit lab, lab">
+		<meta name="author" content="Smash Hit Lab">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="shortcut icon" type="image/png" href="./icon.png"/>
 		<link rel="stylesheet" href="./main.css"/>
-		<title>Smash Hit Lab</title>
+		<?php
+		global $gTitle;
+		
+		if (!isset($gTitle)) {
+			echo "<title>Smash Hit Lab</title>";
+		}
+		else {
+			echo "<title>$gTitle &mdash; Smash Hit Lab</title>";
+		}
+		?>
 	</head>
 	<body>
 		<div class="navbar-section">

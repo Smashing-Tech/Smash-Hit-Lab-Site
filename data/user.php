@@ -552,26 +552,27 @@ function display_user(string $user) {
 	$stalker = get_name_if_authed();
 	
 	if (!$stalker) {
-		include_header();
-		echo "<h1>Sorry</h1><p>Only logged in users can view profile pages.</p>";
-		include_footer();
-		return;
+		sorry("Only logged in users can view profile pages.");
 	}
 	
 	// We need this so admins can have some extra options like banning users
 	$stalker = new User($stalker);
 	
 	if (!user_exists($user)) {
-		echo "<h1>Sorry</h1><p>We could not find that user in our database.</p>";
-		return;
+		sorry("We could not find that user in our database.");
 	}
 	
 	$user = new User($user);
 	
-	if (!$user->is_admin() && !$stalker->is_admin() && ($stalker != $user)) {
-		echo "<h1>Sorry</h1><p>We don't allow viewing non-admin user profiles.</p>";
-		return;
-	}
+	// HACK Page title
+	global $gTitle; $gTitle = ($user->display ? $user->display : $user->name) . " (@$user->name)";
+	
+	include_header();
+	
+	// if (!$user->is_admin() && !$stalker->is_admin() && ($stalker != $user)) {
+	// 	echo "<h1>Sorry</h1><p>We don't allow viewing non-admin user profiles.</p>";
+	// 	return;
+	// }
 	
 	// If the user has a YouTube PFP, then display it large!
 	if ($user->ytimg) {
@@ -606,4 +607,7 @@ function display_user(string $user) {
 	// Display comments
 	$disc = new Discussion($user->wall);
 	$disc->display_reverse("Message wall", "./?u=" . $user->name);
+	
+	// Footer
+	include_footer();
 }

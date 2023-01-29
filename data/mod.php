@@ -136,9 +136,23 @@ class ModPage {
 	}
 }
 
-function display_mod(string $mod_name) : void {
+function display_mod_page(string $mod_name) : void {
 	$mod = new ModPage($mod_name);
 	$mod->display();
+}
+
+function display_mod() {
+	/**
+	 * Ugly HACK -ed version to make the title display without much effort.
+	 */
+	
+	$mod = new ModPage($_GET["m"]);
+	
+	global $gTitle; $gTitle = $mod->name;
+	
+	include_header();
+	$mod->display();
+	include_footer();
 }
 
 function edit_mod() : void {
