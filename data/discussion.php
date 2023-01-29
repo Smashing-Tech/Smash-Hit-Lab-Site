@@ -178,7 +178,11 @@ class Discussion {
 			$url = "./" . $url;
 		}
 		
+		// Notify post followers
 		notify_many($this->followers, "New message from $author", $url);
+		
+		// Notify any mentioned users
+		notify_scan($body, $url);
 		
 		// Admin alert!
 		alert("Discssion $this->id updated by $author", "./" . $url);

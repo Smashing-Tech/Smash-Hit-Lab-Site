@@ -463,7 +463,7 @@ function get_name_if_admin_authed() {
 	return $user->name;
 }
 
-function get_nice_display_name(string $user) {
+function get_nice_display_name(string $user, bool $badge = true) {
 	/**
 	 * Get a nicely formatted display name for any user.
 	 */
@@ -483,14 +483,16 @@ function get_nice_display_name(string $user) {
 		$string = "<a href=\"./?u=$user->name\">$user->display</a>";
 	}
 	
-	if ($user->is_admin()) {
-		$string = $string . " <span class=\"small-text staff-badge\">staff</span>";
-	}
-	else if ($user->is_banned()) {
-		$string = $string . " <span class=\"small-text banned-badge\">banned</span>";
-	}
-	else if ($user->is_verified()) {
-		$string = $string . " <span class=\"small-text verified-badge\">verified</span>";
+	if ($badge) {
+		if ($user->is_admin()) {
+			$string = $string . " <span class=\"small-text staff-badge\">staff</span>";
+		}
+		else if ($user->is_banned()) {
+			$string = $string . " <span class=\"small-text banned-badge\">banned</span>";
+		}
+		else if ($user->is_verified()) {
+			$string = $string . " <span class=\"small-text verified-badge\">verified</span>";
+		}
 	}
 	
 	return $string;

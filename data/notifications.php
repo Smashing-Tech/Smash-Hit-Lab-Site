@@ -139,6 +139,39 @@ function notify_many(array $users, string $title, string $url) {
 	}
 }
 
+function notify_scan(string $text, string $where) : void {
+	/**
+	 * Scan formatted text for user ats and notify those users.
+	 */
+	
+	$filtered = htmlspecialchars($text);
+	
+	for ($i = 0; $i < strlen($filtered); $i++) {
+		$s = substr($filtered, $i);
+		
+		if (str_starts_with($s, "\\")) {
+			$i += 1;
+		}
+		else if (str_starts_with($s, "@")) {
+			$end = strcspn($s, " \r\n\t", 1, 24);
+			
+			// If we didn't find it then just use whatever...
+			if ($end < 0) {
+				$end = strlen($s);
+			}
+			
+			$handle = substr($s, 1, $end);
+			
+			if (user_exists($handle)) {
+				// Skip the handle text
+				$i += strlen($handle);
+				
+				notify($handle, "You were mentioned in a post", $where);
+			}
+		}
+	}
+}
+
 function check_notifications() {
 	/**
 	 * Notification checking action handler.

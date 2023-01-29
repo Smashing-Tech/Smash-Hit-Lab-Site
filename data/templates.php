@@ -115,7 +115,15 @@ function rich_format(string $base, bool $trusted = false) : string {
 	for ($i = 0; $i < strlen($filtered); $i++) {
 		$s = substr($filtered, $i);
 		
-		if (str_starts_with($s, "**")) {
+		if (str_starts_with($s, "\\")) {
+			// Escape seqence
+			if (strlen($s) > 1) {
+				$body = $body . $s[1];
+			}
+			
+			$i += 1;
+		}
+		else if (str_starts_with($s, "**")) {
 			// If we are bold, then don't do it again..
 			if ($bold) {
 				$body = $body . "</b>";
@@ -147,6 +155,27 @@ function rich_format(string $base, bool $trusted = false) : string {
 			}
 			
 			$code = !$code;
+		}
+		else if (str_starts_with($s, "@")) {
+			$end = strcspn($s, " \r\n\t", 1, 24);
+			
+			// If we didn't find it then just use whatever...
+			if ($end < 0) {
+				$end = strlen($s);
+			}
+			
+			$handle = substr($s, 1, $end);
+			
+			if (!user_exists($handle)) {
+				$body = $body . "@";
+			}
+			else {
+				// Get display name and handle
+				$body = $body . get_nice_display_name($handle, false);
+				
+				// Skip the handle text
+				$i += strlen($handle);
+			}
 		}
 		else if ($trusted && str_starts_with($s, "{{")) {
 			$end = strpos($s, "}}");
