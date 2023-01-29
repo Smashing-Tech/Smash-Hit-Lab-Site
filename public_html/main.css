@@ -18,7 +18,7 @@ h1, h2, h3, h4, p, li, summary {
 	margin-bottom: 0.5em;
 }
 
-h1 { font-size: 42pt; color: var(--main-colour); text-align: center; margin: 0.75em; }
+h1 { font-size: 42pt; color: var(--main-colour); text-align: center; margin: 0.75em; margin-top: 0; }
 h2 { font-size: 28pt; color: var(--main-colour); text-align: center; }
 h3, summary { font-size: 20pt; font-weight: 400; border-bottom: 1px solid #0AFDEA40; padding-top: 0.8em; padding-bottom: 0.2em; }
 h4 { font-size: 18pt; }
@@ -74,7 +74,7 @@ body {
 	color: var(--main-colour);
 	max-width: 75em;
 	margin: auto;
-	margin-top: 1em;
+	margin-top: 5em;
 	padding: 1em;
 	border-radius: 0.5em;
 }
@@ -360,4 +360,14 @@ input[type=submit], button {
 .comment-card-inner-right {
 	grid-column: 2;
 	margin-left: 1em;
+}
+
+.profile-header-image-wrapper {
+	text-align: center;
+}
+
+.profile-header-image {
+	width: 200px;
+	height: 200px;
+	border-radius: 100px;
 }

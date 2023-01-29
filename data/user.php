@@ -573,9 +573,14 @@ function display_user(string $user) {
 		return;
 	}
 	
+	// If the user has a YouTube PFP, then display it large!
+	if ($user->ytimg) {
+		echo "<div class=\"profile-header-image-wrapper\"><img class=\"profile-header-image\" src=\"$user->ytimg\"/></div>";
+	}
+	
 	// If these contains have passed, we can view the user page
 	$display_name = $user->display ? $user->display : $user->name;
-	echo "<h1>$display_name</h1><h2>($user->name)</h2>";
+	echo "<h1>$display_name</h1><h2>@$user->name</h2>";
 	
 	mod_property("Join date", "The date that the user joined the Smash Hit Lab.", Date("Y-m-d", $user->created));
 	
