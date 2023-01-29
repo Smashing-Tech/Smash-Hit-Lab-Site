@@ -102,14 +102,20 @@ function do_user_ban() {
 	if ($banner) {
 		if (!array_key_exists("handle", $_POST)) {
 			include_header();
-			echo "<h1>Ban user</h1>";
+			echo "<h1>Ban or unban user</h1>";
+			
+			$have_handle = false;
+			
+			if (array_key_exists("handle", $_GET)) {
+				$have_handle = true;
+			}
 			
 			form_start("./?a=user_ban");
-			edit_feild("handle", "text", "Handle", "Handle or username of the user to ban.", "");
+			edit_feild("handle", "text", "Handle", "Handle or username of the user to ban.", $have_handle ? $_GET["handle"] : "", !$have_handle);
 			edit_feild("duration", "select", "Duration", "How long to ban this user.", "1w", true, array("21600" => "6 Hours", "86400" => "1 Day", "604800" => "1 Week", "2678400" => "1 Month", "31536000" => "1 Year", "-1" => "Forever", "1" => "Remove ban"));
 			edit_feild("reason", "text", "Reason", "Type a short reason why you want to ban this user (optional). <b>This message is not shown to the user at the moment and is for audit logs only.</b>", "");
-			echo "<p><b>Note:</b> Any IP addresses assocaited with this user will be blocked for the set duration, up to 3 months.</p>";
-			form_end("Ban user");
+			echo "<p><b>Note:</b> Any IP addresses assocaited with this user will be blocked for the set duration, up to 3 months. We do not block IPs for longer as they can change periodically.</p>";
+			form_end("Set ban status");
 			
 			include_footer();
 		}
@@ -119,16 +125,35 @@ function do_user_ban() {
 			$reason = htmlspecialchars($_POST["reason"]);
 			
 			$user = new User($handle);
+			
+			// Check if the user is admin
+			if ($user->is_admin()) {
+				alert("Admin $banner tried to ban $user->name", "./?u=$banner");
+				sorry("You cannot ban a staff member. This action has been reported.");
+			}
+			
 			$user->set_ban($duration);
 			
-			$duration = $user->unban_date();
+			$until = $user->unban_date();
 			
-			alert("User $user->name banned by $banner: $reason", "./?u=$user->name");
-			
-			// Display success page
-			include_header();
-			echo "<h1>Account banned</h1><p>The account $handle was successfully banned until $duration.</p>";
-			include_footer();
+			// Unbanning
+			if ($duration === 0 || $duration === 1) {
+				alert("User $user->name unbanned by $banner: $reason", "./?u=$user->name");
+				
+				// Display success page
+				include_header();
+				echo "<h1>Account unbanned</h1><p>The account $handle was successfully unbanned.</p>";
+				include_footer();
+			}
+			// Banning
+			else {
+				alert("User $user->name banned by $banner: $reason", "./?u=$user->name");
+				
+				// Display success page
+				include_header();
+				echo "<h1>Account banned</h1><p>The account $handle was successfully banned until $until.</p>";
+				include_footer();
+			}
 		}
 		
 	}

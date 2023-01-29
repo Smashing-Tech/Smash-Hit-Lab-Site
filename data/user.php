@@ -531,7 +531,7 @@ function edit_account() {
 	edit_feild("name", "text", "Handle", "The string that idenifies you in the database.", $user->name, false);
 	edit_feild("display", "text", "Display name", "Choose the name that you prefer to be called.", $user->display);
 	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email);
-	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account.", $user->youtube);
+	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account. We will use this account to give you a profile picture.", $user->youtube);
 	
 	echo "<input type=\"submit\" value=\"Save details\"/>";
 	echo "</form>";
@@ -632,6 +632,12 @@ function display_user(string $user) {
 		mod_property("Email", "This user's email address.", $user->email);
 		mod_property("Token count", "The number of currently active tokens this user has.", sizeof($user->tokens));
 		mod_property("Ban status", "When this user will be unbanned, if banned.", ( $user->is_banned() ? $user->unban_date() : "Not banned" ));
+		
+		// If the wanted user isn't admin, we can ban them
+		if (!$user->is_admin()) {
+			mod_property("Ban user", "Banning this user will revoke access and prevent them from logging in until a set amount of time has passed.", "<a href=\"./?a=user_ban&handle=$user->name\"><button>Ban this user</button></a>");
+		}
+		
 		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "<a href=\"./?a=user_verify&handle=$user->name\"><button>Toggle verified status</button></a>");
 	}
 	

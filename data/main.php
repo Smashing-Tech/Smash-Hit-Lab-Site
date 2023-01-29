@@ -63,6 +63,9 @@ function main() {
 			case "discussion_hide":
 				discussion_hide();
 				break;
+			case "discussion_delete":
+				discussion_delete();
+				break;
 			case "discussion_follow":
 				discussion_follow();
 				break;

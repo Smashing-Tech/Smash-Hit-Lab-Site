@@ -86,7 +86,7 @@ class Comment {
 		$text = rich_format($this->body);
 		$after = htmlspecialchars($_SERVER['REQUEST_URI']);
 		$hidden_text = ($this->is_hidden()) ? "Unhide" : "Hide";
-		$actions = (get_name_if_admin_authed()) ? "<p><a href=\"./?a=discussion_hide&id=$id&index=$index&after=$after\">$hidden_text comment</a></p>" : "";
+		$actions = (get_name_if_admin_authed() || (get_name_if_authed() === $this->author)) ? "<p><a href=\"./?a=discussion_hide&id=$id&index=$index&after=$after\">$hidden_text</a></p>" : "";
 		
 		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\">$img</div><div class=\"comment-card-inner-right\"><p>$name</p><p class=\"small-text\">$date</p><p>$text</p>$actions</div></div></div>";
 	}
@@ -204,6 +204,22 @@ class Discussion {
 		if (isset($this->comments[$index])) {
 			$this->comments[$index]->hide();
 			$this->save();
+		}
+	}
+	
+	function delete_comment(int $index) {
+		if (isset($this->comments[$index])) {
+			array_splice($this->comments, $index, 1);
+			$this->save();
+		}
+	}
+	
+	function get_author(int $index) {
+		if (isset($this->comments[$index])) {
+			return $this->comments[$index]->author;
+		}
+		else {
+			return null;
 		}
 	}
 	
@@ -393,6 +409,49 @@ function discussion_update() {
 }
 
 function discussion_hide() {
+	$user = get_name_if_authed();
+	
+	if (!$user) {
+		sorry("You need to log in to hide a comment.");
+	}
+	
+	if (get_config("enable_discussions", "enabled") === "disabled") {
+		sorry("Updating discussions has been disabled.");
+	}
+	
+	$user = new User($user);
+	
+	if (!array_key_exists("id", $_GET)) {
+		sorry("Need an id to update.");
+	}
+	
+	$discussion = $_GET["id"];
+	
+	if (!array_key_exists("index", $_GET)) {
+		sorry("Need an index to update.");
+	}
+	
+	$index = $_GET["index"];
+	
+	$discussion = new Discussion($discussion);
+	
+	// If the user requesting is not the author and is not admin, we deny the
+	// request.
+	if ($discussion->get_author($index) !== $user->name && !$user->is_admin()) {
+		sorry("You cannot hide a comment which you have not written.");
+	}
+	
+	$discussion->hide_comment($index);
+	
+	if (array_key_exists("after", $_GET)) {
+		redirect($_GET["after"]);
+	}
+	else {
+		sorry("It's done but no clue what page you were on...");
+	}
+}
+
+function discussion_delete() {
 	$user = get_name_if_admin_authed();
 	
 	if (!$user) {
@@ -419,7 +478,7 @@ function discussion_hide() {
 	
 	$discussion = new Discussion($discussion);
 	
-	$discussion->hide_comment($index);
+	$discussion->delete_comment($index);
 	
 	if (array_key_exists("after", $_GET)) {
 		redirect($_GET["after"]);

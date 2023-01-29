@@ -18,7 +18,7 @@ h1, h2, h3, h4, p, li, summary {
 	margin-bottom: 0.5em;
 }
 
-h1 { font-size: 42pt; color: var(--main-colour); text-align: center; margin: 0.75em; margin-top: 0; }
+h1 { font-size: 42pt; color: var(--main-colour); text-align: center; margin: 0.75em; margin-top: 0; text-shadow: 0 0 2em #0AFDEA80; }
 h2 { font-size: 28pt; color: var(--main-colour); text-align: center; }
 h3, summary { font-size: 20pt; font-weight: 400; border-bottom: 1px solid #0AFDEA40; padding-top: 0.8em; padding-bottom: 0.2em; }
 h4 { font-size: 18pt; }
@@ -40,12 +40,14 @@ code {
 a {
 	color: var(--main-colour);
 	text-decoration-line: none;
-	transition: color 0.3s;
 	font-weight: bold;
+	
+	transition: color 0.2s, text-shadow 0.2s;
 }
 
 a:hover {
 	color: #fff;
+	text-shadow: 0 0 1.0em #fff8;
 }
 
 a.insecure-link::after {
@@ -59,6 +61,7 @@ img {
 ::selection {
 	background: var(--main-colour);
 	color: #000;
+	box-shadow: 0 0 0.5em #0AFDEA40;
 }
 
 body {
@@ -107,6 +110,12 @@ input[type=submit], button {
 	font-size: 14pt;
 	padding: 0.5em;
 	outline: none;
+	transition: background 0.1s, box-shadow 0.1s;
+}
+
+input[type=submit]:hover, button:hover {
+	background: #fff;
+	box-shadow: 0 0 1.0em #fff8;
 }
 
 /* Warning */
@@ -138,6 +147,7 @@ input[type=submit], button {
 .news-article-card {
 	background: var(--main-colour-bg-bright);
 	border-radius: 0.5em;
+	box-shadow: 0 0 3em #00474140;
 	overflow: auto;
 	padding: 0.5em;
 	margin: 1em 0;
@@ -356,6 +366,12 @@ input[type=submit], button {
 	overflow: auto;
 	padding: 1em;
 	margin: 1em 0;
+	
+	transition: box-shadow 0.2s;
+}
+
+.comment-card:hover {
+	box-shadow: 0 0 3em #00474180;
 }
 
 .comment-card-inner {
