@@ -276,7 +276,7 @@ class Discussion {
 					$img = "./icon.png";
 				}
 				
-				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><p>$name</p><p><textarea style=\"width: calc(100% - 1em); background: transparent; padding: 0;\" name=\"body\" placeholder=\"Add your comment...\">$body</textarea></p><p><input type=\"submit\" value=\"Post comment\"></p></form></div></div></div>";
+				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><p>$name</p><p><textarea style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none;\" name=\"body\" placeholder=\"Add your comment...\">$body</textarea></p><p><input type=\"submit\" value=\"Post comment\"></p></form></div></div></div>";
 				break;
 			}
 			case "closed": {

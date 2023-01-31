@@ -754,11 +754,11 @@ function display_user(string $user) {
 			echo "qs.style.setProperty('--main-colour-bg-dark', '$darkest');";
 			echo "qs.style.setProperty('--main-colour-bg', '$dark');";
 			echo "qs.style.setProperty('--main-colour-bg-bright', '$darkish');";
-			// echo "qs.style.setProperty('--main-colour-bg-bright-hover', '$darkish"."40');";
-			// echo "qs.style.setProperty('--main-colour-bg-bright-hoverb', '$darkish"."80');";
+			echo "qs.style.setProperty('--main-colour-bg-bright-hover', '$darkish"."40');";
+			echo "qs.style.setProperty('--main-colour-bg-bright-hoverb', '$darkish"."80');";
 			echo "qs.style.setProperty('--main-colour', '$bright');";
-			// echo "qs.style.setProperty('--main-colour-hover', '$bright"."40');";
-			// echo "qs.style.setProperty('--main-colour-hoverb', '$bright"."80);";
+			echo "qs.style.setProperty('--main-colour-hover', '$bright"."40');";
+			echo "qs.style.setProperty('--main-colour-hoverb', '$bright"."80');";
 			echo "</script>";
 		}
 	}
