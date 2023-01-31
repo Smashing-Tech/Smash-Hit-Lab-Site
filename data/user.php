@@ -119,6 +119,11 @@ class Token {
 			return null;
 		}
 		
+		// Not the same IP
+		if ($this->ip !== $_SERVER['REMOTE_ADDR']) {
+			return null;
+		}
+		
 		// probably okay to use
 		return $this->user;
 	}
