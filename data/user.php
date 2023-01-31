@@ -172,6 +172,26 @@ function dechexa(int $num) {
 	}
 }
 
+function colour_add(float $scalar, $colour) {
+	$colour["red"] += $scalar;
+	$colour["green"] += $scalar;
+	$colour["blue"] += $scalar;
+	
+	return $colour;
+}
+
+function colour_mul(float $scalar, $colour) {
+	$colour["red"] *= $scalar;
+	$colour["green"] *= $scalar;
+	$colour["blue"] *= $scalar;
+	
+	return $colour;
+}
+
+function colour_hex($colour) {
+	return "#" . dechexa(min(floor($colour["red"] * 255), 255)) . dechexa(min(floor($colour["green"] * 255), 255)) . dechexa(min(floor($colour["blue"] * 255), 255));
+}
+
 function get_image_accent_colour(string $url) {
 	/**
 	 * Get the accent colour of the image at the given URL.
@@ -187,6 +207,8 @@ function get_image_accent_colour(string $url) {
 		return null;
 	}
 	
+	$colours = array();
+	
 	// Just get the centre pixel for now...
 	$colour = imagecolorat($img, floor(imagesx($img) / 2), floor(imagesy($img) / 2));
 	
@@ -194,25 +216,19 @@ function get_image_accent_colour(string $url) {
 	$colour = imagecolorsforindex($img, $colour);
 	
 	// Dividing by 255
-	$colour["red"] /= 255;
-	$colour["green"] /= 255;
-	$colour["blue"] /= 255;
+	$colour = colour_mul(1 / 255, $colour);
 	
 	// Normalise colour
 	$n = sqrt(($colour["red"] * $colour["red"]) + ($colour["green"] * $colour["green"]) + ($colour["blue"] * $colour["blue"]));
-	$colour["red"] /= $n;
-	$colour["green"] /= $n;
-	$colour["blue"] /= $n;
+	$base = colour_mul(1 / $n, $colour);
 	
-	// Mul them back to 255's
-	$colour["red"] = floor(255 * $colour["red"]);
-	$colour["green"] = floor(255 * $colour["green"]);
-	$colour["blue"] = floor(255 * $colour["blue"]);
+	// Create variants
+	$colours[] = colour_hex(colour_mul(0.12, $base)); // Darkest
+	$colours[] = colour_hex(colour_mul(0.18, $base)); // Dark (BG)
+	$colours[] = colour_hex(colour_mul(0.225, $base)); // Dark lighter
+	$colours[] = colour_hex(colour_add(0.4, colour_mul(0.6, $base))); // Text
 	
-	// Convert to hex code
-	$colour = "#" . dechexa($colour["red"]) . dechexa($colour["green"]) . dechexa($colour["blue"]);
-	
-	return $colour;
+	return $colours;
 }
 
 class User {
@@ -674,10 +690,6 @@ function display_user(string $user) {
 	
 	include_header();
 	
-	if (array_key_exists("colourful", $_GET) && $user->accent) {
-		echo "<script>var qs = document.querySelector(':root'); qs.style.setProperty('--main-colour', '$user->accent');</script>";
-	}
-	
 	// If the user has a YouTube PFP, then display it large!
 	if ($user->ytimg) {
 		echo "<div class=\"profile-header-image-wrapper\"><img class=\"profile-header-image\" src=\"$user->ytimg\"/></div>";
@@ -724,6 +736,32 @@ function display_user(string $user) {
 	// Display comments
 	$disc = new Discussion($user->wall);
 	$disc->display_reverse("Message wall", "./?u=" . $user->name);
+	
+	// Colourful user profile, if we can show it
+	if (array_key_exists("colourful", $_GET) && $user->ytimg) {
+		// Try to update it just for this time...
+		if (!$user->accent) {
+			$user->accent = get_image_accent_colour($user->ytimg);
+		}
+		
+		if ($user->accent) {
+			$darkest = $user->accent[0];
+			$dark = $user->accent[1];
+			$darkish = $user->accent[2];
+			$bright = $user->accent[3];
+			
+			echo "<script>var qs = document.querySelector(':root');";
+			echo "qs.style.setProperty('--main-colour-bg-dark', '$darkest');";
+			echo "qs.style.setProperty('--main-colour-bg', '$dark');";
+			echo "qs.style.setProperty('--main-colour-bg-bright', '$darkish');";
+			// echo "qs.style.setProperty('--main-colour-bg-bright-hover', '$darkish"."40');";
+			// echo "qs.style.setProperty('--main-colour-bg-bright-hoverb', '$darkish"."80');";
+			echo "qs.style.setProperty('--main-colour', '$bright');";
+			// echo "qs.style.setProperty('--main-colour-hover', '$bright"."40');";
+			// echo "qs.style.setProperty('--main-colour-hoverb', '$bright"."80);";
+			echo "</script>";
+		}
+	}
 	
 	// Footer
 	include_footer();
