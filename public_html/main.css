@@ -5,6 +5,9 @@
 * {
 	margin: 0;
 	padding: 0;
+}
+
+:root {
 	--main-colour: #0AFDEA;
 	--main-colour-bg-bright: #004741;
 	--main-colour-bg: #002624;

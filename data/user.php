@@ -135,7 +135,7 @@ function get_yt_image(string $handle) : string {
 	 */
 	
 	try {
-		$ytpage = file_get_contents("https://youtube.com/@$handle/featured");
+		$ytpage = @file_get_contents("https://youtube.com/@$handle/featured");
 		
 		if (!$ytpage) {
 			return "";
@@ -161,6 +161,58 @@ function get_yt_image(string $handle) : string {
 	catch (Exception $e) {
 		return "";
 	}
+}
+
+function dechexa(int $num) {
+	if ($num < 16) {
+		return "0" . dechex($num);
+	}
+	else {
+		return dechex($num);
+	}
+}
+
+function get_image_accent_colour(string $url) {
+	/**
+	 * Get the accent colour of the image at the given URL.
+	 */
+	
+	if (!$url) {
+		return null;
+	}
+	
+	$img = @imagecreatefromjpeg($url);
+	
+	if (!$img) {
+		return null;
+	}
+	
+	// Just get the centre pixel for now...
+	$colour = imagecolorat($img, floor(imagesx($img) / 2), floor(imagesy($img) / 2));
+	
+	// Bit shifting...
+	$colour = imagecolorsforindex($img, $colour);
+	
+	// Dividing by 255
+	$colour["red"] /= 255;
+	$colour["green"] /= 255;
+	$colour["blue"] /= 255;
+	
+	// Normalise colour
+	$n = sqrt(($colour["red"] * $colour["red"]) + ($colour["green"] * $colour["green"]) + ($colour["blue"] * $colour["blue"]));
+	$colour["red"] /= $n;
+	$colour["green"] /= $n;
+	$colour["blue"] /= $n;
+	
+	// Mul them back to 255's
+	$colour["red"] = floor(255 * $colour["red"]);
+	$colour["green"] = floor(255 * $colour["green"]);
+	$colour["blue"] = floor(255 * $colour["blue"]);
+	
+	// Convert to hex code
+	$colour = "#" . dechexa($colour["red"]) . dechexa($colour["green"]) . dechexa($colour["blue"]);
+	
+	return $colour;
 }
 
 class User {
@@ -192,6 +244,7 @@ class User {
 			$this->wall = property_exists($info, "wall") ? $info->wall : random_discussion_name();
 			$this->youtube = property_exists($info, "youtube") ? $info->youtube : "";
 			$this->ytimg = property_exists($info, "ytimg") ? $info->ytimg : "";
+			$this->accent = property_exists($info, "accent") ? $info->accent : null;
 			
 			// If there weren't discussions before, save them now.
 			if (!property_exists($info, "wall")) {
@@ -211,6 +264,7 @@ class User {
 			$this->wall = random_discussion_name();
 			$this->youtube = "";
 			$this->ytimg = "";
+			$this->accent = null;
 			
 			// Make sure the new user is following their wall by default.
 			$d = new Discussion($this->wall);
@@ -578,6 +632,16 @@ function save_account() {
 	
 	if ($user->youtube) {
 		$user->ytimg = get_yt_image($user->youtube);
+		
+		if ($user->ytimg) {
+			$user->accent = get_image_accent_colour($user->ytimg);
+		}
+		else {
+			$user->accent = null;
+		}
+	}
+	else {
+		$user->ytimg = null;
 	}
 	
 	$user->save();
@@ -609,6 +673,10 @@ function display_user(string $user) {
 	global $gTitle; $gTitle = ($user->display ? $user->display : $user->name) . " (@$user->name)";
 	
 	include_header();
+	
+	if (array_key_exists("colourful", $_GET) && $user->accent) {
+		echo "<script>var qs = document.querySelector(':root'); qs.style.setProperty('--main-colour', '$user->accent');</script>";
+	}
 	
 	// If the user has a YouTube PFP, then display it large!
 	if ($user->ytimg) {
