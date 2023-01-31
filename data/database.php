@@ -114,3 +114,48 @@ class Database {
 		return $array;
 	}
 }
+
+function enumerate_stores() {
+	/**
+	 * Enumerate available database stores
+	 */
+	
+	global $database_path;
+	
+	$array = scandir($database_path);
+	array_shift($array);
+	array_shift($array);
+	return $array;
+}
+
+function backup_database() : string {
+	/**
+	 * Back up the databse to a zip file
+	 */
+	
+	global $database_path;
+	
+	$zip = new ZipArchive();
+	
+	$filename = "../data/store/smashhitlab_" . date("Y-m-d_His", time()) . ".zip";
+	
+	$zip->open($filename, ZIPARCHIVE::CREATE);
+	$zip->addEmptyDir("db");
+	
+	$stores = enumerate_stores();
+	
+	for ($j = 0; $j < sizeof($stores); $j++) {
+		$db = new Database($stores[$j]);
+		$files = $db->enumerate();
+		
+		$zip->addEmptyDir("db/" . $stores[$j]);
+		
+		for ($i = 0; $i < sizeof($files); $i++) {
+			$zip->addFile($database_path . "/" . $stores[$j] . "/" . $files[$i], "db/" . $stores[$j] . "/" . $files[$i]);
+		}
+	}
+	
+	$zip->close();
+	
+	return $filename;
+}

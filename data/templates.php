@@ -267,3 +267,26 @@ function redirect(string $location) {
 	header("Location: $location");
 	die();
 }
+
+function download_file(string $file) : void {
+	/**
+	 * Force a file download
+	 * 
+	 * NOTE: This is taken from the php manual.
+	 */
+	
+	if (file_exists($file)) {
+		header('Content-Description: File Transfer');
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment; filename="'.basename($file).'"');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate');
+		header('Pragma: public');
+		header('Content-Length: ' . filesize($file));
+		readfile($file);
+		die();
+	}
+	else {
+		sorry("The file that you wanted to download doesn't seem to exist.");
+	}
+}

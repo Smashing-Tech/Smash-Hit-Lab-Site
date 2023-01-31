@@ -87,6 +87,7 @@ function do_admin_dashboard() {
 		echo "<ul>";
 		echo "<li><a href=\"./?a=site_config\">Site configuration</a> &mdash; very basic site options</li>";
 		echo "<li><a href=\"./?a=send_notification\">Send notification</a> &mdash; send a notification to everyone</li>";
+		echo "<li><a href=\"./?a=backup_db\">Backup database</a> &mdash; back up the site data files</li>";
 		echo "</ul>";
 		
 		echo "<h4>Users and content</h4>";
@@ -199,6 +200,55 @@ function do_send_notification() {
 			
 			alert("Global notification sent by $user", "./?u=$user");
 			redirect("./?a=send_notification");
+		}
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
+}
+
+function do_backup_db() {
+	/**
+	 * Back up the site database.
+	 */
+	
+	$user = get_name_if_admin_authed();
+	
+	if ($user) {
+		if (!array_key_exists("submit", $_GET)) {
+			include_header();
+			echo "<h1>Backup database</h1>";
+			form_start("./?a=backup_db&submit=1");
+			echo "<p><b>Note:</b> This operation might take a long time to preform.</p>";
+			form_end("Backup database");
+			include_footer();
+		}
+		else {
+			$path = htmlspecialchars(basename(backup_database()));
+			
+			include_header();
+			echo "<h1>Backup is done</h1><p>The database was backed up to <code>$path</code>.</p><p><a href=\"./?a=storage_download&file=$path\">Click here to download the backup</a></p>";
+			include_footer();
+		}
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
+}
+
+function do_storage_download() {
+	/**
+	 * Download a file from the site storage.
+	 */
+	
+	$user = get_name_if_admin_authed();
+	
+	if ($user) {
+		if (array_key_exists("file", $_GET)) {
+			download_file("../data/store/" . str_replace("/", ".", $_GET["file"]));
+		}
+		else {
+			sorry("You didn't specify what file you wanted to download...");
 		}
 	}
 	else {

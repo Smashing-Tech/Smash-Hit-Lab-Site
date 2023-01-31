@@ -48,6 +48,12 @@ function main() {
 			case "site_config":
 				do_site_config();
 				break;
+			case "backup_db":
+				do_backup_db();
+				break;
+			case "storage_download":
+				do_storage_download();
+				break;
 			case "user_ban":
 				do_user_ban();
 				break;
