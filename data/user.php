@@ -220,6 +220,12 @@ function get_image_accent_colour(string $url) {
 	
 	// Normalise colour
 	$n = sqrt(($colour["red"] * $colour["red"]) + ($colour["green"] * $colour["green"]) + ($colour["blue"] * $colour["blue"]));
+	
+	if ($n < 0.3) {
+		$colour = colour_add(0.1 + $n, $colour);
+		$n += 0.1;
+	}
+	
 	$base = colour_mul(1 / $n, $colour);
 	
 	// Create variants
@@ -261,6 +267,7 @@ class User {
 			$this->youtube = property_exists($info, "youtube") ? $info->youtube : "";
 			$this->ytimg = property_exists($info, "ytimg") ? $info->ytimg : "";
 			$this->accent = property_exists($info, "accent") ? $info->accent : null;
+			$this->about = property_exists($info, "about") ? $info->about : "";
 			
 			// If there weren't discussions before, save them now.
 			if (!property_exists($info, "wall")) {
@@ -281,6 +288,7 @@ class User {
 			$this->youtube = "";
 			$this->ytimg = "";
 			$this->accent = null;
+			$this->about = "";
 			
 			// Make sure the new user is following their wall by default.
 			$d = new Discussion($this->wall);
@@ -610,6 +618,7 @@ function edit_account() {
 	
 	edit_feild("name", "text", "Handle", "The string that idenifies you in the database.", $user->name, false);
 	edit_feild("display", "text", "Display name", "Choose the name that you prefer to be called.", $user->display);
+	edit_feild("about", "textarea", "About", "You can write a piece of text detailing whatever you like on your userpage. Please don't include personal information!", $user->about);
 	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email);
 	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, not including the at sign (@). We will use this account to give you a profile picture.", $user->youtube);
 	
@@ -660,6 +669,10 @@ function save_account() {
 		$user->ytimg = null;
 	}
 	
+	// Finally the about section
+	// This is sanitised at display time
+	$user->about = $_POST["about"];
+	
 	$user->save();
 	
 	redirect("/?a=edit_account");
@@ -688,7 +701,14 @@ function display_user(string $user) {
 	// HACK Page title
 	global $gTitle; $gTitle = ($user->display ? $user->display : $user->name) . " (@$user->name)";
 	
+	// Roll the colour beta die
+	$colourbeta = (rand(1, 20) == 1);
+	
 	include_header();
+	
+	if ($colourbeta == 1) {
+		echo "<div class=\"comment-card\"><p>You are viewing the colourful userpages prototype. Please let <a href=\"./?u=knot126\">Knot126</a> know about any feedback.</p></div>";
+	}
 	
 	// If the user has a YouTube PFP, then display it large!
 	if ($user->ytimg) {
@@ -699,6 +719,13 @@ function display_user(string $user) {
 	$display_name = $user->display ? $user->display : $user->name;
 	echo "<h1>$display_name</h1><h2>@$user->name</h2>";
 	
+	// If the user has an about section, then we should show it.
+	if ($user->about) {
+		echo "<h3>About</h3>";
+		echo rich_format($user->about);
+	}
+	
+	echo "<h3>Details</h3>";
 	mod_property("Join date", "The date that the user joined the Smash Hit Lab.", Date("Y-m-d", $user->created));
 	
 	// Show if this user is an admin
@@ -738,7 +765,7 @@ function display_user(string $user) {
 	$disc->display_reverse("Message wall", "./?u=" . $user->name);
 	
 	// Colourful user profile, if we can show it
-	if (array_key_exists("colourful", $_GET) && $user->ytimg) {
+	if ((array_key_exists("colourful", $_GET) || $colourbeta) && $user->ytimg) {
 		// Try to update it just for this time...
 		if (!$user->accent) {
 			$user->accent = get_image_accent_colour($user->ytimg);
