@@ -2,6 +2,26 @@
 
 require_once "user.php";
 
+class Page {
+	public $title;
+	public $body;
+	public $redirect;
+	public $download;
+	
+	function set_title(string $title) {
+		$this->title = $title;
+	}
+	
+	function add_header() {
+		global $gTitle; $gTitle = $this->title;
+		include_header();
+	}
+	
+	function append(string $data) {
+		
+	}
+}
+
 function get_page_name() {
 	return str_replace("/", ",", str_replace(".", ",", $_GET["p"]));
 }

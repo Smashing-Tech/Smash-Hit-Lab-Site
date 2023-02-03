@@ -30,7 +30,7 @@ h2 { font-size: 28pt; color: var(--main-colour); text-align: center; }
 h3, summary { font-size: 20pt; font-weight: 400; border-bottom: 1px solid var(--main-colour-hover); padding-top: 0.8em; padding-bottom: 0.2em; }
 h4 { font-size: 18pt; }
 p, ul { font-size: 14pt; margin-bottom: 0.75em; }
-ul { margin-left: 1em; }
+ul { margin-left: 1.5em; }
 .cb-quote { font-size: 20pt; line-height: 1.5; }
 
 code {
@@ -96,11 +96,11 @@ input[type=text], input[type=password], textarea, select {
 	font-size: 14pt;
 	padding: 0.5em;
 	outline: none;
-	width: 30em;
+	width: 80%;
 }
 
 textarea {
-	height: 10em;
+	min-height: 10em;
 }
 
 .comment-edit textarea {
@@ -340,6 +340,7 @@ input[type=submit]:hover, button:hover {
 
 .mod-edit-property-data {
 	grid-column: 2;
+	margin-left: 1em;
 }
 
 .mod-property {
@@ -419,4 +420,8 @@ input[type=submit]:hover, button:hover {
 	width: 200px;
 	height: 200px;
 	border-radius: 100px;
+}
+
+.centred {
+	text-align: center;
 }

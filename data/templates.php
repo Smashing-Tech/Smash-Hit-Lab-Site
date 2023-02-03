@@ -9,8 +9,11 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $optio
 	
 	echo "<div class=\"mod-edit-property\">";
 		echo "<div class=\"mod-edit-property-label\">";
-			echo "<h4>$title</h4>";
-			echo "<p>$desc</p>";
+			// If there is no title there is little reason for a desc. as well.
+			if ($title) {
+				echo "<h4>$title</h4>";
+				echo "<p>$desc</p>";
+			}
 		echo "</div>";
 		echo "<div class=\"mod-edit-property-data\">";
 			switch ($type) {
@@ -50,6 +53,9 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $optio
 					echo "</div>";
 					
 					break;
+				case "submit":
+					echo "<input type=\"submit\" value=\"$desc\"/>";
+					break;
 				default:
 					echo "$value";
 					break;
@@ -61,13 +67,20 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $optio
 	echo "</div>";
 }
 
-function form_start(string $url, string $method = "post") {
-	echo "<form action=\"$url\" method=\"$method\">";
+function form_start(string $url, string $method = "post", string $csrf = "") {
+	echo "<form action=\"$url\" method=\"$method" . (($csrf) ? "&key=" . $csrf : "") . "\">";
 }
 
 function form_end(string $submit_text = "Submit form") {
-	echo "<input type=\"submit\" value=\"$submit_text\"/>";
+	//echo "<input type=\"submit\" value=\"$submit_text\"/>";
+	edit_feild(null, "submit", null, $submit_text, null);
 	echo "</form>";
+}
+
+function action_button(string $url, string $title) {
+	$csrf = (new User(get_name_if_authed()))->get_sak();
+	form_start($url, "post", $csrf);
+	form_end($title);
 }
 
 function mod_property($title, $desc, $value) : void {

@@ -77,16 +77,12 @@ class Comment {
 		$name = get_nice_display_name($this->author);
 		$img = get_profile_image($this->author);
 		
-		// Default PFP
-		if (!$img) {
-			$img = "./icon.png";
-		}
-		
 		$img = "<img src=\"$img\"/>";
 		$text = rich_format($this->body);
 		$after = htmlspecialchars($_SERVER['REQUEST_URI']);
 		$hidden_text = ($this->is_hidden()) ? "Unhide" : "Hide";
-		$actions = (get_name_if_admin_authed() || (get_name_if_authed() === $this->author)) ? "<p><a href=\"./?a=discussion_hide&id=$id&index=$index&after=$after\">$hidden_text</a></p>" : "";
+		$sak = user_get_sak();
+		$actions = (get_name_if_admin_authed() || (get_name_if_authed() === $this->author)) ? "<p><a href=\"./?a=discussion_hide&id=$id&index=$index&after=$after&key=$sak\">$hidden_text</a></p>" : "";
 		
 		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\">$img</div><div class=\"comment-card-inner-right\"><p>$name</p><p class=\"small-text\">$date</p><p>$text</p>$actions</div></div></div>";
 	}
@@ -100,6 +96,7 @@ class Discussion {
 	public $id;
 	public $followers;
 	public $comments;
+	public $url;
 	
 	function __construct(string $id) {
 		$db = new Database("discussion");
@@ -110,6 +107,7 @@ class Discussion {
 			$this->id = $info->id;
 			$this->followers = property_exists($info, "followers") ? $info->followers : array();
 			$this->comments = $info->comments;
+			$this->url = property_exists($info, "url") ? $info->url : null;
 			
 			// Make sure that comments are Comment type objects
 			for ($i = 0; $i < sizeof($this->comments); $i++) {
@@ -120,6 +118,7 @@ class Discussion {
 			$this->id = $id;
 			$this->followers = array();
 			$this->comments = array();
+			$this->url = null;
 		}
 	}
 	
@@ -162,6 +161,28 @@ class Discussion {
 		$this->save();
 	}
 	
+	function get_url() : ?string {
+		/**
+		 * Get the URL where this discussion appears
+		 */
+		
+		return $this->url;
+	}
+	
+	function set_url(string $url) : bool {
+		/**
+		 * Set the URL assocaited with the discussion, if not already set.
+		 */
+		
+		if (!$this->url) {
+			$this->url = $url;
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
 	function add_comment(string $author, string $body) {
 		$this->comments[] = (new Comment())->create($author, $body);
 		$this->save();
@@ -172,7 +193,9 @@ class Discussion {
 		// URL (which is probably a good idea, actually).
 		// HACK I think if we start with "./" for now, it should be secure
 		// enough.
-		$url = $_GET['after'];
+		// FIXED: This will soon be deprecated.
+		$url = $this->get_url();
+		$url = $url ? $url : $_GET['after'];
 		
 		if (!str_starts_with($url, "./") || !str_starts_with($url, "/")) {
 			$url = "./" . $url;
@@ -276,7 +299,7 @@ class Discussion {
 					$img = "./icon.png";
 				}
 				
-				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><p>$name</p><p><textarea style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none;\" name=\"body\" placeholder=\"Add your comment...\">$body</textarea></p><p><input type=\"submit\" value=\"Post comment\"></p></form></div></div></div>";
+				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><p>$name</p><p><textarea style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none; display: inline-block;\" name=\"body\" placeholder=\"Add your comment...\">$body</textarea></p><p><input type=\"submit\" value=\"Post comment\"></p></form></div></div></div>";
 				break;
 			}
 			case "closed": {
@@ -433,11 +456,17 @@ function discussion_hide() {
 	
 	$index = $_GET["index"];
 	
+	if (!array_key_exists("key", $_GET)) {
+		sorry("Need an index to update.");
+	}
+	
+	$sak = $_GET["key"];
+	
 	$discussion = new Discussion($discussion);
 	
 	// If the user requesting is not the author and is not admin, we deny the
 	// request.
-	if ($discussion->get_author($index) !== $user->name && !$user->is_admin()) {
+	if (($discussion->get_author($index) !== $user->name && !$user->is_admin()) || (!$user->verify_sak($sak))) {
 		sorry("You cannot hide a comment which you have not written.");
 	}
 	

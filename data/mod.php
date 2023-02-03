@@ -60,6 +60,7 @@ class ModPage {
 			$this->version = null;
 			$this->updated = time();
 			$this->created = time();
+			$this->author = "";
 			$this->security = "No potentially insecure modifications";
 			$this->status = "Released";
 			$this->reviews = random_discussion_name();
@@ -75,17 +76,19 @@ class ModPage {
 		echo "<h1>" . ($this->name ? $this->name : $this->package) . "</h1>";
 		
 		if (get_name_if_authed()) {
-			echo "<p><a href=\"./?a=edit_mod&m=$this->package\"><button>Edit mod info</button></a></p>";
+			echo "<p class=\"centred\"><a href=\"./?a=edit_mod&m=$this->package\"><button>Edit mod info</button></a></p>";
 		}
 		
-		echo "<h4>Description</h4>";
-		echo "<p>" . (($this->description) ? $this->description : "<i>No description yet.</i>") . "</p>";
+		echo "<h3>About</h3>";
+		echo ($this->description) ? rich_format($this->description) : "<p><i>We don't have an about section for this mod right now.</i></p>";
 		
-		echo "<h4>Other info</h4>";
+		echo "<h3>Basic info</h3>";
 		mod_property("Download", "A link to where the mod can be downloaded.", $this->download);
 		mod_property("Version", "The latest version of this mod.", $this->version);
 		mod_property("Creators", "The people who created this mod.", create_comma_array_nice($this->creators));
 		mod_property("Security", "A short statement on this mod's security.", $this->security);
+		
+		echo "<h3>Other info</h3>";
 		if ($this->wiki) {
 			mod_property("Wiki article", "A relevant wiki article about the mod.", $this->wiki);
 		}
@@ -94,7 +97,8 @@ class ModPage {
 		}
 		mod_property("Status", "A short description of the mod's development status.", $this->status);
 		mod_property("Package", "The name of the mod's APK or IPA file.", $this->package);
-		mod_property("Updated", "The unix timestamp for the last time this page was updated.", date("Y-m-d H:i:s", $this->updated));
+		
+		echo "<p class=\"small-text\">This page was last updated at " . date("Y-m-d H:i", $this->updated) . " by " . get_nice_display_name($this->author) . "</p>";
 		
 		$disc = new Discussion($this->reviews);
 		$disc->display_reverse("Reviews", "./?m=" . $this->package);
@@ -107,7 +111,7 @@ class ModPage {
 		edit_feild("name", "text", "Name", "The name that will be displayed with the mod.", $this->name);
 		edit_feild("creators", "text", "Creators", "The people who created this mod.", create_comma_array($this->creators));
 		edit_feild("wiki", "text", "Wiki article", "A relevant wiki article about the mod.", $this->wiki);
-		edit_feild("description", "textarea", "Description", "One or two paragraphs that describe the mod.", str_replace("<br/>", "\n", $this->description));
+		edit_feild("description", "textarea", "About", "One or two paragraphs that describe the mod.", htmlspecialchars($this->description));
 		edit_feild("download", "text", "Download", "A link to where the mod can be downloaded.", $this->download);
 		edit_feild("code", "text", "Source code", "A link to where the source code for a mod can be found.", $this->code);
 		edit_feild("tags", "text", "Tags", "Keywords and categorical description of this mod.", create_comma_array($this->tags));
@@ -125,7 +129,7 @@ class ModPage {
 		$this->name = htmlspecialchars($_POST["name"]);
 		$this->creators = parse_comma_array(htmlspecialchars($_POST["creators"]));
 		$this->wiki = htmlspecialchars($_POST["wiki"]);
-		$this->description = str_replace("\n", "<br/>", htmlspecialchars($_POST["description"]));
+		$this->description = $_POST["description"]; // Rich text feild
 		$this->download = htmlspecialchars($_POST["download"]);
 		$this->code = htmlspecialchars($_POST["code"]);
 		$this->tags = parse_comma_array(htmlspecialchars($_POST["tags"]));

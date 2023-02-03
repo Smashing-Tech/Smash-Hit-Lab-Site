@@ -268,6 +268,7 @@ class User {
 			$this->ytimg = property_exists($info, "ytimg") ? $info->ytimg : "";
 			$this->accent = property_exists($info, "accent") ? $info->accent : null;
 			$this->about = property_exists($info, "about") ? $info->about : "";
+			$this->sak = property_exists($info, "sak") ? $info->sak : random_hex();
 			
 			// If there weren't discussions before, save them now.
 			if (!property_exists($info, "wall")) {
@@ -289,6 +290,7 @@ class User {
 			$this->ytimg = "";
 			$this->accent = null;
 			$this->about = "";
+			$this->sak = random_hex();
 			
 			// Make sure the new user is following their wall by default.
 			$d = new Discussion($this->wall);
@@ -360,6 +362,29 @@ class User {
 	
 	function is_verified() : bool {
 		return ($this->verified != null);
+	}
+	
+	function verify_sak(string $key) : bool {
+		/**
+		 * Verify that the SAK is okay, and generate the next one.
+		 */
+		
+		if ($this->sak == $key) {
+			$this->sak = random_hex();
+			$this->save();
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	function get_sak() : string {
+		/**
+		 * Get the current SAK.
+		 */
+		
+		return $this->sak;
 	}
 	
 	function unban_date() : string {
@@ -551,6 +576,34 @@ function get_name_if_admin_authed() {
 	return $user->name;
 }
 
+function user_get_sak() : string {
+	/**
+	 * Get the SAK of the current user.
+	 */
+	
+	$user = get_name_if_authed();
+	
+	if (!$user) {
+		return "";
+	}
+	
+	return (new User($user))->get_sak();
+}
+
+function user_verify_sak() : bool {
+	/**
+	 * Get the SAK of the current user.
+	 */
+	
+	$user = get_name_if_authed();
+	
+	if (!$user) {
+		return false;
+	}
+	
+	return (new User())->verify_sak();
+}
+
 function get_nice_display_name(string $user, bool $badge = true) {
 	/**
 	 * Get a nicely formatted display name for any user.
@@ -593,7 +646,9 @@ function get_profile_image(string $user) {
 	
 	$user = new User($user);
 	
-	return $user->ytimg;
+	$pfpi = (ord($user->name[0]) % 6) + 1;;
+	
+	return $user->ytimg ? $user->ytimg : "./img/defaultuser$pfpi.png";
 }
 
 function edit_account() {
@@ -675,7 +730,7 @@ function save_account() {
 	
 	$user->save();
 	
-	redirect("/?a=edit_account");
+	redirect("/?u=" . $user->name);
 }
 
 function display_user(string $user) {
@@ -702,7 +757,7 @@ function display_user(string $user) {
 	global $gTitle; $gTitle = ($user->display ? $user->display : $user->name) . " (@$user->name)";
 	
 	// Roll the colour beta die
-	$colourbeta = (rand(1, 20) == 1);
+	$colourbeta = (rand(1, 5) == 1);
 	
 	include_header();
 	
