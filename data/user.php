@@ -163,6 +163,39 @@ function get_yt_image(string $handle) : string {
 	}
 }
 
+function get_gravatar_image(string $email, string $default = "identicon") : string {
+	/**
+	 * Get a gravatar image URL.
+	 */
+	
+	return "https://www.gravatar.com/avatar/" . md5(strtolower(trim($email))) . "?s=300&d=$default";
+}
+
+function has_gravatar_image(string $email) {
+	/**
+	 * Check if an email has a gravatar image
+	 */
+	
+	return !!(@file_get_contents(get_gravatar_image($email, "404")));
+}
+
+function find_pfp($user) {
+	/**
+	 * One time find a user's pfp url
+	 */
+	
+	$img_youtube = get_yt_image($user->youtube);
+	$img_gravatar = get_gravatar_image($user->email);
+	
+	// In the case where there is no gravatar but a yt image, display that
+	// instead.
+	if (!has_gravatar_image($user->email) && $img_youtube) {
+		$img_gravatar = null;
+	}
+	
+	return $img_gravatar ? $img_gravatar : $img_youtube;
+}
+
 function dechexa(int $num) {
 	if ($num < 16) {
 		return "0" . dechex($num);
@@ -202,6 +235,11 @@ function get_image_accent_colour(string $url) {
 	}
 	
 	$img = @imagecreatefromjpeg($url);
+	
+	// Try PNG
+	if (!$img) {
+		$img = @imagecreatefrompng($url);
+	}
 	
 	if (!$img) {
 		return null;
@@ -265,13 +303,19 @@ class User {
 			$this->ban = property_exists($info, "ban") ? $info->ban : null;
 			$this->wall = property_exists($info, "wall") ? $info->wall : random_discussion_name();
 			$this->youtube = property_exists($info, "youtube") ? $info->youtube : "";
-			$this->ytimg = property_exists($info, "ytimg") ? $info->ytimg : "";
+			$this->image = property_exists($info, "image") ? $info->image : "";
 			$this->accent = property_exists($info, "accent") ? $info->accent : null;
 			$this->about = property_exists($info, "about") ? $info->about : "";
 			$this->sak = property_exists($info, "sak") ? $info->sak : random_hex();
 			
 			// If there weren't discussions before, save them now.
 			if (!property_exists($info, "wall")) {
+				$this->save();
+			}
+			
+			// If we didn't have a pfp before, find and save it now!
+			if ((!$this->image) || (!$this->accent)) {
+				$this->update_image();
 				$this->save();
 			}
 		}
@@ -287,7 +331,7 @@ class User {
 			$this->ban = null;
 			$this->wall = random_discussion_name();
 			$this->youtube = "";
-			$this->ytimg = "";
+			$this->image = "";
 			$this->accent = null;
 			$this->about = "";
 			$this->sak = random_hex();
@@ -506,6 +550,18 @@ class User {
 		
 		return $this->admin;
 	}
+	
+	function update_image() : void {
+		/**
+		 * Update the profile image
+		 */
+		
+		$this->image = find_pfp($this);
+		
+		if ($this->image) {
+			$this->accent = get_image_accent_colour($this->image);
+		}
+	}
 }
 
 function user_exists(string $username) : bool {
@@ -648,7 +704,7 @@ function get_profile_image(string $user) {
 	
 	$pfpi = (ord($user->name[0]) % 6) + 1;;
 	
-	return $user->ytimg ? $user->ytimg : "./img/defaultuser$pfpi.png";
+	return $user->image ? $user->image : "./img/defaultuser$pfpi.png";
 }
 
 function edit_account() {
@@ -710,19 +766,7 @@ function save_account() {
 		$user->youtube = substr($user->youtube, 1);
 	}
 	
-	if ($user->youtube) {
-		$user->ytimg = get_yt_image($user->youtube);
-		
-		if ($user->ytimg) {
-			$user->accent = get_image_accent_colour($user->ytimg);
-		}
-		else {
-			$user->accent = null;
-		}
-	}
-	else {
-		$user->ytimg = null;
-	}
+	$user->update_image();
 	
 	// Finally the about section
 	// This is sanitised at display time
@@ -756,18 +800,11 @@ function display_user(string $user) {
 	// HACK Page title
 	global $gTitle; $gTitle = ($user->display ? $user->display : $user->name) . " (@$user->name)";
 	
-	// Roll the colour beta die
-	$colourbeta = (rand(1, 5) == 1);
-	
 	include_header();
 	
-	if ($colourbeta == 1) {
-		echo "<div class=\"comment-card\"><p>You are viewing the colourful userpages prototype. Please let <a href=\"./?u=knot126\">Knot126</a> know about any feedback.</p></div>";
-	}
-	
 	// If the user has a YouTube PFP, then display it large!
-	if ($user->ytimg) {
-		echo "<div class=\"profile-header-image-wrapper\"><img class=\"profile-header-image\" src=\"$user->ytimg\"/></div>";
+	if ($user->image) {
+		echo "<div class=\"profile-header-image-wrapper\"><img class=\"profile-header-image\" src=\"$user->image\"/></div>";
 	}
 	
 	// If these contains have passed, we can view the user page
@@ -820,29 +857,22 @@ function display_user(string $user) {
 	$disc->display_reverse("Message wall", "./?u=" . $user->name);
 	
 	// Colourful user profile, if we can show it
-	if ((array_key_exists("colourful", $_GET) || $colourbeta) && $user->ytimg) {
-		// Try to update it just for this time...
-		if (!$user->accent) {
-			$user->accent = get_image_accent_colour($user->ytimg);
-		}
+	if ($user->image && $user->accent) {
+		$darkest = $user->accent[0];
+		$dark = $user->accent[1];
+		$darkish = $user->accent[2];
+		$bright = $user->accent[3];
 		
-		if ($user->accent) {
-			$darkest = $user->accent[0];
-			$dark = $user->accent[1];
-			$darkish = $user->accent[2];
-			$bright = $user->accent[3];
-			
-			echo "<script>var qs = document.querySelector(':root');";
-			echo "qs.style.setProperty('--main-colour-bg-dark', '$darkest');";
-			echo "qs.style.setProperty('--main-colour-bg', '$dark');";
-			echo "qs.style.setProperty('--main-colour-bg-bright', '$darkish');";
-			echo "qs.style.setProperty('--main-colour-bg-bright-hover', '$darkish"."40');";
-			echo "qs.style.setProperty('--main-colour-bg-bright-hoverb', '$darkish"."80');";
-			echo "qs.style.setProperty('--main-colour', '$bright');";
-			echo "qs.style.setProperty('--main-colour-hover', '$bright"."40');";
-			echo "qs.style.setProperty('--main-colour-hoverb', '$bright"."80');";
-			echo "</script>";
-		}
+		echo "<script>var qs = document.querySelector(':root');";
+		echo "qs.style.setProperty('--main-colour-bg-dark', '$darkest');";
+		echo "qs.style.setProperty('--main-colour-bg', '$dark');";
+		echo "qs.style.setProperty('--main-colour-bg-bright', '$darkish');";
+		echo "qs.style.setProperty('--main-colour-bg-bright-hover', '$darkish"."40');";
+		echo "qs.style.setProperty('--main-colour-bg-bright-hoverb', '$darkish"."80');";
+		echo "qs.style.setProperty('--main-colour', '$bright');";
+		echo "qs.style.setProperty('--main-colour-hover', '$bright"."40');";
+		echo "qs.style.setProperty('--main-colour-hoverb', '$bright"."80');";
+		echo "</script>";
 	}
 	
 	// Footer
