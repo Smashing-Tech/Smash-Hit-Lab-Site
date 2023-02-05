@@ -225,8 +225,29 @@ function colour_hex($colour) {
 	return "#" . dechexa(min(floor($colour["red"] * 255), 255)) . dechexa(min(floor($colour["green"] * 255), 255)) . dechexa(min(floor($colour["blue"] * 255), 255));
 }
 
+function colour_brightness($colour) {
+	$R = $colour["red"] / 255;
+	$G = $colour["green"] / 255;
+	$B = $colour["blue"] / 255;
+	
+	return max($R, $G, $B);
+}
+
+function colour_saturation($colour) {
+	$R = $colour["red"] / 255;
+	$G = $colour["green"] / 255;
+	$B = $colour["blue"] / 255;
+	$M = max($R, $G, $B); $M = $M ? $M : 1;
+	
+	return 1.0 - (min($R, $G, $B) / $M);
+}
+
 function frand() : float {
 	return mt_rand() / mt_getrandmax();
+}
+
+function special_function($n) {
+	return max(1.0 - 4.0 * pow($n - 0.65, 2), -0.1);
 }
 
 function get_image_accent_colour(string $url) {
@@ -260,10 +281,10 @@ function get_image_accent_colour(string $url) {
 	$colour = array("red" => 255, "green" => 255, "blue" => 255);
 	$points_to_beat = 0;
 	
-	for ($i = 0; $i < 2000; $i++) {
+	for ($i = 0; $i < 135; $i++) {
 		// Pick a random point radialy (more likely to hit near the centre)
 		$theta = frand() * 6.28;
-		$radius = frand() * frand();
+		$radius = frand();
 		
 		$x = floor(($radius * cos($theta) + 1.0) * 0.5 * (imagesx($img) - 1));
 		$y = floor(($radius * sin($theta) + 1.0) * 0.5 * (imagesx($img) - 1));
@@ -274,7 +295,7 @@ function get_image_accent_colour(string $url) {
 		$candidate = imagecolorsforindex($img, $candidate);
 		
 		// Calculate score
-		$points = (pow(2, abs($candidate["red"] - $candidate["green"])) + pow(2, abs($candidate["green"] - $candidate["blue"])) + pow(2, abs($candidate["blue"] - $candidate["red"]))) - pow(2, ($candidate["red"] + $candidate["green"] + $candidate["blue"]) / 3);
+		$points = colour_saturation($candidate) + 0.5 * special_function(colour_brightness($candidate));
 		
 		// If we've got a better score then we win!
 		if ($points > $points_to_beat) {
@@ -284,6 +305,9 @@ function get_image_accent_colour(string $url) {
 	
 	// Dividing by 255
 	$colour = colour_mul(1 / 255, $colour);
+	
+	// Making it the right brightness
+	$colour = colour_mul(1 / colour_brightness($colour), $colour);
 	
 	// Normalise colour
 	$n = sqrt(($colour["red"] * $colour["red"]) + ($colour["green"] * $colour["green"]) + ($colour["blue"] * $colour["blue"]));
@@ -295,6 +319,10 @@ function get_image_accent_colour(string $url) {
 	
 	$base = colour_mul(1 / $n, $colour);
 	
+	return derive_pallete_from_colour($base);
+}
+
+function derive_pallete_from_colour(array $base) : array {
 	// Create variants
 	$colours[] = colour_hex(colour_mul(0.12, $base)); // Darkest
 	$colours[] = colour_hex(colour_mul(0.18, $base)); // Dark (BG)
@@ -302,6 +330,12 @@ function get_image_accent_colour(string $url) {
 	$colours[] = colour_hex(colour_add(0.4, colour_mul(0.6, $base))); // Text
 	
 	return $colours;
+}
+
+function colour_from_hex($hex) : array {
+	list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+	
+	return array("red" => $r / 255, "green" => $g / 255, "blue" => $b / 255);
 }
 
 class User {
@@ -336,6 +370,7 @@ class User {
 			$this->accent = property_exists($info, "accent") ? $info->accent : null;
 			$this->about = property_exists($info, "about") ? $info->about : "";
 			$this->sak = property_exists($info, "sak") ? $info->sak : random_hex();
+			$this->manual_colour = property_exists($info, "manual_colour") ? $info->manual_colour : "";
 			
 			// If there weren't discussions before, save them now.
 			if (!property_exists($info, "wall")) {
@@ -364,6 +399,7 @@ class User {
 			$this->accent = null;
 			$this->about = "";
 			$this->sak = random_hex();
+			$this->manual_colour = "";
 			
 			// Make sure the new user is following their wall by default.
 			$d = new Discussion($this->wall);
@@ -590,6 +626,10 @@ class User {
 		if ($this->image) {
 			$this->accent = get_image_accent_colour($this->image);
 		}
+		
+		if ($this->manual_colour) {
+			$this->accent = derive_pallete_from_colour(colour_from_hex($this->manual_colour));
+		}
 	}
 }
 
@@ -758,8 +798,9 @@ function edit_account() {
 	
 	edit_feild("name", "text", "Handle", "The string that idenifies you in the database.", $user->name, false);
 	edit_feild("display", "text", "Display name", "Choose the name that you prefer to be called.", $user->display);
-	edit_feild("about", "textarea", "About", "You can write a piece of text detailing whatever you like on your userpage. Please don't include personal information!", $user->about);
 	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email);
+	edit_feild("colour", "text", "Page colour", "The base colour that the colour of your userpage is derived from. Represented as hex #RRGGBB.", $user->manual_colour);
+	edit_feild("about", "textarea", "About", "You can write a piece of text detailing whatever you like on your userpage. Please don't include personal information!", $user->about);
 	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, not including the at sign (@). We will use this account to give you a profile picture.", $user->youtube);
 	
 	echo "<input type=\"submit\" value=\"Save details\"/>";
@@ -788,6 +829,7 @@ function save_account() {
 	
 	$user->email = htmlspecialchars($_POST["email"]);
 	$user->youtube = htmlspecialchars($_POST["youtube"]);
+	$user->manual_colour = htmlspecialchars($_POST["colour"]);
 	
 	// If the user started it with an @ then we will try to make it okay for
 	// them.
