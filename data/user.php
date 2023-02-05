@@ -225,6 +225,10 @@ function colour_hex($colour) {
 	return "#" . dechexa(min(floor($colour["red"] * 255), 255)) . dechexa(min(floor($colour["green"] * 255), 255)) . dechexa(min(floor($colour["blue"] * 255), 255));
 }
 
+function frand() : float {
+	return mt_rand() / mt_getrandmax();
+}
+
 function get_image_accent_colour(string $url) {
 	/**
 	 * Get the accent colour of the image at the given URL.
@@ -257,7 +261,14 @@ function get_image_accent_colour(string $url) {
 	$points_to_beat = 0;
 	
 	for ($i = 0; $i < 2000; $i++) {
-		$candidate = imagecolorat($img, rand(0, imagesx($img) - 1), rand(0, imagesy($img) - 1));
+		// Pick a random point radialy (more likely to hit near the centre)
+		$theta = frand() * 6.28;
+		$radius = frand() * frand();
+		
+		$x = floor(($radius * cos($theta) + 1.0) * 0.5 * (imagesx($img) - 1));
+		$y = floor(($radius * sin($theta) + 1.0) * 0.5 * (imagesx($img) - 1));
+		
+		$candidate = imagecolorat($img, $x, $y);
 		
 		// Get the proper colour names
 		$candidate = imagecolorsforindex($img, $candidate);
