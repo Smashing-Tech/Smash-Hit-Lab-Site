@@ -247,11 +247,29 @@ function get_image_accent_colour(string $url) {
 	
 	$colours = array();
 	
-	// Just get the centre pixel for now...
-	$colour = imagecolorat($img, floor(imagesx($img) / 2), floor(imagesy($img) / 2));
+	//floor(imagesx($img) / 2), floor(imagesy($img) / 2)
 	
-	// Bit shifting...
-	$colour = imagecolorsforindex($img, $colour);
+	// Get the accent colour
+	// We pick the colour that is most unique. This means we need a function that
+	// weighs heavy with large differences but barely does anything with small
+	// ones.
+	$colour = array("red" => 255, "green" => 255, "blue" => 255);
+	$points_to_beat = 0;
+	
+	for ($i = 0; $i < 2000; $i++) {
+		$candidate = imagecolorat($img, rand(0, imagesx($img) - 1), rand(0, imagesy($img) - 1));
+		
+		// Get the proper colour names
+		$candidate = imagecolorsforindex($img, $candidate);
+		
+		// Calculate score
+		$points = (pow(2, abs($candidate["red"] - $candidate["green"])) + pow(2, abs($candidate["green"] - $candidate["blue"])) + pow(2, abs($candidate["blue"] - $candidate["red"]))) - pow(2, ($candidate["red"] + $candidate["green"] + $candidate["blue"]) / 3);
+		
+		// If we've got a better score then we win!
+		if ($points > $points_to_beat) {
+			$colour = $candidate;
+		}
+	}
 	
 	// Dividing by 255
 	$colour = colour_mul(1 / 255, $colour);
