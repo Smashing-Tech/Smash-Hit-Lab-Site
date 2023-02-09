@@ -64,7 +64,7 @@ class Database {
 		return $this->path . str_replace("/", ".", $item);
 	}
 	
-	function load(string $item) : object | array {
+	function load(string $item) : object | array | null {
 		/**
 		 * Load a database object
 		 */
@@ -104,7 +104,9 @@ class Database {
 	}
 	
 	function has(string $item) : bool {
-		return file_exists($this->get_item_path($item));
+		$path = $this->get_item_path($item);
+		
+		return file_exists($path) && !is_dir($path);
 	}
 	
 	function enumerate() : array {

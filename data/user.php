@@ -327,7 +327,7 @@ function derive_pallete_from_colour(array $base) : array {
 	$colours[] = colour_hex(colour_mul(0.12, $base)); // Darkest
 	$colours[] = colour_hex(colour_mul(0.18, $base)); // Dark (BG)
 	$colours[] = colour_hex(colour_mul(0.225, $base)); // Dark lighter
-	$colours[] = colour_hex(colour_add(0.4, colour_mul(0.6, $base))); // Text
+	$colours[] = colour_hex(colour_add(0.5, colour_mul(0.6, $base))); // Text
 	
 	return $colours;
 }
