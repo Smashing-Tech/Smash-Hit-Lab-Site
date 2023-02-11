@@ -873,14 +873,23 @@ function display_user(string $user) {
 	
 	include_header();
 	
-	// If the user has a YouTube PFP, then display it large!
-	if ($user->image) {
-		echo "<div class=\"profile-header-image-wrapper\"><img class=\"profile-header-image\" src=\"$user->image\"/></div>";
-	}
-	
+	// 
 	// If these contains have passed, we can view the user page
+	// 
+	
 	$display_name = $user->display ? $user->display : $user->name;
-	echo "<h1>$display_name</h1><h2>@$user->name</h2>";
+	
+	echo "<div class=\"mod-edit-property\">";
+		echo "<div class=\"mod-edit-property-label\">";
+			if ($user->image) {
+				echo "<div class=\"profile-header-image-wrapper\"><img class=\"profile-header-image\" src=\"$user->image\"/></div>";
+			}
+		echo "</div>";
+		echo "<div class=\"mod-edit-property-data\">";
+			echo "<h1 class=\"left-align\">$display_name</h1>";
+			echo "<h2 class=\"left-align\">@$user->name</h2>";
+		echo "</div>";
+	echo "</div>";
 	
 	// If the user has an about section, then we should show it.
 	if ($user->about) {

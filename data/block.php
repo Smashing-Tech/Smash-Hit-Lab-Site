@@ -88,3 +88,7 @@ function is_ip_blocked(string $ip) : bool {
 	$ip = new BlockIP($ip);
 	return $ip->is_blocked();
 }
+
+class BlockUser {
+	// An object containg a list of users that this user has blocked.
+}

@@ -33,6 +33,12 @@ p, ul { font-size: 14pt; margin-bottom: 0.75em; }
 ul { margin-left: 1.5em; }
 .cb-quote { font-size: 20pt; line-height: 1.5; }
 
+.left-align {
+	text-align: left;
+	margin-left: 0;
+	padding-left: 0;
+}
+
 code {
 	background: #8883;
 	border-radius: 0.325em;
