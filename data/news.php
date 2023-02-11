@@ -49,7 +49,7 @@ function get_news_edit_button(string $name) : string {
 		$user = new User($user);
 		
 		if ($user->is_admin()) {
-			return "<p><a href=\"./?a=update_news&n=$name\"><button>Edit this article</button></a></p>";
+			return "<p class=\"centred\"><a href=\"./?a=update_news&n=$name\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit this article</button></a></p>";
 		}
 	}
 	

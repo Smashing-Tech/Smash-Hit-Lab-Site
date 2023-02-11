@@ -76,7 +76,7 @@ class ModPage {
 		echo "<h1>" . ($this->name ? $this->name : $this->package) . "</h1>";
 		
 		if (get_name_if_authed()) {
-			echo "<p class=\"centred\"><a href=\"./?a=edit_mod&m=$this->package\"><button>Edit mod info</button></a></p>";
+			echo "<p class=\"centred\"><a href=\"./?a=edit_mod&m=$this->package\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit mod info</button></a></p>";
 		}
 		
 		echo "<h3>About</h3>";

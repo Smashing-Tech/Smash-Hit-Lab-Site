@@ -80,7 +80,7 @@ class Comment {
 		$img = "<img src=\"$img\"/>";
 		$text = rich_format($this->body);
 		$after = htmlspecialchars($_SERVER['REQUEST_URI']);
-		$hidden_text = ($this->is_hidden()) ? "Unhide" : "Hide";
+		$hidden_text = ($this->is_hidden()) ? "Unhide" : "<span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">block</span> Hide";
 		$sak = user_get_sak();
 		$actions = (get_name_if_admin_authed() || (get_name_if_authed() === $this->author)) ? "<p><a href=\"./?a=discussion_hide&id=$id&index=$index&after=$after&key=$sak\">$hidden_text</a></p>" : "";
 		
@@ -324,7 +324,7 @@ class Discussion {
 			$follow = ($this->is_following($name)) ? "Unfollow" : "Follow";
 			$url = $_SERVER['REQUEST_URI'];
 			
-			echo "<p><a href=\"./?a=discussion_follow&id=$this->id&after=$url\"><button>$follow this discussion</button></a></p>";
+			echo "<p><a href=\"./?a=discussion_follow&id=$this->id&after=$url\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">notification_add</span> $follow this discussion</button></a></p>";
 		}
 	}
 	
