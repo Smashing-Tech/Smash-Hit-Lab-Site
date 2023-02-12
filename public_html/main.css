@@ -205,6 +205,32 @@ input[type=submit]:hover, button:hover {
 	position: fixed;
 	top: 0;
 	width: calc(100vw - 32px);
+	z-index: 100;
+}
+
+@media (max-width: 1200px) {
+	.navbar-section {
+		top: 68px;
+		display: none;
+	}
+}
+
+.show-navbar-section {
+	background: var(--main-colour-bg-dark);
+	color: var(--main-colour);
+	border: none;
+	padding: 1em;
+	position: fixed;
+	top: 0;
+	text-align: center;
+	width: calc(100vw - 32px);
+	z-index: 100;
+}
+
+@media (min-width: 1201px) {
+	.show-navbar-section {
+		display: none;
+	}
 }
 
 .post-navbar-padding {
@@ -227,6 +253,13 @@ input[type=submit]:hover, button:hover {
 	vertical-align: middle;
 	font-family: var(--font-face);
 	max-height: 64px; /* Why did this fix it? */
+}
+
+@media (max-width: 1200px) {
+	.cb-top-item {
+		display: block;
+		margin-bottom: 1em;
+	}
 }
 
 .toleft {
@@ -361,6 +394,7 @@ input[type=submit]:hover, button:hover {
 
 .mod-property-data {
 	grid-column: 2;
+	margin-left: 1em;
 }
 
 .header-container {

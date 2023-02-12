@@ -19,9 +19,27 @@
 			echo "<title>$gTitle &mdash; Smash Hit Lab</title>";
 		}
 		?>
+		<script>
+			// BUG If you expand then collapse and then restore the window, the
+			// top bar is still explicitly marked as hidden.
+			function shownavbar() {
+				let navbar = document.getElementById("navbar");
+				let displayed = (navbar.style.display != "none");
+				
+				if (!displayed) {
+					navbar.style.display = "inherit";
+				}
+				else {
+					navbar.style.display = "none";
+				}
+			}
+		</script>
 	</head>
 	<body>
-		<div class="navbar-section">
+		<div id="navbar-button" class="show-navbar-section" onclick="shownavbar();">
+			<div class="cb-logo-item">Explore Smash Hit Lab <span class="material-icons" style="position: relative; top: 4px; left: 10px;">arrow_forward</span></div>
+		</div>
+		<div id="navbar" class="navbar-section">
 			<div class="header-container">
 				<div class="header-container-left">
 					<div class="cb-logo-item">Smash Hit Lab</div>
