@@ -28,6 +28,26 @@ function random_password() : string {
 	return $pw;
 }
 
+function crush_ip(?string $ip = null) : string {
+	/**
+	 * Crush an IP address into a partial hash.
+	 * 
+	 * Normally IP addresses are used to deny access, so it's okay if there are
+	 * collisions (and in fact this should help with privacy).
+	 * 
+	 * TODO IPv6 address might not be handled as well
+	 * 
+	 * TODO This is also used for denying tokens from the wrong IP, so it's worth
+	 * considering if this mitigates that.
+	 */
+	
+	if ($ip === null) {
+		$ip = $_SERVER["REMOTE_ADDR"];
+	}
+	
+	return substr(md5($ip), 0, 6);
+}
+
 class Token {
 	public $name; // Name of the token
 	public $user; // Name of the user
@@ -54,7 +74,7 @@ class Token {
 			$this->user = $token->user;
 			$this->created = $token->created;
 			$this->expire = $token->expire;
-			$this->ip = property_exists($token, "ip") ? $token->ip : "0.0.0.0";
+			$this->ip = property_exists($token, "ip") ? $token->ip : crush_ip();
 		}
 		// Create a new token
 		else {
@@ -62,7 +82,7 @@ class Token {
 			$this->user = null;
 			$this->created = time();
 			$this->expire = time() + 60 * 60 * 24 * 7 * 2; // Expire in 2 weeks
-			$this->ip = $_SERVER['REMOTE_ADDR'];
+			$this->ip = crush_ip();
 		}
 	}
 	
@@ -119,8 +139,8 @@ class Token {
 			return null;
 		}
 		
-		// Not the same IP
-		if ($this->ip !== $_SERVER['REMOTE_ADDR']) {
+		// Not the same IP (TODO: Needs some extra conditions so it's not annoying)
+		if ($this->ip !== crush_ip()) {
 			return null;
 		}
 		
