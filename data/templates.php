@@ -110,6 +110,12 @@ function sorry(string $why = "There was a problem.", string $extra = "") {
 	die();
 }
 
+function validate_length(string $feild_name, string $what, int $max_length = 100) : void {
+	if (strlen($what) > $max_length) {
+		sorry("$feild_name should be at most $max_length characters.");
+	}
+}
+
 function rich_format(string $base, bool $trusted = false) : string {
 	/**
 	 * Sanitise and convert rich formatted user text.

@@ -414,6 +414,8 @@ function discussion_update() {
 		sorry("Need a body for content.");
 	}
 	
+	validate_length("Body of message", $_POST["body"], 4000);
+	
 	$discussion = new Discussion($discussion);
 	
 	if ($index == "-1") {

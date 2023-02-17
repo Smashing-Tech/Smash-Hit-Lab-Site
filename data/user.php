@@ -840,6 +840,12 @@ function save_account() {
 		sorry("Please log in to edit your user preferences.");
 	}
 	
+	validate_length("Display name", $_POST["display"], 30);
+	validate_length("Email", $_POST["email"], 300);
+	validate_length("YouTube", $_POST["youtube"], 30);
+	validate_length("Colour", $_POST["colour"], 7);
+	validate_length("About", $_POST["about"], 2000);
+	
 	$user = new User($user);
 	$user->display = htmlspecialchars($_POST["display"]);
 	

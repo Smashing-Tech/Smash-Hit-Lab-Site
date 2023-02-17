@@ -152,6 +152,17 @@ class ModPage {
 	}
 	
 	function save_edit(string $whom) {
+		validate_length("Name", $_POST["name"], 100);
+		validate_length("creators", $_POST["creators"], 300);
+		validate_length("wiki", $_POST["wiki"], 500);
+		validate_length("description", $_POST["description"], 2000);
+		validate_length("download", $_POST["download"], 500);
+		validate_length("code", $_POST["code"], 500);
+		validate_length("tags", $_POST["tags"], 300);
+		validate_length("version", $_POST["version"], 100);
+		validate_length("security", $_POST["security"], 200);
+		validate_length("status", $_POST["status"], 50);
+		
 		$this->name = htmlspecialchars($_POST["name"]);
 		$this->creators = parse_comma_array(htmlspecialchars($_POST["creators"]));
 		$this->wiki = htmlspecialchars($_POST["wiki"]);
