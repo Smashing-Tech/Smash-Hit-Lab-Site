@@ -79,6 +79,11 @@ class ModPage {
 			echo "<p class=\"centred\">";
 			echo "<a href=\"./?a=edit_mod&m=$this->package\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit mod info</button></a> ";
 			echo "<a href=\"./?a=mod_history&m=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">history</span> Revision history</button></a>";
+			
+			if (get_name_if_admin_authed()) {
+				echo "<a href=\"./?a=mod_delete&package=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">delete</span> Delete page</button></a>";
+			}
+			
 			echo "</p>";
 		}
 		
@@ -168,11 +173,6 @@ class ModPage {
 		$db->delete($this->package);
 		discussion_delete_given_id($this->reviews);
 	}
-}
-
-function display_mod_page(string $mod_name) : void {
-	$mod = new ModPage($mod_name);
-	$mod->display();
 }
 
 function display_mod() {
@@ -265,8 +265,14 @@ function delete_mod() : void {
 			
 			echo "<h1>Delete mod page</h1>";
 			
+			$default = false;
+			
+			if (array_key_exists("package", $_GET)) {
+				$default = $_GET["package"];
+			}
+			
 			form_start("./?a=delete_mod");
-			edit_feild("page", "text", "Page name", "The name of the page to delete. This is the same as the mod's package name.", "");
+			edit_feild("page", "text", "Page name", "The name of the page to delete. This is the same as the mod's package name.", $default, !$default);
 			edit_feild("reason", "text", "Reason", "Type a short reason that you would like to delete this page (optional).", "");
 			form_end("Delete mod page");
 			

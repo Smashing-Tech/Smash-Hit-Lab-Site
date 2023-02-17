@@ -139,6 +139,11 @@ input[type=submit]:hover, button:hover, .button:hover {
 	color: var(--main-colour);
 }
 
+.button.secondary:hover {
+	background: var(--main-colour-bg-bright);
+	box-shadow: none;
+}
+
 /* Warning */
 .warning-main {
 	background: var(--main-colour-bg-dark);
