@@ -186,7 +186,16 @@ class RevisionDB {
 		 */
 		
 		// Load current version info
-		$data = $this->db->load($item);
+		$data = null;
+		
+		if ($this->db->has($item)) {
+			$data = $this->db->load($item);
+		}
+		else {
+			$data = new stdClass();
+			$data->rdb_ = 1;
+			$data->revisions = array();
+		}
 		
 		// Constuct the RDB Object
 		// We can do this transparently since RDBObject will auto-create itself

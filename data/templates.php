@@ -122,6 +122,7 @@ function rich_format(string $base, bool $trusted = false) : string {
 	$bold = false; // Are we currently bold?
 	$italic = false; // Are we currently italic?
 	$code = false; // Are we currently code?
+	$pre = false; // Are we in a pre tag?
 	
 	// This parser is really not great, but it's simple and does what it does
 	// do quite well and really I don't feel like a big parser right now.
@@ -158,6 +159,17 @@ function rich_format(string $base, bool $trusted = false) : string {
 			
 			$i += 1;
 			$italic = !$italic;
+		}
+		else if (str_starts_with($s, "```")) {
+			if ($pre) {
+				$body = $body . "</pre>";
+			}
+			else {
+				$body = $body . "<pre>";
+			}
+			
+			$i += 2;
+			$pre = !$pre;
 		}
 		else if (str_starts_with($s, "`")) {
 			if ($code) {
@@ -239,7 +251,7 @@ function rich_format(string $base, bool $trusted = false) : string {
 		}
 	}
 	
-	// If we are still bold or italics we need to stop that!
+	// If we are still bold or italics or anything else we need to stop that!
 	if ($bold) {
 		$body = $body . "</b>";
 	}
@@ -250,6 +262,10 @@ function rich_format(string $base, bool $trusted = false) : string {
 	
 	if ($code) {
 		$body = $body . "</code>";
+	}
+	
+	if ($pre) {
+		$body = $body . "</pre>";
 	}
 	
 	// Dobule newlines -> paragraphs
