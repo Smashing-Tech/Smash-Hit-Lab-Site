@@ -318,7 +318,7 @@ class Discussion {
 	}
 	
 	function display_follow() {
-		$name = get_name_if_admin_authed();
+		$name = get_name_if_authed();
 		
 		if ($name) {
 			$follow = ($this->is_following($name)) ? "Unfollow" : "Follow";
