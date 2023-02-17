@@ -22,7 +22,7 @@ class ModPage {
 	public $reviews;
 	
 	function __construct(string $package) {
-		$db = new Database("mod");
+		$db = new RevisionDB("mod");
 		
 		if ($db->has($package)) {
 			$mod = $db->load($package);
@@ -68,7 +68,7 @@ class ModPage {
 	}
 	
 	function save() {
-		$db = new Database("mod");
+		$db = new RevisionDB("mod");
 		$db->save($this->package, $this);
 	}
 	
@@ -76,7 +76,10 @@ class ModPage {
 		echo "<h1>" . ($this->name ? $this->name : $this->package) . "</h1>";
 		
 		if (get_name_if_authed()) {
-			echo "<p class=\"centred\"><a href=\"./?a=edit_mod&m=$this->package\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit mod info</button></a></p>";
+			echo "<p class=\"centred\">";
+			echo "<a href=\"./?a=edit_mod&m=$this->package\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit mod info</button></a> ";
+			echo "<a href=\"./?a=mod_history&m=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">history</span> Revision history</button></a>";
+			echo "</p>";
 		}
 		
 		echo "<h3>About</h3>";
@@ -102,6 +105,24 @@ class ModPage {
 		
 		$disc = new Discussion($this->reviews);
 		$disc->display_reverse("Reviews", "./?m=" . $this->package);
+	}
+	
+	function display_history() {
+		echo "<h1>History of " . ($this->name ? $this->name : $this->package) . "</h1>";
+		
+		$db = new RevisionDB("mod");
+		$history = $db->history($this->package);
+		
+		echo "<ul>";
+		
+		for ($i = (sizeof($history) - 1); $i >= 0; $i--) {
+			$rev = $history[$i];
+			$revnum = $i + 1;
+			
+			echo "<li>Updated at " . date("Y-m-d H:i:s", $rev->updated) . " (Rev $revnum) by <a href=\"./?u=$rev->author\">$rev->author</a> &mdash; $rev->reason</li>";
+		}
+		
+		echo "</ul>";
 	}
 	
 	function display_edit() {
@@ -143,7 +164,7 @@ class ModPage {
 	}
 	
 	function delete() {
-		$db = new Database("mod");
+		$db = new RevisionDB("mod");
 		$db->delete($this->package);
 		discussion_delete_given_id($this->reviews);
 	}
@@ -187,6 +208,29 @@ function edit_mod() : void {
 	
 	$mod = new ModPage($mod_name);
 	$mod->display_edit();
+	
+	include_footer();
+}
+
+function mod_history() : void {
+	include_header();
+	
+	if (!array_key_exists("m", $_GET)) {
+		echo "<h1>Sorry</h1><p>Bad request.</p>";
+		include_footer();
+		return;
+	}
+	
+	$mod_name = $_GET["m"];
+	
+	if (!get_name_if_authed()) {
+		echo "<h1>Sorry</h1><p>You need to <a href=\"./?p=login\">log in</a> or <a href=\"./?p=register\">create an account</a> to view page history.</p>";
+		include_footer();
+		return;
+	}
+	
+	$mod = new ModPage($mod_name);
+	$mod->display_history();
 	
 	include_footer();
 }
@@ -250,7 +294,7 @@ function delete_mod() : void {
 }
 
 function list_mods() : void {
-	$db = new Database("mod");
+	$db = new RevisionDB("mod");
 	
 	$list = $db->enumerate();
 	

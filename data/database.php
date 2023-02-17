@@ -7,10 +7,10 @@
 
 $database_path = "../data/db/";
 
-/*class RDBObject {
+class RDBObject {
 	/**
 	 * RevisionDB object container
-	 *
+	 */
 	
 	public $revisions;
 	public $rdb_;
@@ -27,14 +27,51 @@ $database_path = "../data/db/";
 		}
 	}
 	
-	function top() {
-		return $this->revisions[];
+	function at(int $index = -1) {
+		/**
+		 * Return the revision at the given index. If index is -1, then the newest
+		 * revision is returned.
+		 */
+		
+		if ($index == -1) {
+			$index = sizeof($this->revisions) - 1;
+		}
+		
+		return $this->revisions[$index];
 	}
 	
-	function add(object $item) {
+	function top() {
+		/**
+		 * Return the top (current) revision
+		 */
+		
+		return $this->at();
+	}
+	
+	function add($item) {
+		/**
+		 * Add a new revision.
+		 */
+		
 		$this->revisions[] = $item;
 	}
-}*/
+	
+	function revert(int $index) {
+		/**
+		 * Revert to the revision at index.
+		 */
+		
+		$this->add($this->at($index));
+	}
+	
+	function size() {
+		/**
+		 * Return the number of revisions.
+		 */
+		
+		return sizeof($this->revisions);
+	}
+}
 
 class Database {
 	/**
@@ -114,6 +151,122 @@ class Database {
 		array_shift($array);
 		array_shift($array);
 		return $array;
+	}
+}
+
+class RevisionDB {
+	/**
+	 * A database which supports revisioing. It can be used as a drop in replacement
+	 * for the normal database.
+	 */
+	
+	public $db;
+	
+	function __construct(string $name) {
+		$this->db = new Database($name);
+	}
+	
+	function load(string $item, int $index = -1) {
+		/**
+		 * Load a revision (or the latest if not specified)
+		 */
+		
+		$data = $this->db->load($item);
+		
+		// RDBObject's constructor will take care of the case that this isn't
+		// already an RDBObject for us :)
+		$obj = new RDBObject($data);
+		
+		return $obj->at($index);
+	}
+	
+	function save(string $item, $newdata) : void {
+		/**
+		 * Save a new revision
+		 */
+		
+		// Load current version info
+		$data = $this->db->load($item);
+		
+		// Constuct the RDB Object
+		// We can do this transparently since RDBObject will auto-create itself
+		// if this isn't already an RDBObject
+		$obj = new RDBObject($data);
+		
+		// Add the new revision
+		$obj->add($newdata);
+		
+		// Save the new RDBObject
+		$this->db->save($item, $obj);
+	}
+	
+	function delete(string $item) : void {
+		$this->db->delete($item);
+	}
+	
+	function has(string $item) : bool {
+		return $this->db->has($item);
+	}
+	
+	function enumerate() : array {
+		return $this->db->enumerate();
+	}
+	
+	function history(string $item) : array {
+		/**
+		 * Return the revision history for a given item as
+		 * 
+		 * array(
+		 *     object(
+		 *         author: string,
+		 *         updated: int,
+		 *         reason: string
+		 *     ),
+		 *     ...
+		 * )
+		 */
+		
+		$data = $this->db->load($item);
+		
+		// Array to hold history info
+		$history = array();
+		
+		$obj = new RDBObject($data);
+		
+		for ($i = 0; $i < $obj->size(); $i++) {
+			$revision = $obj->at($i);
+			
+			// Check if there is an author feild, if so use it instead
+			$author = "Unknown author";
+			
+			if (property_exists($revision, "author")) {
+				$author = $revision->author;
+			}
+			
+			// Check if there is an updated feild, and use if so
+			$updated = 0;
+			
+			if (property_exists($revision, "updated")) {
+				$updated = $revision->updated;
+			}
+			
+			// Check if there is a reason feild, and use if so
+			$reason = "No reason given";
+			
+			if (property_exists($revision, "reason")) {
+				$reason = $revision->reason;
+			}
+			
+			// Create the info object
+			$info = new stdClass();
+			$info->author = $author;
+			$info->updated = $updated;
+			$info->reason = $reason;
+			
+			$history[] = $info;
+		}
+		
+		return $history;
 	}
 }
 

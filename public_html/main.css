@@ -113,7 +113,7 @@ textarea {
 	width: 100%;
 }
 
-input[type=submit], button {
+input[type=submit], button, .button {
 	background: var(--main-colour);
 	border: none;
 	border-radius: 0.5em;
@@ -125,9 +125,14 @@ input[type=submit], button {
 	transition: background 0.1s, box-shadow 0.1s;
 }
 
-input[type=submit]:hover, button:hover {
+input[type=submit]:hover, button:hover, .button:hover {
 	background: #fff;
 	box-shadow: 0 0 1.0em #fff8;
+}
+
+.button.secondary {
+	background: transparent;
+	color: var(--main-colour);
 }
 
 /* Warning */

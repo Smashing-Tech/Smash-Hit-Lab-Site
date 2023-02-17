@@ -23,6 +23,9 @@ function handle_action($action) {
 		case "save_mod":
 			save_mod();
 			break;
+		case "mod_history":
+			mod_history();
+			break;
 		case "delete_mod":
 			delete_mod();
 			break;
