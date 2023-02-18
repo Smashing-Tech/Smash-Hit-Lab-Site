@@ -735,9 +735,9 @@ function user_get_sak() : string {
 	return (new User($user))->get_sak();
 }
 
-function user_verify_sak() : bool {
+function user_verify_sak(string $key) : bool {
 	/**
-	 * Get the SAK of the current user.
+	 * Verify that the SAK of the current user matches the given one.
 	 */
 	
 	$user = get_name_if_authed();
@@ -746,7 +746,7 @@ function user_verify_sak() : bool {
 		return false;
 	}
 	
-	return (new User())->verify_sak();
+	return (new User($user))->verify_sak($key);
 }
 
 function get_nice_display_name(string $user, bool $badge = true) {

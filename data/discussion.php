@@ -84,7 +84,7 @@ class Comment {
 		$sak = user_get_sak();
 		$actions = (get_name_if_admin_authed() || (get_name_if_authed() === $this->author)) ? "<p><a href=\"./?a=discussion_hide&id=$id&index=$index&after=$after&key=$sak\">$hidden_text</a></p>" : "";
 		
-		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\">$img</div><div class=\"comment-card-inner-right\"><p>$name</p><p class=\"small-text\">$date</p><p>$text</p>$actions</div></div></div>";
+		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\">$img</div><div class=\"comment-card-inner-right\"><p>$name <span class=\"small-text\">(@$this->author | $date)</span></p><p>$text</p>$actions</div></div></div>";
 	}
 }
 
@@ -294,12 +294,13 @@ class Discussion {
 				$url = htmlspecialchars($_SERVER['REQUEST_URI']); // Yes this should be sanitised for mod pages
 				$body = htmlspecialchars($comment->body);
 				$img = get_profile_image(get_name_if_authed());
+				$sak = user_get_sak();
 				
 				if (!$img) {
 					$img = "./icon.png";
 				}
 				
-				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><p>$name</p><p><textarea style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none; display: inline-block;\" name=\"body\" placeholder=\"Add your comment...\">$body</textarea></p><p><input type=\"submit\" value=\"Post comment\"></p></form></div></div></div>";
+				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><p>$name</p><p><textarea style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none; display: inline-block;\" name=\"body\" placeholder=\"Add your comment...\">$body</textarea></p><p><input type=\"hidden\" name=\"key\" value=\"$sak\"><input type=\"submit\" value=\"Post comment\"></p></form></div></div></div>";
 				break;
 			}
 			case "closed": {
@@ -388,7 +389,7 @@ function discussion_delete_given_id(string $id) {
 function discussion_update() {
 	$user = get_name_if_authed();
 	
-	if (!$user) {
+	if (!$user || !array_key_exists("key", $_POST) || !user_verify_sak($_POST["key"])) {
 		sorry("You need to be logged in to post comments.");
 	}
 	

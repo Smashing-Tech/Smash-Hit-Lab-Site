@@ -435,15 +435,10 @@ input[type=submit]:hover, button:hover, .button:hover {
 .comment-card {
 	background: var(--main-colour-bg-bright);
 	border-radius: 0.5em;
+	box-shadow: 0 0 3em var(--main-colour-bg-bright-hover);
 	overflow: auto;
 	padding: 1em;
 	margin: 1em 0;
-	
-	transition: box-shadow 0.2s;
-}
-
-.comment-card:hover {
-	box-shadow: 0 0 3em var(--main-colour-bg-bright-hoverb);
 }
 
 .comment-card-inner {

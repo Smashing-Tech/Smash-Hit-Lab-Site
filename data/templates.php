@@ -54,6 +54,8 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $optio
 					
 					break;
 				case "submit":
+					$sak = user_get_sak();
+					echo "<input type=\"hidden\" name=\"key\" value=\"$sak\">";
 					echo "<input type=\"submit\" value=\"$desc\"/>";
 					break;
 				default:
@@ -129,6 +131,7 @@ function rich_format(string $base, bool $trusted = false) : string {
 	$italic = false; // Are we currently italic?
 	$code = false; // Are we currently code?
 	$pre = false; // Are we in a pre tag?
+	$big = false; // Are we big text?
 	
 	// This parser is really not great, but it's simple and does what it does
 	// do quite well and really I don't feel like a big parser right now.
@@ -186,6 +189,17 @@ function rich_format(string $base, bool $trusted = false) : string {
 			}
 			
 			$code = !$code;
+		}
+		else if (str_starts_with($s, "^^^")) {
+			if ($big) {
+				$body = $body . "</span>";
+			}
+			else {
+				$body = $body . "<span class=\"cb-quote\">";
+			}
+			
+			$i += 2;
+			$big = !$big;
 		}
 		else if (str_starts_with($s, "@")) {
 			$end = strcspn($s, " \r\n\t", 1, 24);
@@ -274,10 +288,16 @@ function rich_format(string $base, bool $trusted = false) : string {
 		$body = $body . "</pre>";
 	}
 	
+	if ($big) {
+		$body = $body . "</span>";
+	}
+	
 	// Dobule newlines -> paragraphs
+	$body = str_replace("\r\n\r\n", "</p><p>", $body);
 	$body = str_replace("\n\n", "</p><p>", $body);
 	
 	// Single newlines -> linebreaks
+	$body = str_replace("\r\n", "<br/>", $body);
 	$body = str_replace("\n", "<br/>", $body);
 	
 	// Final closing tag
