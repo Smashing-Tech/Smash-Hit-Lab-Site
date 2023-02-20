@@ -98,6 +98,9 @@ function handle_action($action) {
 		case "admin_dashboard":
 			do_admin_dashboard();
 			break;
+		case "alerts":
+			do_admin_alerts();
+			break;
 		case "send_notification":
 			do_send_notification();
 			break;

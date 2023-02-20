@@ -629,7 +629,7 @@ class User {
 		return $name;
 	}
 	
-	function verify(string $verifier) : void {
+	function verify(?string $verifier) : void {
 		$this->verified = $verifier;
 		$this->save();
 	}

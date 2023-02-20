@@ -64,23 +64,36 @@ function do_admin_dashboard() {
 		echo "<h3>Actions</h3>";
 		
 		echo "<h4>Site and maintanance</h4>";
-		// echo "<ul>";
 		admin_action_item("./?a=site_config", "settings", "Settings");
 		admin_action_item("./?a=send_notification", "notifications_active", "Send notification");
 		admin_action_item("./?a=backup_db", "backup", "Create backup");
 		admin_action_item("./?a=storage_list", "inventory", "Site storage");
-		// echo "</ul>";
+		admin_action_item("./?a=alerts", "new_releases", "Alerts");
 		
 		echo "<h4>Users and contributed content</h4>";
-		// echo "<ul>";
 		admin_action_item("./?a=user_ban", "person_off", "Ban user");
 		admin_action_item("./?a=user_delete", "person_remove", "Delete user");
 		admin_action_item("./?a=delete_mod", "delete", "Delete mod page");
-		// echo "</ul>";
 		
-		echo "";
 		
-		echo "<h3>Alerts</h3>";
+		include_footer();
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
+}
+
+function do_admin_alerts() {
+	/**
+	 * ADMINNNNNNNNNNNNNNNNNNNNNNNN!!!!!!!!!
+	 */
+	
+	$user = get_name_if_admin_authed();
+	
+	if ($user) {
+		include_header();
+		echo "<h1>Alerts</h1>";
+		
 		$un = new UserNotifications($user, "alert");
 		$un->display("");
 		$un->clear();
