@@ -86,6 +86,9 @@ function handle_action($action) {
 		case "user_ban":
 			do_user_ban();
 			break;
+		case "user_delete":
+			do_user_delete();
+			break;
 		case "user_verify":
 			user_verify();
 			break;

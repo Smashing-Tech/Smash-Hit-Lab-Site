@@ -9,35 +9,6 @@ require_once "templates.php";
 require_once "user.php";
 require_once "block.php";
 
-function do_evaluate() {
-	/**
-	 * This is *only* for Knot126 to use :)
-	 */
-	
-	if (get_name_if_authed() === "knot126") {
-		if (!array_key_exists("command", $_POST)) {
-			include_header();
-			echo "<h1>Run code</h1>";
-			echo "<form action=\"./?a=eval\" method=\"post\">";
-			edit_feild("command", "textarea", "Code", "The code that you would like to run.", "echo 'Hello, world!';");
-			echo "<input type=\"submit\" value=\"Execute\"/>";
-			echo "</form>";
-			include_footer();
-		}
-		else {
-			include_header();
-			echo "<h1>Code result</h1>";
-			echo "<pre>";
-			eval($_POST["command"]);
-			echo "</pre>";
-			include_footer();
-		}
-	}
-	else {
-		sorry("The action you have requested is not currently implemented.");
-	}
-}
-
 function do_site_config() {
 	/**
 	 * Site config form
@@ -70,6 +41,15 @@ function do_site_config() {
 	}
 }
 
+function admin_action_item(string $url, string $icon, string $title) {
+	echo "<div style=\"display: inline-block; width: 150px; text-align: center; padding: 0.5em; margin: 0.5em; background: var(--main-colour-bg-bright); border-radius: 0.5em;\">";
+		echo "<a href=\"$url\">";
+			echo "<p style=\"font-size: 24pt;\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px; font-size: 32pt;\">$icon</span></p>";
+			echo "<p>$title</p>";
+		echo "</a>";
+	echo "</div>";
+}
+
 function do_admin_dashboard() {
 	/**
 	 * Our really lovely admin dashboard!
@@ -84,17 +64,20 @@ function do_admin_dashboard() {
 		echo "<h3>Actions</h3>";
 		
 		echo "<h4>Site and maintanance</h4>";
-		echo "<ul>";
-		echo "<li><a href=\"./?a=site_config\">Site configuration</a> &mdash; very basic site options</li>";
-		echo "<li><a href=\"./?a=send_notification\">Send notification</a> &mdash; send a notification to everyone</li>";
-		echo "<li><a href=\"./?a=backup_db\">Backup database</a> &mdash; back up the site data files</li>";
-		echo "</ul>";
+		// echo "<ul>";
+		admin_action_item("./?a=site_config", "settings", "Settings");
+		admin_action_item("./?a=send_notification", "notifications_active", "Send notification");
+		admin_action_item("./?a=backup_db", "backup", "Create backup");
+		// echo "</ul>";
 		
-		echo "<h4>Users and content</h4>";
-		echo "<ul>";
-		echo "<li><a href=\"./?a=user_ban\">Ban user</a> &mdash; user banning form</li>";
-		echo "<li><a href=\"./?a=delete_mod\">Delete mod page</a> &mdash; remove a mod page from the site</li>";
-		echo "</ul>";
+		echo "<h4>Users and contributed content</h4>";
+		// echo "<ul>";
+		admin_action_item("./?a=user_ban", "person_off", "Ban user");
+		admin_action_item("./?a=user_delete", "person_remove", "Delete user");
+		admin_action_item("./?a=delete_mod", "delete", "Delete mod page");
+		// echo "</ul>";
+		
+		echo "";
 		
 		echo "<h3>Alerts</h3>";
 		$un = new UserNotifications($user, "alert");
@@ -166,6 +149,62 @@ function do_user_ban() {
 				echo "<h1>Account banned</h1><p>The account $handle was successfully banned until $until.</p>";
 				include_footer();
 			}
+		}
+		
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
+}
+
+function do_user_delete() {
+	$banner = get_name_if_admin_authed();
+	
+	if ($banner) {
+		if (!array_key_exists("handle", $_POST)) {
+			include_header();
+			echo "<h1>Delete user</h1>";
+			
+			$have_handle = false;
+			
+			if (array_key_exists("handle", $_GET)) {
+				$have_handle = true;
+			}
+			
+			form_start("./?a=user_delete");
+			edit_feild("handle", "text", "Handle", "Handle or username of the user to delete.", $have_handle ? $_GET["handle"] : "", !$have_handle);
+			edit_feild("reason", "text", "Reason", "Type a short reason why you want to delete this user (required). <b>This message is not shown to the user at the moment and is for audit logs only.</b>", "");
+			form_end("Delete this user");
+			
+			include_footer();
+		}
+		else {
+			$handle = htmlspecialchars($_POST["handle"]);
+			$reason = htmlspecialchars($_POST["reason"]);
+			
+			$user = new User($handle);
+			
+			if (strlen($reason) < 3) {
+				sorry("Please type a better ban reason.");
+			}
+			
+			if ($user->is_admin()) {
+				alert("Admin $banner tried to delete staff member $user->name", "./?u=$banner");
+				sorry("You cannot delete a staff member. This action has been reported.");
+			}
+			
+			if ($user->is_verified()) {
+				alert("Admin $banner tried to delete verified user $user->name", "./?u=$banner");
+				sorry("You cannot delete a verified member. This action has been reported.");
+			}
+			
+			$user->delete();
+			
+			alert("Admin $banner deleted user $user->name: $reason", "./?u=$banner");
+			
+			include_header();
+			echo "<h1>Account deleted</h1><p>The account $handle was successfully deleted.</p>";
+			include_footer();
 		}
 		
 	}

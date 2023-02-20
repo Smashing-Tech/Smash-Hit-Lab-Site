@@ -457,6 +457,12 @@ class User {
 	}
 	
 	function delete() : void {
+		/**
+		 * Delete the user
+		 */
+		
+		$this->wipe_tokens();
+		
 		$db = new Database("user");
 		
 		$db->delete($this->name);
@@ -623,12 +629,12 @@ class User {
 		return $name;
 	}
 	
-	function verify(string $verifier) {
+	function verify(string $verifier) : void {
 		$this->verified = $verifier;
 		$this->save();
 	}
 	
-	function is_admin() {
+	function is_admin() : bool {
 		/**
 		 * Check if the user can preform administrative tasks.
 		 */
