@@ -345,3 +345,15 @@ function download_file(string $file) : void {
 		sorry("The file that you wanted to download doesn't seem to exist.");
 	}
 }
+
+function list_folder(string $path) {
+	/**
+	 * List the contents of a folder
+	 */
+	
+	$array = scandir($path);
+	array_shift($array);
+	array_shift($array);
+	
+	return $array;
+}

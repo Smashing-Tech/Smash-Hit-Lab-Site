@@ -68,6 +68,7 @@ function do_admin_dashboard() {
 		admin_action_item("./?a=site_config", "settings", "Settings");
 		admin_action_item("./?a=send_notification", "notifications_active", "Send notification");
 		admin_action_item("./?a=backup_db", "backup", "Create backup");
+		admin_action_item("./?a=storage_list", "inventory", "Site storage");
 		// echo "</ul>";
 		
 		echo "<h4>Users and contributed content</h4>";
@@ -289,6 +290,34 @@ function do_storage_download() {
 		else {
 			sorry("You didn't specify what file you wanted to download...");
 		}
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
+}
+
+function do_storage_list() {
+	/**
+	 * Download a file from the site storage.
+	 */
+	
+	$user = get_name_if_admin_authed();
+	
+	if ($user) {
+		include_header();
+		
+		echo "<h1>Site storage</h1>";
+		
+		$files = list_folder("../data/store/");
+		
+		for ($i = 0; $i < sizeof($files); $i++) {
+			$name = $files[$i];
+			$name_url = urlencode($name);
+			
+			echo "<p>[$i] <a href=\"./?a=storage_download&file=$name_url\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">description</span> $name</a></p>";
+		}
+		
+		include_footer();
 	}
 	else {
 		sorry("The action you have requested is not currently implemented.");

@@ -83,6 +83,9 @@ function handle_action($action) {
 		case "storage_download":
 			do_storage_download();
 			break;
+		case "storage_list":
+			do_storage_list();
+			break;
 		case "user_ban":
 			do_user_ban();
 			break;
