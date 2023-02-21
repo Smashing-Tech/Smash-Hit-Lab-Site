@@ -133,22 +133,21 @@ class ModPage {
 	function display_edit() {
 		echo "<h1>Editing " . ($this->name ? $this->name : $this->package) . "</h1>";
 		echo "<form action=\"./?a=save_mod&amp;m=$this->package\" method=\"post\">";
-		edit_feild("package", "text", "Package", "The name of the mod's APK or IPA file.", $this->package, false);
+		echo "<h3>Main</h3>";
 		edit_feild("name", "text", "Name", "The name that will be displayed with the mod.", $this->name);
-		edit_feild("creators", "text", "Creators", "The people who created this mod.", create_comma_array($this->creators));
-		edit_feild("wiki", "text", "Wiki article", "A relevant wiki article about the mod.", $this->wiki);
 		edit_feild("description", "textarea", "About", "One or two paragraphs that describe the mod.", htmlspecialchars($this->description));
+		echo "<h3>Basic</h3>";
 		edit_feild("download", "text", "Download", "A link to where the mod can be downloaded.", $this->download);
+		edit_feild("version", "text", "Version", "The latest version of this mod.", $this->version);
+		edit_feild("creators", "text", "Creators", "The people who created this mod.", create_comma_array($this->creators));
+		edit_feild("security", "text", "Security", "A short statement on this mod's security.", $this->security);
+		edit_feild("wiki", "text", "Wiki article", "A relevant wiki article about the mod.", $this->wiki);
+		echo "<h3>Extra</h3>";
 		edit_feild("code", "text", "Source code", "A link to where the source code for a mod can be found.", $this->code);
 		edit_feild("tags", "text", "Tags", "Keywords and categorical description of this mod.", create_comma_array($this->tags));
-		edit_feild("version", "text", "Version", "The latest version of this mod.", $this->version);
-		edit_feild("updated", "text", "Updated", "The unix timestamp for the last time this page was updated.", date("Y-m-d H:i:s", $this->updated), false);
-		edit_feild("created", "text", "Created", "The time when this page was first created.", date("Y-m-d H:i:s", $this->created), false);
-		edit_feild("author", "text", "Author", "The person who edited this page before you.", $this->author, false);
-		edit_feild("security", "text", "Security", "A short statement on this mod's security.", $this->security);
-		edit_feild("status", "text", "Status", "A short description of the mod's development status.", $this->status);
-		echo "<input type=\"submit\" value=\"Save edits\"/>";
-		echo "</form>";
+		
+		edit_feild("status", "select", "Status", "A short description of the mod's development status.", $this->status, true, array("" => "None", "Released" => "Released", "Abandoned" => "Abandoned", "Completed" => "Completed", "On haitus" => "On haitus"));
+		form_end("Save edits");
 	}
 	
 	function save_edit(string $whom) {

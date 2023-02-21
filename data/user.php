@@ -951,9 +951,13 @@ function display_user(string $user) {
 	if ($stalker->is_admin()) {
 		echo "<h3>Admin-only info and actions</h3>";
 		
-		mod_property("Email", "This user's email address.", $user->email);
-		mod_property("Token count", "The number of currently active tokens this user has.", sizeof($user->tokens));
-		mod_property("Ban status", "When this user will be unbanned, if banned.", ( $user->is_banned() ? $user->unban_date() : "Not banned" ));
+		if ($user->email) {
+			mod_property("Email", "This user's email address.", "<a href=\"mailto:$user->email\">$user->email</a>");
+		}
+		
+		if ($user->is_banned()) {
+			mod_property("Unban time", "The time at which this user will be allowed to log in again.", $user->unban_date());
+		}
 		
 		// If the wanted user isn't admin, we can ban them
 		if (!$user->is_admin()) {
