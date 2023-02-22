@@ -657,6 +657,10 @@ class User {
 			$this->accent = derive_pallete_from_colour(colour_from_hex($this->manual_colour));
 		}
 	}
+	
+	function get_image() : ?string {
+		return $this->image;
+	}
 }
 
 function user_exists(string $username) : bool {

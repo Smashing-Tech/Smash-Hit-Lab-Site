@@ -34,6 +34,50 @@
 				}
 			}
 		</script>
+		<style>
+			.shl-old-profile-dropdown-button {
+				position: relative;
+				display: inline-block;
+				text-align: left;
+			}
+			
+			.shl-old-profile-dropdown-main {
+				display: none;
+				position: absolute;
+				right: 1px;
+				border-radius: 0.5em;
+				padding: 0.75em 0;
+				background: var(--main-colour-bg);
+				box-shadow: 0 0.4em 0.7em #0005;
+				transition: display 0.2s;
+			}
+			
+			.shl-old-profile-dropdown-button:hover .shl-old-profile-dropdown-main {
+				display: block;
+			}
+			
+			.shl-old-profile-dropdown-item {
+				display: grid;
+				grid: auto / 32px auto;
+				height: 32px;
+				padding: 0.5em 1.5em;
+/* 				border-radius: 0.5em; */
+			}
+			
+			.shl-old-profile-dropdown-item:hover {
+				background: var(--main-colour-bg-bright);
+			}
+			
+			.shl-old-profile-dropdown-item-icon {
+				grid-column: 1;
+			}
+			
+			.shl-old-profile-dropdown-item-text {
+				text-align: left;
+				margin-left: 0.25em;
+				grid-column: 2;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="navbar-button" class="show-navbar-section" onclick="shownavbar();">
@@ -63,16 +107,48 @@
 					<?php
 						$user_name = get_name_if_authed();
 						
-						if ($user_name) {
-							display_notification_charm($user_name);
-							echo "<div class=\"cb-top-item\">" . get_nice_display_name($user_name) . "</div>";
-							
-							if (get_name_if_admin_authed()) {
-								header_item("settings_suggest", "", "./?a=admin_dashboard");
+						function nav_dropdown_item(string $icon, string $title, string $link) : void {
+							if ($link) {
+								echo "<a href=\"$link\">";
 							}
 							
-							header_item("manage_accounts", "", "./?a=edit_account");
-							header_item("logout", "", "./?a=logout");
+							echo "<div class=\"shl-old-profile-dropdown-item\">";
+							echo "<div class=\"shl-old-profile-dropdown-item-icon\">";
+							echo "<span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">$icon</span>";
+							echo "</div>";
+							echo "<div class=\"shl-old-profile-dropdown-item-text\">";
+							echo "<span>$title</span>";
+							echo "</div>";
+							echo "</div>";
+							
+							if ($link) {
+								echo "</a>";
+							}
+						}
+						
+						if ($user_name) {
+							display_notification_charm($user_name);
+							
+							$u = new User($user_name);
+							$image = $u->get_image();
+							
+							echo "<div class=\"cb-top-item\">";
+							echo "<div class=\"shl-old-profile-dropdown-button\">";
+							echo "<img class=\"navabr-profile\" src=\"$image\"/>";
+							echo "<div class=\"shl-old-profile-dropdown-main\">";
+							
+							nav_dropdown_item("account_circle", "Profile", "./?u=$user_name");
+							if (get_name_if_admin_authed()) {
+								nav_dropdown_item("apps", "Dashboard", "./?a=admin_dashboard");
+								nav_dropdown_item("new_releases", "Alerts", "./?a=alerts");
+							}
+							nav_dropdown_item("manage_accounts", "Account", "./?a=edit_account");
+							nav_dropdown_item("notifications", "Notifications", "./?a=notifications");
+							nav_dropdown_item("logout", "Logout", "./?a=logout");
+							
+							echo "</div>";
+							echo "</div>";
+							echo "</div>";
 						} else {
 							header_item("login", "Login", "./?p=login");
 							header_item("person_add", "Register", "./?a=register");

@@ -251,6 +251,16 @@ input[type=submit]:hover, button:hover, .button:hover {
 	padding-top: 1em;
 }
 
+.navabr-profile {
+	position: relative;
+	top: 5px;
+	width: 32px;
+	height: 32px;
+	border-radius: 16px;
+}
+
+/* ============ */
+
 .bottom-section {
 	border: 1px solid var(--main-colour);
 	border-radius: 0.5em;
