@@ -344,9 +344,9 @@ function get_image_accent_colour(string $url) {
 
 function derive_pallete_from_colour(array $base) : array {
 	// Create variants
-	$colours[] = colour_hex(colour_mul(0.12, $base)); // Darkest
-	$colours[] = colour_hex(colour_mul(0.18, $base)); // Dark (BG)
-	$colours[] = colour_hex(colour_mul(0.225, $base)); // Dark lighter
+	$colours[] = colour_hex(colour_mul(0.1, $base)); // Darkest
+	$colours[] = colour_hex(colour_mul(0.15, $base)); // Dark (BG)
+	$colours[] = colour_hex(colour_mul(0.245, $base)); // Dark lighter
 	$colours[] = colour_hex(colour_add(0.5, colour_mul(0.6, $base))); // Text
 	
 	return $colours;

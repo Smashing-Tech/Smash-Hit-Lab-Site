@@ -95,12 +95,13 @@
 					header_item("home", "Home", "./?p=home");
 					header_item("newspaper", "News", "./?n=home");
 					header_item("build", "Mods", "./?a=list_mods");
+					header_item("description", "Wiki", "https://smashhit.fandom.com/wiki/");
+					if (get_name_if_admin_authed()) {
+						header_item("description", "Wiki (beta)", "./?w=home");
+					}
+					header_item("play_circle_filled", "YouTube", "https://youtube.com/@SmashHitLab");
+					header_item("forum", "Discord", "https://discord.gg/7kra7Z3UNn");
 					?>
-					
-<!-- 					<div class="cb-top-item"><a href="./?n=home">News</a></div> -->
-<!-- 					<div class="cb-top-item"><a href="./?a=list_mods">Mods</a></div> -->
-					<div class="cb-top-item"><a href="https://youtube.com/@SmashHitLab">YouTube</a></div>
-					<div class="cb-top-item"><a href="https://discord.gg/7kra7Z3UNn">Discord</a></div>
 				</div>
 				<div class="header-container-right">
 					<div class="cb-logo-item">&ZeroWidthSpace;</div><!--amazing hack-->
@@ -151,7 +152,7 @@
 							echo "</div>";
 						} else {
 							header_item("login", "Login", "./?p=login");
-							header_item("person_add", "Register", "./?a=register");
+							header_item("person_add", "Register", "./?p=register");
 						}
 					?>
 				</div>

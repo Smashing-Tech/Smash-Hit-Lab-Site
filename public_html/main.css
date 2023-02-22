@@ -98,7 +98,8 @@ body {
 input[type=text], input[type=password], textarea, select {
 	background: var(--main-colour-bg-dark);
 	border: none;
-	border-radius: 0.5em;
+	border-bottom: 2px solid var(--main-colour-bg-bright);
+	border-radius: 0.5em 0.5em 0 0;
 	caret-color: var(--main-colour);
 	color: var(--main-colour);
 	font-family: var(--font-face);
@@ -106,6 +107,10 @@ input[type=text], input[type=password], textarea, select {
 	padding: 0.5em;
 	outline: none;
 	width: 80%;
+}
+
+input[type=text]:focus, input[type=password]:focus, textarea:focus, select:focus {
+	border-bottom: 2px solid var(--main-colour);
 }
 
 textarea {
@@ -120,11 +125,11 @@ textarea {
 input[type=submit], button, .button {
 	background: var(--main-colour);
 	border: none;
-	border-radius: 0.5em;
+	border-radius: 1.25em;
 	color: #000;
 	font-family: var(--font-face);
 	font-size: 14pt;
-	padding: 0.5em;
+	padding: 0.5em 1.25em;
 	outline: none;
 	transition: background 0.1s, box-shadow 0.1s;
 }
