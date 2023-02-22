@@ -968,7 +968,7 @@ function display_user(string $user) {
 			mod_property("Ban user", "Banning this user will revoke access and prevent them from logging in until a set amount of time has passed.", "<a href=\"./?a=user_ban&handle=$user->name\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">gavel</span> Ban this user</button></a>");
 		}
 		
-		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "<a href=\"./?a=user_verify&handle=$user->name\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">verified</span> Toggle verified status</button></a>");
+		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "<a href=\"./?a=user_verify&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">verified</span> Toggle verified status</button></a>");
 	}
 	
 	// Finally the message wall for this user

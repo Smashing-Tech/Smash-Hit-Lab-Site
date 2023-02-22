@@ -127,6 +127,7 @@ input[type=submit], button, .button {
 	border: none;
 	border-radius: 1.25em;
 	color: #000;
+	cursor: pointer;
 	font-family: var(--font-face);
 	font-size: 14pt;
 	padding: 0.5em 1.25em;
@@ -141,6 +142,7 @@ input[type=submit]:hover, button:hover, .button:hover {
 
 .button.secondary {
 	background: transparent;
+	border: 1px solid var(--main-colour-bg-bright);
 	color: var(--main-colour);
 }
 
@@ -267,7 +269,7 @@ input[type=submit]:hover, button:hover, .button:hover {
 /* ============ */
 
 .bottom-section {
-	border: 1px solid var(--main-colour);
+	background: var(--main-colour-bg-bright);
 	border-radius: 0.5em;
 	padding: 0.5em;
 	margin-top: 1em;
