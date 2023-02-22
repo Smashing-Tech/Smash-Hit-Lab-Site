@@ -234,7 +234,7 @@ function rich_format(string $base, bool $trusted = false) : string {
 				$url = substr($s, 2, $end - 2);
 				
 				// Yay, a database lookup during parsing ...
-				$db = new Database("article");
+				$db = new RevisionDB("article");
 				
 				// If this is an article reference ...
 				if ($db->has($url)) {

@@ -71,7 +71,7 @@ class Article {
 	public $comments;
 	
 	function __construct(string $name) {
-		$db = new Database("article");
+		$db = new RevisionDB("article");
 		
 		if ($db->has($name)) {
 			$info = $db->load($name);
@@ -103,7 +103,7 @@ class Article {
 	}
 	
 	function save() {
-		$db = new Database("article");
+		$db = new RevisionDB("article");
 		
 		$db->save($this->name, $this);
 	}
@@ -139,14 +139,9 @@ class Article {
 	function display_update() {
 		echo "<h1>Editing $this->title</h1>";
 		echo "<form action=\"./?a=save_news&amp;n=$this->name\" method=\"post\">";
-		edit_feild("name", "text", "Name", "Internal name of the article.", $this->name, false);
 		edit_feild("title", "text", "Title", "Real title of the article.", $this->title);
-		edit_feild("body", "textarea", "Body", "The actual article's contents.</p><p>**bold** = <b>bold</b><br/>__italic__ = <i>italic</i><br/>`code` = <code>code</code><br/>Two newlines = New paragraph<br/>One newline = linebreak", $this->body);
-		edit_feild("created", "text", "Created", "When the article was made.", date("Y-m-d H:m:s", $this->created), false);
-		edit_feild("updated", "text", "Updated", "When the article was edited.", date("Y-m-d H:m:s", $this->updated), false);
-		edit_feild("comments", "text", "Discussion", "The Discussion ID for this article's comments.", $this->comments, false);
+		edit_feild("body", "textarea", "Body", "The actual article's contents.", $this->body);
 		edit_feild("permissions", "select", "Visibility", "Controls weather the article can be seen by the public or not.", $this->permissions, true, array("private" => "Private", "public" => "Public"));
-		echo "<p><b>Warning:</b> By updating this article, your name will be added to the update list and it will be pushed to the top of the site. Please think carefully before continuing.</p>";
 		echo "<input type=\"submit\" value=\"Save article\"/>";
 		echo "</form>";
 	}
@@ -196,7 +191,7 @@ function article_exists(string $name) : bool {
 	 * Check if a news article exsists.
 	 */
 	
-	$db = new Database("article");
+	$db = new RevisionDB("article");
 	return $db->has($name);
 }
 
