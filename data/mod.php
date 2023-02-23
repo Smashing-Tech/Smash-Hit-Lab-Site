@@ -21,11 +21,11 @@ class ModPage {
 	public $security;
 	public $reviews;
 	
-	function __construct(string $package) {
+	function __construct(string $package, int $revision = -1) {
 		$db = new RevisionDB("mod");
 		
 		if ($db->has($package)) {
-			$mod = $db->load($package);
+			$mod = $db->load($package, $revision);
 			
 			$this->package = $mod->package;
 			$this->name = $mod->name;
@@ -122,9 +122,8 @@ class ModPage {
 		
 		for ($i = (sizeof($history) - 1); $i >= 0; $i--) {
 			$rev = $history[$i];
-			$revnum = $i + 1;
 			
-			echo "<li>Updated at " . date("Y-m-d H:i:s", $rev->updated) . " (Rev $revnum) by <a href=\"./?u=$rev->author\">$rev->author</a> &mdash; $rev->reason</li>";
+			echo "<li><a href=\"./?m=$this->package&index=$i\">Edit at " . date("Y-m-d H:i:s", $rev->updated) . "</a> (Index $i) by <a href=\"./?u=$rev->author\">$rev->author</a> &mdash; $rev->reason</li>";
 		}
 		
 		echo "</ul>";
@@ -190,9 +189,14 @@ function display_mod() {
 	 * Ugly HACK -ed version to make the title display without much effort.
 	 */
 	
-	$mod = new ModPage($_GET["m"]);
+	$revision = array_key_exists("index", $_GET) ? $_GET["index"] : -1;
+	$mod = new ModPage($_GET["m"], $revision);
 	
 	global $gTitle; $gTitle = $mod->name;
+	
+	if ($revision >= 0) {
+		$gTitle = $gTitle . " (old rev $revision)";
+	}
 	
 	include_header();
 	$mod->display();
