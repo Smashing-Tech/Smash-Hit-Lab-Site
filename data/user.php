@@ -461,10 +461,14 @@ class User {
 		 * Delete the user
 		 */
 		
+		// Wipe tokens
 		$this->wipe_tokens();
 		
-		$db = new Database("user");
+		// Wipe discussions
+		discussion_nuke_comments_by($this->name);
 		
+		// Delete the user
+		$db = new Database("user");
 		$db->delete($this->name);
 	}
 	
@@ -833,8 +837,11 @@ function edit_account() {
 	edit_feild("about", "textarea", "About", "You can write a piece of text detailing whatever you like on your userpage. Please don't include personal information!", $user->about);
 	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, not including the at sign (@). We will use this account to give you a profile picture.", $user->youtube);
 	
-	echo "<input type=\"submit\" value=\"Save details\"/>";
-	echo "</form>";
+	form_end("Save account details");
+	
+	echo "<h2>Other actions</h2>";
+	
+	edit_feild("delete", "label", "Delete account", "If you would like to delete your account, you can start by clicking the button.", "<a href=\"./?a=account_delete\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">person_off</span> Delete my account</button></a>");
 	
 	include_footer();
 }
@@ -1017,6 +1024,60 @@ function user_verify() {
 		alert("User $user->name was marked verified", "./?u=$user->name");
 		
 		redirect("./?u=$user->name");
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
+}
+
+function account_delete() {
+	$user = get_name_if_authed();
+	
+	if ($user) {
+		$user = new User($user);
+		
+		if (!array_key_exists("submit", $_GET)) {
+			include_header();
+			
+			echo "<h1>Delete your account</h1>";
+			
+			form_start("./?a=account_delete&submit=1");
+			
+			edit_feild("reason", "text", "Reason", "You can optionally provide us a short reason for deleteing your account.", "");
+			edit_feild("understand", "select", "Acknowledgement", "<b>By deleting your account, you agree that your data will be deleted forever, and that there is no possible way we can recover it.</b>", "0", true, array("0" => "No, I don't understand", "1" => "Yes, I understand"));
+			
+			form_end("Delete my account");
+			
+			include_footer();
+		}
+		else {
+			// Must accept agreement
+			if (!$_POST["understand"]) {
+				sorry("You must agree to the acknowledgement in order to delete your account.");
+			}
+			
+			// Must not be admin
+			if ($user->is_admin()) {
+				sorry("Admin accounts cannot be deleted.");
+			}
+			
+			// Validate the length
+			validate_length("Reason", $_POST["reason"], 50);
+			
+			$reason = htmlspecialchars($_POST["reason"]);
+			
+			// Send alert
+			alert("User account $user->name was deleted: $reason");
+			
+			// Delete the account
+			$user->delete();
+			
+			// Show the final page ;(
+			include_header();
+			echo "<h1>Account deleted</h1>";
+			echo "<p>Your account has been deleted. Maybe we will see you again? TwT</p>";
+			include_footer();
+		}
 	}
 	else {
 		sorry("The action you have requested is not currently implemented.");

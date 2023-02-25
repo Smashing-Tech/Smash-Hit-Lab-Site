@@ -53,6 +53,9 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $optio
 					echo "</div>";
 					
 					break;
+				case "label":
+					echo $value;
+					break;
 				case "submit":
 					$sak = user_get_sak();
 					echo "<input type=\"hidden\" name=\"key\" value=\"$sak\">";

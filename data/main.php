@@ -4,106 +4,47 @@ require_once "page.php";
 require_once "action.php";
 require_once "mod.php";
 require_once "news.php";
-require_once "wiki.php";
 require_once "admin.php";
 
 function handle_action($action) {
 	switch ($action) {
 	// ---- USER ACCOUNTS ---- //
-		case "register":
-			do_register();
-			break;
-		case "login":
-			do_login();
-			break;
-		case "logout":
-			do_logout();
-			break;
+		case "register": do_register(); break;
+		case "login": do_login(); break;
+		case "logout": do_logout(); break;
 	// ---- MOD PAGES ---- //
 		case "mod_update":
-		case "edit_mod":
-			edit_mod();
-			break;
-		case "save_mod":
-			save_mod();
-			break;
-		case "mod_history":
-			mod_history();
-			break;
+		case "edit_mod": edit_mod(); break;
+		case "save_mod": save_mod(); break;
+		case "mod_history": mod_history(); break;
 		case "mod_delete":
-		case "delete_mod":
-			delete_mod();
-			break;
-		case "list_mods":
-			list_mods();
-			break;
-	// ---- WIKI ---- //
-		case "wiki_display": wiki_display(); break;
-		case "wiki_update": wiki_update(); break;
-		case "wiki_history": wiki_history(); break;
-		case "wiki_delete": wiki_delete(); break;
+		case "delete_mod": delete_mod(); break;
+		case "list_mods": list_mods(); break;
 	// ---- MORE USER ACCOUNT STUFF ---- //
-		case "edit_account":
-			edit_account();
-			break;
-		case "save_account":
-			save_account();
-			break;
+		case "edit_account": edit_account(); break;
+		case "save_account": save_account(); break;
+		case "account_delete": account_delete(); break;
 	// ---- NEWS STUFF ---- //
-		case "update_news":
-			update_news();
-			break;
-		case "save_news":
-			save_news();
-			break;
+		case "update_news": update_news(); break;
+		case "save_news": save_news(); break;
 	// ---- DISCUSSIONS ---- //
-		case "discussion_update":
-			discussion_update();
-			break;
-		case "discussion_hide":
-			discussion_hide();
-			break;
-		case "discussion_delete":
-			discussion_delete();
-			break;
-		case "discussion_follow":
-			discussion_follow();
-			break;
+		case "discussion_update": discussion_update(); break;
+		case "discussion_hide": discussion_hide(); break;
+		case "discussion_delete": discussion_delete(); break;
+		case "discussion_follow": scussion_follow(); break;
 	// ---- MISC USER PAGES ---- //
-		case "notifications":
-			check_notifications();
-			break;
+		case "notifications": check_notifications(); break;
 	// ---- ADMIN ACTION PAGES ---- //
-		case "site_config":
-			do_site_config();
-			break;
-		case "backup_db":
-			do_backup_db();
-			break;
-		case "storage_download":
-			do_storage_download();
-			break;
-		case "storage_list":
-			do_storage_list();
-			break;
-		case "user_ban":
-			do_user_ban();
-			break;
-		case "user_delete":
-			do_user_delete();
-			break;
-		case "user_verify":
-			user_verify();
-			break;
-		case "admin_dashboard":
-			do_admin_dashboard();
-			break;
-		case "alerts":
-			do_admin_alerts();
-			break;
-		case "send_notification":
-			do_send_notification();
-			break;
+		case "site_config": do_site_config(); break;
+		case "backup_db": do_backup_db(); break;
+		case "storage_download": do_storage_download(); break;
+		case "storage_list": do_storage_list(); break;
+		case "user_ban": do_user_ban(); break;
+		case "user_delete": do_user_delete(); break;
+		case "user_verify": user_verify(); break;
+		case "admin_dashboard": do_admin_dashboard(); break;
+		case "alerts": do_admin_alerts(); break;
+		case "send_notification": do_send_notification(); break;
 		default:
 			sorry("The action you have requested is not currently implemented.");
 			break;
@@ -122,9 +63,6 @@ function main() {
 	}
 	else if (array_key_exists("n", $_GET)) {
 		display_news($_GET["n"]);
-	}
-	else if (array_key_exists("w", $_GET)) {
-		wiki_display();
 	}
 	// DEPRECATED: Static pages are deprecated, should use news articles now!
 	else if (array_key_exists("p", $_GET)) {

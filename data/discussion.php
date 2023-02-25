@@ -246,6 +246,18 @@ class Discussion {
 		}
 	}
 	
+	function delete_comments_by(string $author) {
+		/**
+		 * Delete comments by a given author.
+		 */
+		
+		for ($i = 0; $i < sizeof($this->comments); $i++) {
+			if ($this->get_author($i) == $author) {
+				$this->delete_comment($i);
+			}
+		}
+	}
+	
 	function enumerate_hidden() {
 		/**
 		 * Return the number of hidden comments.
@@ -387,6 +399,20 @@ function discussion_exists(string $name) {
 function discussion_delete_given_id(string $id) {
 	$d = new Discussion($id);
 	$d->delete();
+}
+
+function discussion_nuke_comments_by(string $author) {
+	/**
+	 * Nuke every comment by a user in every discussion.
+	 */
+	
+	$db = new Database("discussion");
+	$entries = $db->enumerate();
+	
+	for ($i = 0; $i < sizeof($entries); $i++) {
+		$d = new Discussion($entries[$i]);
+		$d->delete_comments_by($author);
+	}
 }
 
 function discussion_update() {
