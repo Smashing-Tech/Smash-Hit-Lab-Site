@@ -322,10 +322,13 @@ class Discussion {
 		$name = get_name_if_authed();
 		
 		if ($name) {
-			$follow = ($this->is_following($name)) ? "Unfollow" : "Follow";
+			$following = $this->is_following($name);
+			
+			$follow = ($following) ? "Unfollow" : "Follow";
+			$secondary = ($following) ? " secondary" : "";
 			$url = $_SERVER['REQUEST_URI'];
 			
-			echo "<p><a href=\"./?a=discussion_follow&id=$this->id&after=$url\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">notification_add</span> $follow this discussion</button></a></p>";
+			echo "<p><a href=\"./?a=discussion_follow&id=$this->id&after=$url\"><button class=\"button$secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">notification_add</span> $follow this discussion</button></a></p>";
 		}
 	}
 	
