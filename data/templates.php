@@ -88,7 +88,11 @@ function action_button(string $url, string $title) {
 	form_end($title);
 }
 
-function mod_property($title, $desc, $value) : void {
+function mod_property($title, $desc, $value, $conditional = false) : void {
+	if ($conditional && !$value) {
+		return;
+	}
+	
 	echo "<div class=\"mod-property\">";
 		echo "<div class=\"mod-property-label\">";
 			echo "<p><b>$title</b></p>";

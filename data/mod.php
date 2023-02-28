@@ -88,23 +88,26 @@ class ModPage {
 		}
 		
 		echo "<h3>About</h3>";
+		
 		echo ($this->description) ? rich_format($this->description) : "<p><i>We don't have an about section for this mod right now.</i></p>";
 		
-		echo "<h3>Basic info</h3>";
-		mod_property("Download", "A link to where the mod can be downloaded.", $this->download);
-		mod_property("Version", "The latest version of this mod.", $this->version);
-		mod_property("Creators", "The people who created this mod.", create_comma_array_nice($this->creators));
-		mod_property("Security", "A short statement on this mod's security.", $this->security);
+		if ($this->download || $this->version || $this->creators || $this->security) {
+			echo "<h3>Basic info</h3>";
+		}
 		
-		echo "<h3>Other info</h3>";
-		if ($this->wiki) {
-			mod_property("Wiki article", "A relevant wiki article about the mod.", $this->wiki);
+		mod_property("Download", "A link to where the mod can be downloaded.", $this->download, true);
+		mod_property("Version", "The latest version of this mod.", $this->version, true);
+		mod_property("Creators", "The people who created this mod.", create_comma_array_nice($this->creators), true);
+		mod_property("Security", "A short statement on this mod's security.", $this->security, true);
+		
+		if ($this->wiki || $this->code || $this->status || $this->package) {
+			echo "<h3>Other info</h3>";
 		}
-		if ($this->code) {
-			mod_property("Source code", "A link to where the source code for a mod can be found.", $this->code);
-		}
-		mod_property("Status", "A short description of the mod's development status.", $this->status);
-		mod_property("Package", "The name of the mod's APK or IPA file.", $this->package);
+		
+		mod_property("Wiki article", "A relevant wiki article about the mod.", $this->wiki, true);
+		mod_property("Source code", "A link to where the source code for a mod can be found.", $this->code, true);
+		mod_property("Status", "A short description of the mod's development status.", $this->status, true);
+		mod_property("Package", "The name of the mod's APK or IPA file.", $this->package, true);
 		
 		echo "<p class=\"small-text\">This page was last updated at " . date("Y-m-d H:i", $this->updated) . " by " . get_nice_display_name($this->author) . "</p>";
 		
