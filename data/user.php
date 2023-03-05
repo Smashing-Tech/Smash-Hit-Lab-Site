@@ -16,13 +16,12 @@ function random_password() : string {
 	 * Randomly generates a new password.
 	 */
 	
-	$alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*-_+=";
+	$alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*-_+=[]{}<>()";
 	
 	$pw = random_bytes(25);
 	
-	// TODO: The distribution isn't even in this case..
 	for ($i = 0; $i < strlen($pw); $i++) {
-		$pw[$i] = $alphabet[ord($pw[$i]) % strlen($alphabet)];
+		$pw[$i] = $alphabet[floor((ord($pw[$i]) / 255) * strlen($alphabet))];
 	}
 	
 	return $pw;
@@ -119,9 +118,10 @@ class Token {
 		return null;
 	}
 	
-	function get_user() {
+	function get_user(?string $lockbox = null) {
 		/**
 		 * Get the username with a token, or null if the token can't be used.
+		 * This will also verify the lockbox if given.
 		 */
 		
 		// Not initialised
@@ -139,6 +139,11 @@ class Token {
 			return null;
 		}
 		
+		// Check the lockbox
+		if ($lockbox && !$this->verify_lockbox($lockbox)) {
+			return null;
+		}
+		
 		// Not the same IP (TODO: Needs some extra conditions so it's not annoying)
 		if ($this->ip !== crush_ip()) {
 			return null;
@@ -146,6 +151,30 @@ class Token {
 		
 		// probably okay to use
 		return $this->user;
+	}
+	
+	function get_id() : string {
+		return $this->name;
+	}
+	
+	function make_lockbox() : string {
+		/**
+		 * Create a lockbox value and store its hash
+		 */
+		
+		$lockbox = random_hex();
+		$this->lockbox = hash("sha256", $lockbox);
+		$this->save();
+		
+		return $this->lockbox;
+	}
+	
+	function verify_lockbox(string $lockbox) : bool {
+		/**
+		 * Verify that a lockbox matches
+		 */
+		
+		return (hash("sha256", $lockbox) === $this->lockbox);
 	}
 }
 
@@ -356,6 +385,24 @@ function colour_from_hex($hex) : array {
 	list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
 	
 	return array("red" => $r / 255, "green" => $g / 255, "blue" => $b / 255);
+}
+
+function validate_username(string $name) : bool {
+	$chars = str_split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.");
+	
+	// Charset limit
+	for ($i = 0; $i < strlen($name); $i++) {
+		if (array_search($name[$i], $chars, true) === false) {
+			return false;
+		}
+	}
+	
+	// Size limit
+	if (strlen($name) > 24) {
+		return false;
+	}
+	
+	return true;
 }
 
 class User {
@@ -630,7 +677,7 @@ class User {
 		$this->tokens[] = $name;
 		$this->save();
 		
-		return $name;
+		return $token;
 	}
 	
 	function verify(?string $verifier) : void {
@@ -676,14 +723,14 @@ function user_exists(string $username) : bool {
 	return $db->has($username);
 }
 
-function check_token(string $name) {
+function check_token(string $name, string $lockbox) {
 	/**
 	 * Given the name of the token, get the user's assocaited name, or NULL if
 	 * the token is not valid.
 	 */
 	
 	$token = new Token($name);
-	return $token->get_user();
+	return $token->get_user($lockbox);
 }
 
 function get_name_if_authed() {
@@ -695,7 +742,11 @@ function get_name_if_authed() {
 		return null;
 	}
 	
-	return check_token($_COOKIE["tk"]);
+	if (!array_key_exists("lb", $_COOKIE)) {
+		return null;
+	}
+	
+	return check_token($_COOKIE["tk"], $_COOKIE["lb"]);
 }
 
 function get_display_name_if_authed() {

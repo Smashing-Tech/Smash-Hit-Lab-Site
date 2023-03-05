@@ -10,24 +10,6 @@ function login_error() {
 	include_footer();
 }
 
-function validate_username(string $name) : bool {
-	$chars = str_split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.");
-	
-	// Charset limit
-	for ($i = 0; $i < strlen($name); $i++) {
-		if (array_search($name[$i], $chars, true) === false) {
-			return false;
-		}
-	}
-	
-	// Size limit
-	if (strlen($name) > 24) {
-		return false;
-	}
-	
-	return true;
-}
-
 function do_login() {
 	$username = htmlspecialchars($_POST["username"]);
 	$password = $_POST["password"]; // We should not sanitise the password, bad things happen
@@ -106,11 +88,11 @@ function do_login() {
 	}
 	
 	// We should be able to log the user in
-	setcookie("tk", $token, time() + 60 * 60 * 24 * 14, "/");
+	setcookie("tk", $token->get_id(), time() + 60 * 60 * 24 * 14, "/");
+	setcookie("lb", $token->make_lockbox(), time() + 60 * 60 * 24 * 14, "/");
 	
 	// Redirect to homepage
-	header("Location: /?p=home");
-	die();
+	redirect("/?p=home");
 }
 
 function do_logout() {
@@ -124,8 +106,7 @@ function do_logout() {
 	setcookie("tk", "badtoken", 1, "/");
 	
 	// Redirect to homepage
-	header("Location: /?p=home");
-	die();
+	redirect("/?p=home");
 }
 
 function do_register() {
