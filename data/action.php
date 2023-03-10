@@ -104,6 +104,7 @@ function do_logout() {
 	
 	// Unset cookie
 	setcookie("tk", "badtoken", 1, "/");
+	setcookie("lb", "badtoken", 1, "/");
 	
 	// Redirect to homepage
 	redirect("/?p=home");

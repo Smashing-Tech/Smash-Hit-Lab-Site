@@ -71,10 +71,9 @@ function do_admin_dashboard() {
 		admin_action_item("./?a=alerts", "new_releases", "Alerts");
 		
 		echo "<h4>Users and contributed content</h4>";
-		admin_action_item("./?a=user_ban", "person_off", "Ban user");
-		admin_action_item("./?a=user_delete", "person_remove", "Delete user");
+		admin_action_item("./?a=user_ban", "gavel", "Ban user");
+		admin_action_item("./?a=user_delete", "person_off", "Delete user");
 		admin_action_item("./?a=delete_mod", "delete", "Delete mod page");
-		
 		
 		include_footer();
 	}
@@ -327,7 +326,7 @@ function do_storage_list() {
 			$name = $files[$i];
 			$name_url = urlencode($name);
 			
-			echo "<p>[$i] <a href=\"./?a=storage_download&file=$name_url\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">description</span> $name</a></p>";
+			echo "<p><a href=\"./?a=storage_download&file=$name_url\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">description</span> $name</a></p>";
 		}
 		
 		include_footer();

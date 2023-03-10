@@ -53,6 +53,7 @@ class Token {
 	public $created; // Time the user logged in
 	public $expire; // Expiration date of the token
 	public $ip; // IP the token was created under
+	public $lockbox; // IP the token was created under
 	
 	function __construct(string $name = null) {
 		$db = new Database("token");
@@ -74,6 +75,7 @@ class Token {
 			$this->created = $token->created;
 			$this->expire = $token->expire;
 			$this->ip = property_exists($token, "ip") ? $token->ip : crush_ip();
+			$this->lockbox = property_exists($token, "lockbox") ? $token->lockbox : "";
 		}
 		// Create a new token
 		else {
@@ -82,7 +84,13 @@ class Token {
 			$this->created = time();
 			$this->expire = time() + 60 * 60 * 24 * 7 * 2; // Expire in 2 weeks
 			$this->ip = crush_ip();
+			$this->lockbox = "";
 		}
+	}
+	
+	function save() {
+		$db = new Database("token");
+		$db->save($this->name, $this);
 	}
 	
 	function delete() {
@@ -118,10 +126,16 @@ class Token {
 		return null;
 	}
 	
-	function get_user(?string $lockbox = null) {
+	function get_user(?string $lockbox = null, bool $require_lockbox = false) {
 		/**
 		 * Get the username with a token, or null if the token can't be used.
 		 * This will also verify the lockbox if given.
+		 * 
+		 * Lockboxes are not nessicarially enforced here; if you pass in NULL
+		 * then the LB isn't checked unless $require_lockbox == true. This is
+		 * kind of legacy code.
+		 * 
+		 * TODO Make it not work this way
 		 */
 		
 		// Not initialised
@@ -140,7 +154,9 @@ class Token {
 		}
 		
 		// Check the lockbox
-		if ($lockbox && !$this->verify_lockbox($lockbox)) {
+		$lbok = $this->verify_lockbox($lockbox);
+		
+		if (($lockbox || $require_lockbox) && !$lbok) {
 			return null;
 		}
 		
@@ -166,7 +182,7 @@ class Token {
 		$this->lockbox = hash("sha256", $lockbox);
 		$this->save();
 		
-		return $this->lockbox;
+		return $lockbox;
 	}
 	
 	function verify_lockbox(string $lockbox) : bool {
@@ -730,7 +746,8 @@ function check_token(string $name, string $lockbox) {
 	 */
 	
 	$token = new Token($name);
-	return $token->get_user($lockbox);
+	
+	return $token->get_user($lockbox, true);
 }
 
 function get_name_if_authed() {
