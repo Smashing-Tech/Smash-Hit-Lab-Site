@@ -327,7 +327,7 @@ class Discussion {
 	}
 	
 	function display_title(string $title) {
-		echo "<h4>$title (" . $this->enumerate_shown() . ")</h4>";
+		echo "<h3 class=\"left-align\" style=\"margin-top: 0; position: relative; top: -10px;\">$title (" . $this->enumerate_shown() . ")</h3>";
 	}
 	
 	function display_follow() {
@@ -340,8 +340,21 @@ class Discussion {
 			$secondary = ($following) ? " secondary" : "";
 			$url = $_SERVER['REQUEST_URI'];
 			
-			echo "<p><a href=\"./?a=discussion_follow&id=$this->id&after=$url\"><button class=\"button$secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">notification_add</span> $follow this discussion</button></a></p>";
+			echo "<a href=\"./?a=discussion_follow&id=$this->id&after=$url\"><button class=\"button$secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">notification_add</span> $follow this discussion</button></a>";
 		}
+	}
+	
+	function display_bar(string $title) {
+		echo "<div class=\"comments-header\">";
+			echo "<div class=\"comments-header-label\">";
+				$this->display_title($title);
+			echo "</div>";
+			echo "<div class=\"comments-header-data right-align\"><p>";
+				if (get_name_if_authed()) {
+					$this->display_follow();
+				}
+			echo "</p></div>";
+		echo "</div>";
 	}
 	
 	function display_hidden() {
@@ -373,21 +386,19 @@ class Discussion {
 	}
 	
 	function display(string $title = "Discussion", string $url = "") {
-		$this->display_title($title);
+		$this->display_bar($title);
 		if ($this->display_disabled()) { return; }
-		$this->display_follow();
 		$this->display_hidden();
 		$this->display_comments();
 		$this->display_edit(-1, $url);
 	}
 	
 	function display_reverse(string $title = "Discussion", string $url = "") {
-		$this->display_title($title);
+		$this->display_bar($title);
 		if ($this->display_disabled()) { return; }
+		$this->display_hidden();
 		$this->display_edit(-1, $url);
 		$this->display_comments(true);
-		$this->display_hidden();
-		$this->display_follow();
 	}
 }
 

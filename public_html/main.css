@@ -29,7 +29,7 @@ h1, h2, h3, h4, p, li, summary {
 
 h1 { font-size: 42pt; color: var(--main-colour); text-align: center; margin: 0.75em; margin-top: 0; text-shadow: 0 0 2em var(--main-colour-hoverb); }
 h2 { font-size: 28pt; color: var(--main-colour); text-align: center; }
-h3, summary { font-size: 20pt; font-weight: 400; border-bottom: 1px solid var(--main-colour-hover); padding-top: 0.8em; padding-bottom: 0.2em; }
+h3 { font-size: 22pt; font-weight: 400; padding-top: 0.8em; padding-bottom: 0.2em; }
 h4 { font-size: 18pt; }
 p, ul { font-size: 14pt; margin-bottom: 0.75em; }
 ul { margin-left: 1.5em; }
@@ -39,6 +39,12 @@ ul { margin-left: 1.5em; }
 	text-align: left;
 	margin-left: 0;
 	padding-left: 0;
+}
+
+.right-align {
+	text-align: right;
+	margin-right: 0;
+	padding-right: 0;
 }
 
 code, pre {
@@ -426,6 +432,19 @@ input[type=submit]:hover, button:hover, .button:hover {
 .mod-property-data {
 	grid-column: 2;
 	margin-left: 1em;
+}
+
+.comments-header {
+	display: grid;
+	grid-template-columns: 25% auto;
+}
+
+.comments-header-label {
+	grid-column: 1;
+}
+
+.comments-header-data {
+	grid-column: 2;
 }
 
 .header-container {
