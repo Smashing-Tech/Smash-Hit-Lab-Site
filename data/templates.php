@@ -2,6 +2,14 @@
 
 require_once "database.php"; // Needed for the article stuff
 
+function form_feild($name, $type, $title, $desc, $value, $enabled = true, $options = null) : void {
+	edit_feild($name, $type, $title, $desc, $value, $enabled, $options);
+}
+
+function form_textbox($name, $title, $desc, $value = "") : void {
+	form_feild($name, "text", $title, $desc, $value);
+}
+
 function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $options = null) : void {
 	if (!$value) {
 		$value = "";
@@ -73,6 +81,7 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $optio
 }
 
 function form_start(string $url, string $method = "post", string $csrf = "") {
+	$url = htmlspecialchars($url);
 	echo "<form action=\"$url\" method=\"$method" . (($csrf) ? "&key=" . $csrf : "") . "\">";
 }
 

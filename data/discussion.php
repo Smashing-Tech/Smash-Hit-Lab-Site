@@ -97,6 +97,7 @@ class Discussion {
 	public $followers;
 	public $comments;
 	public $url;
+	public $locked;
 	
 	function __construct(string $id) {
 		$db = new Database("discussion");
@@ -108,6 +109,7 @@ class Discussion {
 			$this->followers = property_exists($info, "followers") ? $info->followers : array();
 			$this->comments = $info->comments;
 			$this->url = property_exists($info, "url") ? $info->url : null;
+			$this->locked = property_exists($info, "locked") ? $info->locked : false;
 			
 			// Make sure that comments are Comment type objects
 			for ($i = 0; $i < sizeof($this->comments); $i++) {
@@ -119,6 +121,7 @@ class Discussion {
 			$this->followers = array();
 			$this->comments = array();
 			$this->url = null;
+			$this->locked = false;
 		}
 	}
 	
@@ -158,6 +161,20 @@ class Discussion {
 			$this->followers[] = $user;
 		}
 		
+		$this->save();
+	}
+	
+	function is_locked() {
+		return $this->locked;
+	}
+	
+	function toggle_locked() {
+		/**
+		 * Lock or unlock a thread.
+		 */
+		
+		//            vv It's the toggle operator :P
+		$this->locked =! $this->locked;
 		$this->save();
 	}
 	
@@ -212,7 +229,7 @@ class Discussion {
 	}
 	
 	function update_comment(int $index, string $author, string $body) {
-		if ($this->comments[$index]->author === $author) {
+		if ($this->comments[$index]->author === $author && !$this->locked) {
 			$this->comments[$index]->update($body);
 			$this->save();
 			
@@ -289,6 +306,10 @@ class Discussion {
 		
 		$enabled = get_config("enable_discussions", "enabled");
 		
+		if ($enabled == "enabled" && $this->is_locked()) {
+			$enabled = "closed";
+		}
+		
 		switch ($enabled) {
 			case "enabled": {
 				if (!get_name_if_authed()) {
@@ -316,7 +337,7 @@ class Discussion {
 				break;
 			}
 			case "closed": {
-				echo "<div class=\"comment-card comment-edit\"><p>Discussions have been closed sitewide. You can chat on our Discord server for now!</p></div>";
+				echo "<div class=\"comment-card comment-edit\"><p><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">nights_stay</span>This discussion has been closed. You can still chat on our Discord server!</p></div>";
 				break;
 			}
 			// If they are fully disabled there should be a message about it.
@@ -340,7 +361,20 @@ class Discussion {
 			$secondary = ($following) ? " secondary" : "";
 			$url = $_SERVER['REQUEST_URI'];
 			
-			echo "<a href=\"./?a=discussion_follow&id=$this->id&after=$url\"><button class=\"button$secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">notification_add</span> $follow this discussion</button></a>";
+			echo "<a href=\"./?a=discussion_follow&id=$this->id&after=$url\"><button class=\"button$secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">notification_add</span> $follow</button></a>";
+		}
+	}
+	
+	function display_lock() {
+		$name = get_name_if_admin_authed();
+		
+		if ($name) {
+			$locked = $this->is_locked();
+			
+			$text = ($locked) ? "Unlock" : "Lock";
+			$url = $_SERVER['REQUEST_URI'];
+			
+			echo "<a href=\"./?a=discussion_lock&id=$this->id&after=$url\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">lock</span> $text</button></a>";
 		}
 	}
 	
@@ -350,9 +384,9 @@ class Discussion {
 				$this->display_title($title);
 			echo "</div>";
 			echo "<div class=\"comments-header-data right-align\"><p>";
-				if (get_name_if_authed()) {
-					$this->display_follow();
-				}
+				$this->display_lock();
+				echo " ";
+				$this->display_follow();
 			echo "</p></div>";
 		echo "</div>";
 	}
@@ -587,4 +621,56 @@ function discussion_follow() {
 	else {
 		sorry("It's done but no clue what page you were on...");
 	}
+}
+
+function discussion_lock() {
+	$user = get_name_if_admin_authed();
+	
+	if (!$user) {
+		sorry("The action you have requested is not currently implemented.");
+	}
+	
+	if (get_config("enable_discussions", "enabled") !== "enabled") {
+		sorry("There is no reason to lock a discussion when discussions are already unavailable.");
+	}
+	
+	$user = new User($user);
+	
+	if (!array_key_exists("id", $_GET)) {
+		sorry("Need an id to lock.");
+	}
+	
+	$discussion = $_GET["id"];
+	$discussion = new Discussion($discussion);
+	$discussion->toggle_locked();
+	
+	if (array_key_exists("after", $_GET)) {
+		redirect($_GET["after"]);
+	}
+	else {
+		sorry("It's done but no clue what page you were on...");
+	}
+}
+
+function discussion_view() {
+	if (get_config("enable_discussions", "enabled") !== "enabled") {
+		sorry("Can't do that right now.");
+	}
+	
+	$discussion = $_GET["id"];
+	$discussion = new Discussion($discussion);
+	
+	$real_id = $discussion->get_id();
+	
+	if ($real_id === null) {
+		sorry("Discussion empty!");
+	}
+	
+	include_header();
+	
+	echo "<h1>Viewing #$real_id</h1>";
+	
+	$discussion->display();
+	
+	include_footer();
 }

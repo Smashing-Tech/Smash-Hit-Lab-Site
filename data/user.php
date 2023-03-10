@@ -651,7 +651,7 @@ class User {
 		 * stored.
 		 */
 		
-		$password = random_password();
+		$password = @random_password();
 		
 		$this->set_password($password);
 		

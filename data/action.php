@@ -10,16 +10,7 @@ function login_error() {
 	include_footer();
 }
 
-function do_login() {
-	$username = htmlspecialchars($_POST["username"]);
-	$password = $_POST["password"]; // We should not sanitise the password, bad things happen
-	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
-	
-	if (!isset($_POST["username"]) || !isset($_POST["password"]) || !$_POST["username"] || !$_POST["password"]) {
-		sorry("You did not fill out the entire form. Please try again.");
-	}
-	
-	// Check if logins are enabled
+function handle_login_availability(string $username) {
 	switch (get_config("enable_login", "users")) {
 		case "closed":
 			sorry("Logging in has been disabled. Please check Discord for updates.");
@@ -37,6 +28,19 @@ function do_login() {
 			sorry("The site operator has not configured the site corrently. To be safe, no one is allowed to log in. Please have the hosting party delete the invalid file at \"data/db/site/settings\", then logins will be enabled again.");
 			break;
 	}
+}
+
+function do_login() {
+	$username = htmlspecialchars($_POST["username"]);
+	$password = $_POST["password"]; // We should not sanitise the password, bad things happen
+	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
+	
+	if (!isset($_POST["username"]) || !isset($_POST["password"]) || !$_POST["username"] || !$_POST["password"]) {
+		sorry("You did not fill out the entire form. Please try again.");
+	}
+	
+	// Check if logins are enabled
+	handle_login_availability($username);
 	
 	// Check if the username is valid
 	if (!validate_username($username)) {
@@ -110,17 +114,7 @@ function do_logout() {
 	redirect("/?p=home");
 }
 
-function do_register() {
-	if (!isset($_POST["username"]) || !isset($_POST["email"]) || !isset($_POST["day"]) || !isset($_POST["month"]) || !isset($_POST["year"])) {
-		sorry("You did not fill out the entire form. Please try again.");
-	}
-	
-	$username = htmlspecialchars($_POST["username"]);
-	$email = htmlspecialchars($_POST["email"]);
-	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
-	$birthdate = strtotime($_POST["day"] . "-" . $_POST["month"] . "-" . $_POST["year"]);
-	
-	// Check if registering is enabled.
+function handle_register_availability() {
 	switch (get_config("register", "anyone")) {
 		case "closed":
 			sorry("User account registration has been disabled for the moment. Please try again later and make sure to join the Discord for updates.");
@@ -141,6 +135,20 @@ function do_register() {
 			sorry("The site operator has not configured the site corrently. To be safe, accounts will not be created. Please have the hosting party delete the invalid file at \"data/db/site/settings\", then user account creation will be enabled again.");
 			break;
 	}
+}
+
+function handle_register() {
+	if (!isset($_POST["username"]) || !isset($_POST["email"]) || !isset($_POST["day"]) || !isset($_POST["month"]) || !isset($_POST["year"])) {
+		sorry("You did not fill out the entire form. Please try again.");
+	}
+	
+	$username = htmlspecialchars($_POST["username"]);
+	$email = htmlspecialchars($_POST["email"]);
+	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
+	$birthdate = strtotime($_POST["day"] . "-" . $_POST["month"] . "-" . $_POST["year"]);
+	
+	// Check if registering is enabled.
+	handle_register_availability();
 	
 	// Check if the IP has been blocked
 	if (is_ip_blocked($ip)) {
@@ -189,4 +197,23 @@ function do_register() {
 	echo "<p>We sent an email to " . $email . " that contains your username and password.</p>";
 	include_footer();
 	$user->save();
+}
+
+function do_register() {
+	if (!array_key_exists("submit", $_GET)) {
+		include_header();
+		
+		form_start("./?a=register&submit=1");
+		form_textbox("handle", "Handle", "This is the name that you will be identified by. It should be between 3 and 24 characters of only A-Z, 0-9 and dashes (<code>-</code>) or underscores (<code>_</code>).");
+		form_textbox("email", "Email", "Please give your email address. We will send an email containing your login details, so make sure it is the right address!");
+		form_textbox("day", "day", "TODO: DESC.");
+		form_textbox("month", "month", "TODO: DESC.");
+		form_textbox("year", "year", "TODO: DESC.");
+		form_end("Create account");
+		
+		include_footer();
+	}
+	else {
+		handle_register();
+	}
 }

@@ -31,7 +31,9 @@ function handle_action($action) {
 		case "discussion_update": discussion_update(); break;
 		case "discussion_hide": discussion_hide(); break;
 		case "discussion_delete": discussion_delete(); break;
-		case "discussion_follow": scussion_follow(); break;
+		case "discussion_follow": discussion_follow(); break;
+		case "discussion_lock": discussion_lock(); break;
+		case "discussion_view": discussion_view(); break;
 	// ---- MISC USER PAGES ---- //
 		case "notifications": check_notifications(); break;
 	// ---- ADMIN ACTION PAGES ---- //
