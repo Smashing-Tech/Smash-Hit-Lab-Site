@@ -969,12 +969,12 @@ function display_user(string $user) {
 	
 	$stalker = get_name_if_authed();
 	
-	if (!$stalker) {
-		sorry("Only logged in users can view profile pages.");
-	}
+	// if (!$stalker) {
+	// 	sorry("Only logged in users can view profile pages.");
+	// }
 	
 	// We need this so admins can have some extra options like banning users
-	$stalker = new User($stalker);
+	$stalker = $stalker ? (new User($stalker)) : (new User("_"));
 	
 	if (!user_exists($user)) {
 		sorry("We could not find that user in our database.");
