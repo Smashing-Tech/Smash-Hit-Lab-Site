@@ -885,6 +885,7 @@ function edit_account() {
 	
 	$user = get_name_if_authed();
 	
+	global $gTitle; $gTitle = "Editing account info";
 	include_header();
 	
 	if (!$user) {
@@ -895,21 +896,23 @@ function edit_account() {
 	
 	$user = new User($user);
 	
-	echo "<h1>Account information</h1>";
-	echo "<form action=\"./?a=save_account\" method=\"post\">";
+	display_user_banner($user);
 	
-	edit_feild("name", "text", "Handle", "The string that idenifies you in the database.", $user->name, false);
-	edit_feild("display", "text", "Display name", "Choose the name that you prefer to be called.", $user->display);
-	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email);
-	edit_feild("colour", "text", "Page colour", "The base colour that the colour of your userpage is derived from. Represented as hex #RRGGBB.", $user->manual_colour);
+	form_start("./?a=save_account");
+	
+	edit_feild("display", "text", "Display name", "This is the name that will be displayed instead of your handle. It can be any name you prefer to be called.", $user->display);
 	edit_feild("about", "textarea", "About", "You can write a piece of text detailing whatever you like on your userpage. Please don't include personal information!", $user->about);
 	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, not including the at sign (@). We will use this account to give you a profile picture.", $user->youtube);
+	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email);
+	edit_feild("colour", "text", "Page colour", "The base colour that the colour of your userpage is derived from. Represented as hex #RRGGBB.", $user->manual_colour);
 	
 	form_end("Save account details");
 	
 	echo "<h2>Other actions</h2>";
 	
 	edit_feild("delete", "label", "Delete account", "If you would like to delete your account, you can start by clicking the button.", "<a href=\"./?a=account_delete\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">person_off</span> Delete my account</button></a>");
+	
+	display_user_accent_script($user);
 	
 	include_footer();
 }
@@ -988,19 +991,7 @@ function display_user(string $user) {
 	// If these contains have passed, we can view the user page
 	// 
 	
-	$display_name = $user->display ? $user->display : $user->name;
-	
-	echo "<div class=\"mod-edit-property\">";
-		echo "<div class=\"mod-edit-property-label\">";
-			if ($user->image) {
-				echo "<div class=\"profile-header-image-wrapper\"><img class=\"profile-header-image\" src=\"$user->image\"/></div>";
-			}
-		echo "</div>";
-		echo "<div class=\"mod-edit-property-data\">";
-			echo "<h1 class=\"left-align\">$display_name</h1>";
-			echo "<h2 class=\"left-align\">@$user->name</h2>";
-		echo "</div>";
-	echo "</div>";
+	display_user_banner($user);
 	
 	// If the user has an about section, then we should show it.
 	if ($user->about) {
@@ -1024,6 +1015,13 @@ function display_user(string $user) {
 	// Show if the user is verified
 	if ($user->is_verified()) {
 		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "Verified by $user->verified");
+	}
+	
+	if ($stalker->name === $user->name) {
+		echo "<h3>Account actions</h3>";
+		mod_property("Settings",
+			"You can edit your details and customise your exprience by editing your account settings.",
+			"<a href=\"./?a=edit_account\"><button class=\"button\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">manage_accounts</span> Account settings</button></a>");
 	}
 	
 	// Admins can view some extra data like emails
@@ -1052,7 +1050,30 @@ function display_user(string $user) {
 	$disc->display_reverse("Message wall", "./?u=" . $user->name);
 	
 	// Colourful user profile, if we can show it
-	if ($user->image && $user->accent) {
+	display_user_accent_script($user);
+	
+	// Footer
+	include_footer();
+}
+
+function display_user_banner(User $user) {
+	$display_name = $user->display ? $user->display : $user->name;
+	
+	echo "<div class=\"mod-edit-property\">";
+		echo "<div class=\"mod-edit-property-label\">";
+			if ($user->image) {
+				echo "<div class=\"profile-header-image-wrapper\"><img class=\"profile-header-image\" src=\"$user->image\"/></div>";
+			}
+		echo "</div>";
+		echo "<div class=\"mod-edit-property-data\">";
+			echo "<h1 class=\"left-align\">$display_name</h1>";
+			echo "<h2 class=\"left-align\">@$user->name</h2>";
+		echo "</div>";
+	echo "</div>";
+}
+
+function display_user_accent_script(User $user) {
+	if ($user->accent) {
 		$darkest = $user->accent[0];
 		$dark = $user->accent[1];
 		$darkish = $user->accent[2];
@@ -1069,9 +1090,6 @@ function display_user(string $user) {
 		echo "qs.style.setProperty('--main-colour-hoverb', '$bright"."80');";
 		echo "</script>";
 	}
-	
-	// Footer
-	include_footer();
 }
 
 function user_verify() {
