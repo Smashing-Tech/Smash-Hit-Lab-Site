@@ -1098,14 +1098,14 @@ function display_user(string $user) {
 	echo "<h3>Details</h3>";
 	mod_property("Join date", "The date that the user joined the Smash Hit Lab.", Date("Y-m-d", $user->created));
 	
-	// DEPRECATED Show if this user is an admin (legacy)
-	if ($user->is_admin()) {
-		mod_property("Rank (legacy)", "The offical position this user holds at the Smash Hit Lab.", "Staff and Administrators (via legacy admin bit)");
-	}
-	
 	// Show roles
 	if ($user->count_roles()) {
 		mod_property("Roles", "Users that are members of certian roles can preform extra administrative actions.", join(", ", $user->roles));
+	}
+	
+	// DEPRECATED Show if this user is an admin (legacy)
+	if ($user->admin) {
+		mod_property("Legacy admin", "If the admin priveleges for this user were given before 2023-03-13, then this will be set. It may be required to preform some admin actions while the codebase is transitioned to use roles.", "This user is an admin.");
 	}
 	
 	// Maybe show youtube?

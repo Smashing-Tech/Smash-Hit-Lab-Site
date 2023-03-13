@@ -26,7 +26,7 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $optio
 		echo "<div class=\"mod-edit-property-data\">";
 			switch ($type) {
 				case "text":
-					$s = ($enabled) ? "" : " disabled";
+					$s = ($enabled) ? "" : " readonly";
 					echo "<input type=\"text\" name=\"$name\" placeholder=\"$title\" value=\"$value\" $s/>";
 					break;
 				case "textarea":
