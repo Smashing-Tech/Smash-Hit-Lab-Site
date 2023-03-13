@@ -185,12 +185,12 @@ class Token {
 		return $lockbox;
 	}
 	
-	function verify_lockbox(string $lockbox) : bool {
+	function verify_lockbox(?string $lockbox) : bool {
 		/**
 		 * Verify that a lockbox matches
 		 */
 		
-		return (hash("sha256", $lockbox) === $this->lockbox);
+		return ($lockbox) && (hash("sha256", $lockbox) === $this->lockbox);
 	}
 }
 
