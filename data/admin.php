@@ -73,6 +73,7 @@ function do_admin_dashboard() {
 		echo "<h4>Users and contributed content</h4>";
 		admin_action_item("./?a=user_ban", "gavel", "Ban user");
 		admin_action_item("./?a=user_delete", "person_off", "Delete user");
+		admin_action_item("./?a=user_roles", "security", "Edit roles");
 		admin_action_item("./?a=delete_mod", "delete", "Delete mod page");
 		
 		include_footer();
@@ -330,6 +331,91 @@ function do_storage_list() {
 		}
 		
 		include_footer();
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
+}
+
+function do_user_roles() {
+	$actor = get_name_if_admin_authed();
+	
+	if ($actor) {
+		if (!array_key_exists("submit", $_GET)) {
+			include_header();
+			echo "<h1>Edit user roles</h1>";
+			
+			$have_handle = false;
+			
+			if (array_key_exists("handle", $_GET)) {
+				$have_handle = true;
+			}
+			
+			form_start("./?a=user_roles&submit=1");
+			edit_feild("handle", "text", "Handle", "Handle or username of the user to update.", $have_handle ? $_GET["handle"] : "", !$have_handle);
+			edit_feild("role", "select", "Role", "Which role to set this user to.", "1w", true, array("headmaster" => "Headmaster", "admin" => "Administrator", "mod" => "Moderator", "none" => "None"));
+			edit_feild("reason", "text", "Reason", "Type a short reason why you want to change this user's role (required).", "");
+			form_end("Set role");
+			
+			include_footer();
+		}
+		else {
+			$handle = htmlspecialchars($_POST["handle"]);
+			$reason = htmlspecialchars($_POST["reason"]);
+			$role = htmlspecialchars($_POST["role"]);
+			
+			$user = new User($handle);
+			$actor = new User($actor);
+			
+			if (strlen($reason) < 3) {
+				sorry("Please type a better ban reason.");
+			}
+			
+			if ($role == "headmaster" && !$actor->has_role("headmaster")) {
+				sorry("Only another headmaster can grant the headmaster role.");
+			}
+			
+			if ($user->has_role("headmaster") && ($actor->name !== $user->name)) {
+				sorry("Only the person who has the headmaster role can demote themselves.");
+			}
+			
+			if ($user->get_role_score() > $actor->get_role_score()) {
+				sorry("You cannot change the role of $user->name because you do not have a role that is at least equal to that role.");
+			}
+			
+			if (!$actor->has_role("admin")) {
+				sorry("You must be an admin to change roles!");
+			}
+			
+			switch ($role) {
+				case "headmaster": {
+					$user->set_roles(array("headmaster", "admin", "staff"));
+					break;
+				}
+				case "admin": {
+					$user->set_roles(array("admin", "staff"));
+					break;
+				}
+				case "mod": {
+					$user->set_roles(array("mod", "staff"));
+					break;
+				}
+				case "none": {
+					$user->set_roles(array());
+					break;
+				}
+				default: {
+					sorry("Invalid role type: $role.");
+				}
+			}
+			
+			alert("User $user->name has role set to $role by $actor->name: $reason");
+			
+			include_header();
+			echo "<h1>Roles updated</h1><p>The role for $handle was set to $role!</p>";
+			include_footer();
+		}
+		
 	}
 	else {
 		sorry("The action you have requested is not currently implemented.");

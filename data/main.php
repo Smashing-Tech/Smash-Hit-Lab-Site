@@ -41,6 +41,7 @@ function handle_action($action) {
 		case "backup_db": do_backup_db(); break;
 		case "storage_download": do_storage_download(); break;
 		case "storage_list": do_storage_list(); break;
+		case "user_roles": do_user_roles(); break;
 		case "user_ban": do_user_ban(); break;
 		case "user_delete": do_user_delete(); break;
 		case "user_verify": user_verify(); break;

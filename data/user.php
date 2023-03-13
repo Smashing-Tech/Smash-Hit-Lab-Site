@@ -454,6 +454,7 @@ class User {
 			$this->about = property_exists($info, "about") ? $info->about : "";
 			$this->sak = property_exists($info, "sak") ? $info->sak : random_hex();
 			$this->manual_colour = property_exists($info, "manual_colour") ? $info->manual_colour : "";
+			$this->roles = property_exists($info, "roles") ? $info->roles : array();
 			
 			// If there weren't discussions before, save them now.
 			if (!property_exists($info, "wall")) {
@@ -463,6 +464,13 @@ class User {
 			// If we didn't have a pfp before, find and save it now!
 			if ((!$this->image) || (!$this->accent)) {
 				$this->update_image();
+				$this->save();
+			}
+			
+			// Convert a legacy admin bit to a new user role
+			if ($this->admin && !$this->has_role("admin")) {
+				$this->toggle_role("admin");
+				$this->toggle_role("staff");
 				$this->save();
 			}
 		}
@@ -483,6 +491,7 @@ class User {
 			$this->about = "";
 			$this->sak = random_hex();
 			$this->manual_colour = "";
+			$this->roles = array();
 			
 			// Make sure the new user is following their wall by default.
 			$d = new Discussion($this->wall);
@@ -706,7 +715,7 @@ class User {
 		 * Check if the user can preform administrative tasks.
 		 */
 		
-		return $this->admin;
+		return $this->has_role("admin");
 	}
 	
 	function update_image() : void {
@@ -727,6 +736,93 @@ class User {
 	
 	function get_image() : ?string {
 		return $this->image;
+	}
+	
+	function set_roles(array $roles) : void {
+		/**
+		 * Set the user's roles
+		 */
+		
+		$this->roles = $roles;
+		$this->save();
+	}
+	
+	function toggle_role(string $role) : bool {
+		/**
+		 * Toggle a given role
+		 */
+		
+		$roles = $this->roles;
+		
+		$key = array_search($role, $roles);
+		
+		$set = false;
+		
+		// Add role
+		if ($key === false) {
+			$roles[] = $role;
+			$set = true;
+		}
+		// Remove role
+		else {
+			$roles = array_diff($roles, array($role));
+		}
+		
+		$this->roles = $roles;
+		$this->save();
+		
+		return $set;
+	}
+	
+	function add_role(string $role) : void {
+		if (array_search($role, $this->roles) === false) {
+			$this->roles[] = $role;
+		}
+		
+		$this->save();
+	}
+	
+	function remove_role(string $role) : void {
+		if (array_search($role, $this->roles) !== false) {
+			$this->roles = array_diff($this->roles, array($role));
+		}
+		
+		$this->save();
+	}
+	
+	function has_role(string $role) : bool {
+		/**
+		 * Check if the user has a certian role
+		 */
+		
+		return (array_search($role, $this->roles) !== false);
+	}
+	
+	function count_roles() : int {
+		/**
+		 * Get the number of roles this user has
+		 */
+		
+		return sizeof($this->roles);
+	}
+	
+	function get_role_score() : int {
+		/**
+		 * Get a number assocaited with a user's highest role.
+		 */
+		
+		$n = 0;
+		
+		for ($i = 0; $i < sizeof($this->roles); $i++) {
+			switch ($this->roles[$i]) {
+				case "mod": max($n, 1); break;
+				case "admin": max($n, 2); break;
+				case "headmaster": max($n, 3); break;
+				default: break;
+			}
+		}
+		
+		return $n;
 	}
 }
 
@@ -1002,9 +1098,14 @@ function display_user(string $user) {
 	echo "<h3>Details</h3>";
 	mod_property("Join date", "The date that the user joined the Smash Hit Lab.", Date("Y-m-d", $user->created));
 	
-	// Show if this user is an admin
+	// DEPRECATED Show if this user is an admin (legacy)
 	if ($user->is_admin()) {
-		mod_property("Rank", "The offical position this user holds at the Smash Hit Lab.", "Staff and Administrators");
+		mod_property("Rank (legacy)", "The offical position this user holds at the Smash Hit Lab.", "Staff and Administrators (via legacy admin bit)");
+	}
+	
+	// Show roles
+	if ($user->count_roles()) {
+		mod_property("Roles", "Users that are members of certian roles can preform extra administrative actions.", join(", ", $user->roles));
 	}
 	
 	// Maybe show youtube?
@@ -1040,6 +1141,8 @@ function display_user(string $user) {
 		if (!$user->is_admin()) {
 			mod_property("Ban user", "Banning this user will revoke access and prevent them from logging in until a set amount of time has passed.", "<a href=\"./?a=user_ban&handle=$user->name\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">gavel</span> Ban this user</button></a>");
 		}
+		
+		mod_property("Change roles", "Roles set permissions for what users are allowed to do. They are often used for giving someone moderator or admin privleges.", "<a href=\"./?a=user_roles&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">security</span> Edit roles</button></a>");
 		
 		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "<a href=\"./?a=user_verify&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">verified</span> Toggle verified status</button></a>");
 	}
