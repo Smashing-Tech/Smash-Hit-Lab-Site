@@ -337,7 +337,10 @@ class Discussion {
 				break;
 			}
 			case "closed": {
-				echo "<div class=\"comment-card comment-edit\"><p><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">nights_stay</span>This discussion has been closed. You can still chat on our Discord server!</p></div>";
+				echo "<div class=\"comment-card comment-edit\">";
+				echo "<p style=\"text-align: center\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px; font-size: 128px;\">nights_stay</span></p>";
+				echo "<p style=\"text-align: center\">This discussion has been closed. You can still chat on our Discord server!</p>";
+				echo "</div>";
 				break;
 			}
 			// If they are fully disabled there should be a message about it.
