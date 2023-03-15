@@ -1118,6 +1118,8 @@ function display_user(string $user) {
 		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "Verified by $user->verified");
 	}
 	
+	mod_property("Email", "You can send a private message to this user via email.", "<a href=\"./?a=user_email&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">email</span> Send email</button></a>");
+	
 	if ($stalker->name === $user->name) {
 		echo "<h3>Account actions</h3>";
 		mod_property("Settings",
@@ -1213,6 +1215,55 @@ function user_verify() {
 		alert("User $user->name was marked verified", "./?u=$user->name");
 		
 		redirect("./?u=$user->name");
+	}
+	else {
+		sorry("The action you have requested is not currently implemented.");
+	}
+}
+
+function user_email() {
+	$actor = get_name_if_authed();
+	
+	if ($actor) {
+		if (!array_key_exists("submit", $_GET)) {
+			include_header();
+			echo "<h1>Send email</h1>";
+			form_start("./?a=user_email&submit=1");
+			
+			$know_handle = array_key_exists("handle", $_GET);
+			edit_feild("handle", "text", "Handle", "The handle of the user to send mail.", $know_handle ? $_GET["handle"] : "", !$know_handle);
+			form_textarea("message", "Message", "The message you want to send this user.");
+			
+			form_end("Send email");
+			include_footer();
+		}
+		else {
+			$handle = htmlspecialchars($_POST["handle"]);
+			$message = htmlspecialchars($_POST["message"]);
+			
+			// Validate message length before adding our own header
+			validate_length("Message", $message, 2000);
+			
+			// Open user info of the actor
+			$actor = new User($actor);
+			
+			// Prepend message header
+			$message = "This is a message from $actor->name ($actor->email) at the Smash Hit Lab. It is NOT an official email, and you don't have to reply or acknowledge it.\n\n=============================================\n\n" . $message;
+			
+			// Open the user info
+			$user = new User($handle);
+			
+			// Send email, making sure we try to reply to the actor.
+			mail(
+				$user->email,
+				"Message from $actor->name",
+				$message,
+				array("Reply-To" => "$actor->name <$actor->email>")
+			);
+			
+			// Inform the user of success
+			inform("Message sent", "The following message was sent to $user->name:</p><p><pre>$message</pre>");
+		}
 	}
 	else {
 		sorry("The action you have requested is not currently implemented.");

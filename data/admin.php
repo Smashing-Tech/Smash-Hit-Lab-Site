@@ -65,6 +65,7 @@ function do_admin_dashboard() {
 		
 		echo "<h4>Site and maintanance</h4>";
 		admin_action_item("./?a=site_config", "settings", "Settings");
+		admin_action_item("./?a=site_style", "style", "Site styles");
 		admin_action_item("./?a=send_notification", "notifications_active", "Send notification");
 		admin_action_item("./?a=backup_db", "backup", "Create backup");
 		admin_action_item("./?a=storage_list", "inventory", "Site storage");

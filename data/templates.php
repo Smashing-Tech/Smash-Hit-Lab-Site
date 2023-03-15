@@ -10,6 +10,10 @@ function form_textbox($name, $title, $desc, $value = "") : void {
 	form_feild($name, "text", $title, $desc, $value);
 }
 
+function form_textarea($name, $title, $desc, $value = "") : void {
+	form_feild($name, "textarea", $title, $desc, $value);
+}
+
 function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $options = null) : void {
 	if (!$value) {
 		$value = "";
@@ -123,6 +127,17 @@ function sorry(string $why = "There was a problem.", string $extra = "") {
 	
 	include_header();
 	echo "<h1>Sorry</h1><p>$why</p>";
+	echo $extra;
+	include_footer();
+	die();
+}
+
+function inform(string $title = "Success", string $why = "The action completed successfully.", string $extra = "") {
+	global $gTitle;
+	$gTitle = "Success !!!";
+	
+	include_header();
+	echo "<h1>$title</h1><p>$why</p>";
 	echo $extra;
 	include_footer();
 	die();

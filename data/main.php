@@ -24,6 +24,7 @@ function handle_action($action) {
 		case "edit_account": edit_account(); break;
 		case "save_account": save_account(); break;
 		case "account_delete": account_delete(); break;
+		case "user_email": user_email(); break;
 	// ---- NEWS STUFF ---- //
 		case "update_news": update_news(); break;
 		case "save_news": save_news(); break;
