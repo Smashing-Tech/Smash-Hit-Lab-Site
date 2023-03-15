@@ -209,6 +209,10 @@ function rich_format(string $base, bool $trusted = false) : string {
 			}
 			
 			$i += 2;
+			
+			// We should skip over newlines for the start and end
+			(str_starts_with($s, "```\n") && !$pre) ? $i += 1 : $i += 2;
+			
 			$pre = !$pre;
 		}
 		else if (str_starts_with($s, "`")) {

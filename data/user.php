@@ -443,6 +443,7 @@ class User {
 			$this->password = $info->password;
 			$this->tokens = $info->tokens;
 			$this->email = $info->email;
+			$this->allow_messages = (property_exists($info, "allow_messages") ? $info->allow_messages : false);
 			$this->created = (property_exists($info, "created") ? $info->created : time());
 			$this->verified = property_exists($info, "verified") ? $info->verified : null;
 			$this->admin = $info->admin;
@@ -1001,6 +1002,7 @@ function edit_account() {
 	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, not including the at sign (@). We will use this account to give you a profile picture.", $user->youtube);
 	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email);
 	edit_feild("colour", "text", "Page colour", "The base colour that the colour of your userpage is derived from. Represented as hex #RRGGBB.", $user->manual_colour);
+	edit_feild("messages", "select", "Allow emails", "Choose if you want other users to be able to send you emails without revealing your email address.", $user->allow_messages ? "1" : "0", true, array("0" => "Disallow messages", "1" => "Allow messages"));
 	
 	form_end("Save account details");
 	
@@ -1041,6 +1043,9 @@ function save_account() {
 	$user->youtube = htmlspecialchars($_POST["youtube"]);
 	$user->manual_colour = htmlspecialchars($_POST["colour"]);
 	
+	// User messages
+	$user->allow_messages = ($_POST["messages"] === "1") ? true : false;
+	
 	// If the user started it with an @ then we will try to make it okay for
 	// them.
 	if (str_starts_with($user->youtube, "@")) {
@@ -1070,7 +1075,7 @@ function display_user(string $user) {
 	// }
 	
 	// We need this so admins can have some extra options like banning users
-	$stalker = $stalker ? (new User($stalker)) : (new User("_"));
+	$stalker = $stalker ? (new User($stalker)) : null;
 	
 	if (!user_exists($user)) {
 		sorry("We could not find that user in our database.");
@@ -1118,9 +1123,12 @@ function display_user(string $user) {
 		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "Verified by $user->verified");
 	}
 	
-	mod_property("Email", "You can send a private message to this user via email.", "<a href=\"./?a=user_email&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">email</span> Send email</button></a>");
+	// Show the email action if the user allows it
+	if ($stalker && $user->allow_messages) {
+		mod_property("Email", "You can send a private message to this user via email.", "<a href=\"./?a=user_email&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">email</span> Send email</button></a>");
+	}
 	
-	if ($stalker->name === $user->name) {
+	if ($stalker && $stalker->name === $user->name) {
 		echo "<h3>Account actions</h3>";
 		mod_property("Settings",
 			"You can edit your details and customise your exprience by editing your account settings.",
@@ -1128,7 +1136,7 @@ function display_user(string $user) {
 	}
 	
 	// Admins can view some extra data like emails
-	if ($stalker->is_admin()) {
+	if ($stalker && $stalker->is_admin()) {
 		echo "<h3>Admin-only info and actions</h3>";
 		
 		if ($user->email) {
@@ -1252,6 +1260,11 @@ function user_email() {
 			
 			// Open the user info
 			$user = new User($handle);
+			
+			// Disallow sending if the user doesn't want it
+			if (!$user->allow_messages) {
+				sorry("This user does not want to be sent emails.");
+			}
 			
 			// Send email, making sure we try to reply to the actor.
 			mail(
