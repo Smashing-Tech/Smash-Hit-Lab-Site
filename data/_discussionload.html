@@ -1,0 +1,54 @@
+<script>
+	function ds_request(verb, url, func) {
+		/**
+		 * Make an xhr request using the given verb, url and function
+		 */
+		
+		let xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = func;
+		xhr.open(verb, url, true);
+		xhr.send();
+	}
+	
+	function escape_string(string) {
+		// letting the browser do this for us
+		// http://stackoverflow.com/questions/3043775
+		let p = document.createElement("p");
+		p.appendChild(document.createTextNode(string));
+		return p.innerHTML;
+	}
+	
+	function ds_save() {
+		if (this.readyState != 4) {
+			return;
+		}
+		
+		let discussion = document.getElementById("discussion-" + DiscussionID);
+		let data = JSON.parse(this.responseText);
+		
+		switch (this.status) {
+			case 200: {
+				discussion.innerHTML = "";
+				
+				for (let i = 0; i < data["comments"].length; i++) {
+					let comment = data["comments"][i];
+					let author = escape_string(comment["author"]);
+					let body = escape_string(comment["body"]);
+					
+					discussion.innerHTML += "<div><p><b>" + author + "</b></p><p>" + body + "</p></div>";
+				}
+				
+				break;
+			}
+			default:
+				discussion.innerHTML = "<p><i>Error loading comments</i></p>";
+				break;
+		}
+	}
+	
+	function ds_load() {
+		ds_request("GET", "./?a=discussion_poll&id=" + DiscussionID + "&index=0", ds_save);
+	}
+	
+	ds_load();
+</script>

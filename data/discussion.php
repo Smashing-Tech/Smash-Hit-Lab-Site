@@ -299,6 +299,33 @@ class Discussion {
 		return sizeof($this->comments) - $this->enumerate_hidden();
 	}
 	
+	function list_since(int $index) {
+		/**
+		 * Return a list of comments since (and including) a given comment
+		 */
+		
+		$size = sizeof($this->comments);
+		
+		if ($index > ($size - 1)) {
+			return array();
+		}
+		
+		$comments = array_slice($this->comments, $index);
+		
+		for ($i = 0; $i < sizeof($comments);) {
+			if ($comments[$i]->is_hidden()) {
+				array_splice($comments, $i, 1);
+			}
+			// We can only increment if it doesn't exist since everything
+			// will shift down when things are removed!
+			else {
+				$i++;
+			}
+		}
+		
+		return $comments;
+	}
+	
 	function display_edit(int $index, string $url = "") {
 		/**
 		 * Display the comment edit box.
@@ -422,11 +449,19 @@ class Discussion {
 		return $disabled;
 	}
 	
+	function comments_load_script() {
+		echo "<script>var DiscussionID = \"$this->id\";</script>";
+		echo "<div id=\"discussion-$this->id\"></div>";
+		readfile("../data/_discussionload.html");
+	}
+	
 	function display(string $title = "Discussion", string $url = "") {
 		$this->display_bar($title);
 		if ($this->display_disabled()) { return; }
 		$this->display_hidden();
-		$this->display_comments();
+		(array_key_exists("ajaxdiscussions", $_GET))
+			? $this->comments_load_script()
+			: $this->display_comments();
 		$this->display_edit(-1, $url);
 	}
 	
@@ -624,6 +659,30 @@ function discussion_follow() {
 	else {
 		sorry("It's done but no clue what page you were on...");
 	}
+}
+
+function discussion_poll() {
+	if (!array_key_exists("id", $_GET) || !array_key_exists("index", $_GET)) {
+		sorry("Problem doing that.");
+	}
+	
+	$user = get_name_if_authed();
+	
+	// List the comments
+	$disc = new Discussion($_GET["id"]);
+	$comments = $disc->list_since($_GET["index"]);
+	
+	// Create the result data
+	$result = new stdClass;
+	$result->anything = (sizeof($comments) !== 0);
+	$result->comments = $comments;
+	$result->actor = $user;
+	
+	// Send mimetype
+	header('Content-type: application/json');
+	
+	// Send json data
+	echo json_encode($result);
 }
 
 function discussion_lock() {
