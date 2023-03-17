@@ -18,6 +18,10 @@
 		return p.innerHTML;
 	}
 	
+	function ds_render_comment(author, time, body) {
+		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\">IMAGE</div><div class=\"comment-card-inner-right\"><p>DISPLAYNAME <span class=\"small-text\">(@" + author + " | " + new Date(time * 1000) + ")</span></p><p>" + body + "</p>ACTIONS</div></div></div>";
+	}
+	
 	function ds_save() {
 		if (this.readyState != 4) {
 			return;
@@ -34,8 +38,9 @@
 					let comment = data["comments"][i];
 					let author = escape_string(comment["author"]);
 					let body = escape_string(comment["body"]);
+					let date = comment["updated"];
 					
-					discussion.innerHTML += "<div><p><b>" + author + "</b></p><p>" + body + "</p></div>";
+					discussion.innerHTML += ds_render_comment(author, date, body);
 				}
 				
 				break;

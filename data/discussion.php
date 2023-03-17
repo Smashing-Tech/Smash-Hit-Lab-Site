@@ -470,7 +470,9 @@ class Discussion {
 		if ($this->display_disabled()) { return; }
 		$this->display_hidden();
 		$this->display_edit(-1, $url);
-		$this->display_comments(true);
+		(array_key_exists("ajaxdiscussions", $_GET))
+			? $this->comments_load_script()
+			: $this->display_comments(true);
 	}
 }
 
