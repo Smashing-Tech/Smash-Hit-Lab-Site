@@ -18,8 +18,33 @@
 		return p.innerHTML;
 	}
 	
-	function ds_render_comment(author, time, body) {
-		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\">IMAGE</div><div class=\"comment-card-inner-right\"><p>DISPLAYNAME <span class=\"small-text\">(@" + author + " | " + new Date(time * 1000) + ")</span></p><p>" + body + "</p>ACTIONS</div></div></div>";
+	function format_time(t) {
+		let d = new Date(t * 1000);
+		
+		return d.getUTCFullYear() + "-" + d.getUTCMonth() + "-" + d.getUTCDate() + " " + d.getUTCHours() + ":" + d.getUTCMinutes();
+	}
+	
+	function ds_render_actions(actions, index) {
+		let string = "<p>";
+		
+		// Render each action
+		for (let i = 0; i < actions.length; i++) {
+			switch (actions[i]) {
+				case "hide": {
+					string += "<a href=\"./?a=discussion_hide&id=" + DiscussionID + "&index=" + index + "&after=" + window.location + "&key=" + UserSAK + "\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">block</span> Hide</a>";
+					break;
+				}
+				default: {
+					break;
+				}
+			}
+		}
+		
+		return string + "</p>";
+	}
+	
+	function ds_render_comment(image, author, display, time, body, actions, index) {
+		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"" + image + "\"/></div><div class=\"comment-card-inner-right\"><p><a href=\"./?u=" + author + "\">" + display + "</a> <span class=\"small-text\">(@" + author + " | " + time + ")</span></p><p>" + body + "</p>" + ds_render_actions(actions, index) + "</div></div></div>";
 	}
 	
 	function ds_save() {
@@ -36,11 +61,13 @@
 				
 				for (let i = 0; i < data["comments"].length; i++) {
 					let comment = data["comments"][i];
+					let image = escape_string(comment["image"]);
 					let author = escape_string(comment["author"]);
+					let display = escape_string(comment["display"]);
 					let body = escape_string(comment["body"]);
-					let date = comment["updated"];
+					let date = format_time(comment["updated"]);
 					
-					discussion.innerHTML += ds_render_comment(author, date, body);
+					discussion.innerHTML += ds_render_comment(image, author, display, date, body, comment["actions"], i);
 				}
 				
 				break;

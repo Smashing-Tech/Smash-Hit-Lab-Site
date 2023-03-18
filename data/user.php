@@ -735,8 +735,12 @@ class User {
 		}
 	}
 	
-	function get_image() : ?string {
+	function get_image() : string {
 		return $this->image;
+	}
+	
+	function get_display() : string {
+		return $this->display ? $this->display : $this->name;
 	}
 	
 	function set_roles(array $roles) : void {

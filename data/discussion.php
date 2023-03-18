@@ -301,7 +301,8 @@ class Discussion {
 	
 	function list_since(int $index) {
 		/**
-		 * Return a list of comments since (and including) a given comment
+		 * Return a list of comments since (and including) a given comment, also
+		 * including some extra data
 		 */
 		
 		$size = sizeof($this->comments);
@@ -312,6 +313,7 @@ class Discussion {
 		
 		$comments = array_slice($this->comments, $index);
 		
+		// Remove hidden comments
 		for ($i = 0; $i < sizeof($comments);) {
 			if ($comments[$i]->is_hidden()) {
 				array_splice($comments, $i, 1);
@@ -320,6 +322,18 @@ class Discussion {
 			// will shift down when things are removed!
 			else {
 				$i++;
+			}
+		}
+		
+		for ($i = 0; $i < sizeof($comments); $i++) {
+			$user = new User($comments[$i]->author);
+			
+			$comments[$i]->display = $user->get_display();
+			$comments[$i]->image = $user->get_image();
+			$comments[$i]->actions = array();
+			
+			if (get_name_if_admin_authed() || (get_name_if_authed() == $user->name)) {
+				$comments[$i]->actions[] = "hide";
 			}
 		}
 		
@@ -450,7 +464,8 @@ class Discussion {
 	}
 	
 	function comments_load_script() {
-		echo "<script>var DiscussionID = \"$this->id\";</script>";
+		$sak = user_get_sak();
+		echo "<script>var DiscussionID = \"$this->id\"; var UserSAK = \"$sak\";</script>";
 		echo "<div id=\"discussion-$this->id\"></div>";
 		readfile("../data/_discussionload.html");
 	}
