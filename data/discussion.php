@@ -313,6 +313,11 @@ class Discussion {
 		
 		$comments = array_slice($this->comments, $index);
 		
+		// Put indexes on comments
+		for ($i = 0; $i < sizeof($comments); $i++) {
+			$comments[$i]->index = $i;
+		}
+		
 		// Remove hidden comments
 		for ($i = 0; $i < sizeof($comments);) {
 			if ($comments[$i]->is_hidden()) {
@@ -325,11 +330,13 @@ class Discussion {
 			}
 		}
 		
+		// Add extra metadata and format them
 		for ($i = 0; $i < sizeof($comments); $i++) {
 			$user = new User($comments[$i]->author);
 			
 			$comments[$i]->display = $user->get_display();
 			$comments[$i]->image = $user->get_image();
+			$comments[$i]->body = rich_format($comments[$i]->body);
 			$comments[$i]->actions = array();
 			
 			if (get_name_if_admin_authed() || (get_name_if_authed() == $user->name)) {
@@ -374,7 +381,7 @@ class Discussion {
 					$img = "./icon.png";
 				}
 				
-				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><p>$name</p><p><textarea style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none; display: inline-block;\" name=\"body\" placeholder=\"Add your comment...\">$body</textarea></p><p><input type=\"hidden\" name=\"key\" value=\"$sak\"><input type=\"submit\" value=\"Post comment\"></p></form></div></div></div>";
+				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><p>$name</p><p><textarea id=\"discussions-$this->id-entry\" style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none; display: inline-block;\" name=\"body\" placeholder=\"Add your comment...\">$body</textarea></p><p><input type=\"hidden\" name=\"key\" value=\"$sak\"><input type=\"submit\" value=\"Post comment\"><button class=\"button secondary\" onclick=\"ds_update();\">Post comment (ajax)</button><span id=\"discussions-$this->id-error\"></span></p></form></div></div></div>";
 				break;
 			}
 			case "closed": {
@@ -445,11 +452,17 @@ class Discussion {
 	}
 	
 	function display_comments(bool $reverse = false) {
-		$size = sizeof($this->comments);
-		
-		for ($i = 0; $i < $size; $i++) {
-			$j = ($reverse ? ($size - $i - 1) : $i);
-			echo $this->comments[$j]->render($this->id, $j);
+		if (array_key_exists("ajax", $_GET)) {
+			echo "<div id=\"discussion-$this->id\"></div>";
+			echo "<script>ds_clear(); ds_load();</script>";
+		}
+		else {
+			$size = sizeof($this->comments);
+			
+			for ($i = 0; $i < $size; $i++) {
+				$j = ($reverse ? ($size - $i - 1) : $i);
+				echo $this->comments[$j]->render($this->id, $j);
+			}
 		}
 	}
 	
@@ -463,31 +476,28 @@ class Discussion {
 		return $disabled;
 	}
 	
-	function comments_load_script() {
+	function comments_load_script(bool $backwards = false) {
 		$sak = user_get_sak();
-		echo "<script>var DiscussionID = \"$this->id\"; var UserSAK = \"$sak\";</script>";
-		echo "<div id=\"discussion-$this->id\"></div>";
+		echo "<script>var DiscussionID = \"$this->id\"; var UserSAK = \"$sak\"; var DiscussionBackwards = " . ($backwards ? "true" : "false") . ";</script>";
 		readfile("../data/_discussionload.html");
 	}
 	
 	function display(string $title = "Discussion", string $url = "") {
+		$this->comments_load_script();
 		$this->display_bar($title);
 		if ($this->display_disabled()) { return; }
 		$this->display_hidden();
-		(array_key_exists("ajaxdiscussions", $_GET))
-			? $this->comments_load_script()
-			: $this->display_comments();
+		$this->display_comments();
 		$this->display_edit(-1, $url);
 	}
 	
 	function display_reverse(string $title = "Discussion", string $url = "") {
+		$this->comments_load_script(true);
 		$this->display_bar($title);
 		if ($this->display_disabled()) { return; }
 		$this->display_hidden();
 		$this->display_edit(-1, $url);
-		(array_key_exists("ajaxdiscussions", $_GET))
-			? $this->comments_load_script()
-			: $this->display_comments(true);
+		$this->display_comments(true);
 	}
 }
 
@@ -544,12 +554,14 @@ function discussion_update() {
 		sorry("Need a body for content.");
 	}
 	
-	validate_length("Body of message", $_POST["body"], 4000);
+	$body = (array_key_exists("raw", $_GET) ? file_get_contents("php://input") : $_POST["body"]);
+	
+	validate_length("Body of message", $body, 4000);
 	
 	$discussion = new Discussion($discussion);
 	
 	if ($index == "-1") {
-		$discussion->add_comment($user->name, $_POST["body"]);
+		$discussion->add_comment($user->name, $body);
 		
 		if (array_key_exists("after", $_GET)) {
 			redirect($_GET["after"]);

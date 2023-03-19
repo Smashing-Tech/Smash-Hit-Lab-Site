@@ -1,5 +1,5 @@
 <script>
-	function ds_request(verb, url, func) {
+	function ds_request(verb, url, func, body) {
 		/**
 		 * Make an xhr request using the given verb, url and function
 		 */
@@ -7,7 +7,7 @@
 		let xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = func;
 		xhr.open(verb, url, true);
-		xhr.send();
+		xhr.send(body);
 	}
 	
 	function escape_string(string) {
@@ -47,7 +47,7 @@
 		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"" + image + "\"/></div><div class=\"comment-card-inner-right\"><p><a href=\"./?u=" + author + "\">" + display + "</a> <span class=\"small-text\">(@" + author + " | " + time + ")</span></p><p>" + body + "</p>" + ds_render_actions(actions, index) + "</div></div></div>";
 	}
 	
-	function ds_save() {
+	function ds_load_handle() {
 		if (this.readyState != 4) {
 			return;
 		}
@@ -60,14 +60,14 @@
 				discussion.innerHTML = "";
 				
 				for (let i = 0; i < data["comments"].length; i++) {
-					let comment = data["comments"][i];
+					let comment = data["comments"][(DiscussionBackwards ? (data["comments"].length - i - 1) : i)];
 					let image = escape_string(comment["image"]);
 					let author = escape_string(comment["author"]);
 					let display = escape_string(comment["display"]);
-					let body = escape_string(comment["body"]);
+					let body = comment["body"]; // Will already be escaped
 					let date = format_time(comment["updated"]);
 					
-					discussion.innerHTML += ds_render_comment(image, author, display, date, body, comment["actions"], i);
+					discussion.innerHTML += ds_render_comment(image, author, display, date, body, comment["actions"], comment["index"]);
 				}
 				
 				break;
@@ -79,8 +79,34 @@
 	}
 	
 	function ds_load() {
-		ds_request("GET", "./?a=discussion_poll&id=" + DiscussionID + "&index=0", ds_save);
+		ds_request("GET", "./?a=discussion_poll&id=" + DiscussionID + "&index=0", ds_load_handle);
 	}
 	
-	ds_load();
+	function ds_update_handle() {
+		if (this.readyState != 4) {
+			return;
+		}
+		
+		if (this.stauts == 200) {
+			let entry = document.getElementById("discussions-" + DiscussionID + "-entry");
+			entry.value = "";
+			console.log("Submitted comment!");
+			ds_load();
+		}
+		else {
+			let entry = document.getElementById("discussions-" + DiscussionID + "-error");
+			entry.innerHTML = "<i>Sorry, there was an error submitting your comment. Please try again.</i>";
+		}
+	}
+	
+	function ds_update() {
+		let body = document.getElementById("discussions-" + DiscussionID + "-entry").value;
+		ds_request("POST", "./?a=discussion_update&id=$this->id&index=$index&after=$url", ds_update_handle, body);
+	}
+	
+	function ds_clear() {
+		let discussion = document.getElementById("discussion-" + DiscussionID);
+		discussion.innerHTML = "<p style=\"text-align: center;\"><i>Discussions are loading...</i></p>";
+	}
 </script>
+<p><button class="button secondary" onclick="ds_clear(); ds_load();">Reload discussions</button></p>
