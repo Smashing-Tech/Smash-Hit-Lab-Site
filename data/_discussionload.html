@@ -21,7 +21,8 @@
 	function format_time(t) {
 		let d = new Date(t * 1000);
 		
-		return d.getUTCFullYear() + "-" + d.getUTCMonth() + "-" + d.getUTCDate() + " " + d.getUTCHours() + ":" + d.getUTCMinutes();
+		return d.toLocaleString();
+		//return d.getUTCFullYear() + "-" + d.getUTCMonth() + "-" + d.getUTCDate() + " " + d.getUTCHours() + ":" + d.getUTCMinutes();
 	}
 	
 	function ds_render_actions(actions, index) {
@@ -53,10 +54,11 @@
 		}
 		
 		let discussion = document.getElementById("discussion-" + DiscussionID);
-		let data = JSON.parse(this.responseText);
 		
 		switch (this.status) {
 			case 200: {
+				let data = JSON.parse(this.responseText);
+				
 				discussion.innerHTML = "";
 				
 				for (let i = 0; i < data["comments"].length; i++) {
@@ -69,6 +71,8 @@
 					
 					discussion.innerHTML += ds_render_comment(image, author, display, date, body, comment["actions"], comment["index"]);
 				}
+				
+				UserSAK = data["next_sak"];
 				
 				break;
 			}
@@ -87,19 +91,29 @@
 		discussion.innerHTML = "<p style=\"text-align: center;\"><i>Discussions are loading...</i></p>";
 	}
 	
+	function ds_update_error(code, text) {
+		let entry = document.getElementById("discussions-" + DiscussionID + "-error");
+		entry.innerHTML = "<i>" + text + " (Status " + typeof(code) + " " + code + ")</i>";
+	}
+	
 	function ds_update_handle() {
 		if (this.readyState != 4) {
 			return;
 		}
 		
-		if (this.stauts == 200) {
-			let entry = document.getElementById("discussions-" + DiscussionID + "-entry");
-			entry.value = "";
-			console.log("Submitted comment!");
+		if (this.status == 200) {
+			let data = JSON.parse(this.responseText);
+			
+			if (data["error"] == "done") {
+				let entry = document.getElementById("discussions-" + DiscussionID + "-entry");
+				entry.value = "";
+			}
+			else {
+				ds_update_error(data["error"], data["message"]);
+			}
 		}
 		else {
-			let entry = document.getElementById("discussions-" + DiscussionID + "-error");
-			entry.innerHTML = "<i>Sorry, there was an error submitting your comment. Please try again. (Status " + typeof(this.status) + " " + this.status + ")</i>";
+			ds_update_error(this.status, "Sorry, there was a network error while submitting your comment. Please try again.");
 		}
 		
 		setTimeout(ds_load, 1);

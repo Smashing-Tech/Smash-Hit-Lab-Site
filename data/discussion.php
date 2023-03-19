@@ -212,14 +212,14 @@ class Discussion {
 		// enough.
 		// FIXED: This will soon be deprecated.
 		$url = $this->get_url();
-		$url = ($url || !array_key_exists($_GET, "after")) ? $url : $_GET['after'];
+		$url = ($url || !array_key_exists("after", $_GET)) ? $url : $_GET['after'];
 		
 		if (!str_starts_with($url, "./") || !str_starts_with($url, "/")) {
 			$url = "./" . $url;
 		}
 		
 		// Notify post followers
-		notify_many($this->followers, "New message from $author", $url);
+		notify_many($this->followers, "New message from @$author", $url);
 		
 		// Notify any mentioned users
 		notify_scan($body, $url);
@@ -381,7 +381,9 @@ class Discussion {
 					$img = "./icon.png";
 				}
 				
-				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><form action=\"./?a=discussion_update&id=$this->id&index=$index&after=$url\" method=\"post\"><p>$name</p><p><textarea id=\"discussions-$this->id-entry\" style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none; display: inline-block;\" name=\"body\" placeholder=\"Add your comment...\">$body</textarea></p><p><input type=\"hidden\" name=\"key\" value=\"$sak\"><input type=\"submit\" value=\"Post comment\"><button class=\"button secondary\" onclick=\"ds_update();\">Post comment (ajax)</button><span id=\"discussions-$this->id-error\"></span></p></form></div></div></div>";
+				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><div><p>$name</p><p><textarea id=\"discussions-$this->id-entry\" style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none; display: inline-block;\" name=\"body\" placeholder=\"What would you like to say?\">$body</textarea></p><p><input type=\"hidden\" name=\"key\" value=\"$sak\">";
+				echo "<button class=\"button\" onclick=\"ds_update();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">send</span> Post comment</button>";
+				echo "<span id=\"discussions-$this->id-error\"></span></p></div></div></div></div>";
 				break;
 			}
 			case "closed": {
@@ -452,18 +454,8 @@ class Discussion {
 	}
 	
 	function display_comments(bool $reverse = false) {
-		if (array_key_exists("ajax", $_GET)) {
-			echo "<div id=\"discussion-$this->id\"></div>";
-			echo "<script>ds_clear(); ds_load();</script>";
-		}
-		else {
-			$size = sizeof($this->comments);
-			
-			for ($i = 0; $i < $size; $i++) {
-				$j = ($reverse ? ($size - $i - 1) : $i);
-				echo $this->comments[$j]->render($this->id, $j);
-			}
-		}
+		echo "<div id=\"discussion-$this->id\"></div>";
+		echo "<script>ds_clear(); ds_load();</script>";
 	}
 	
 	function display_disabled() : bool {
@@ -586,23 +578,23 @@ function discussion_update_new() {
 	header('Content-type: application/json');
 	
 	if (!$user || !array_key_exists("key", $_GET) || !user_verify_sak($_GET["key"])) {
-		echo "{\"message\": \"You need to log in first.\"}"; return;
+		echo "{\"error\": \"not_authed\", \"message\": \"You need to log in first.\"}"; return;
 	}
 	
 	if (get_config("enable_discussions", "enabled") !== "enabled") {
-		echo "{\"message\": \"Discussions are currently inactive sitewide.\"}"; return;
+		echo "{\"error\": \"discussions_disabled\", \"message\": \"Discussions are currently inactive sitewide.\"}"; return;
 	}
 	
 	$user = new User($user);
 	
 	if (!array_key_exists("id", $_GET)) {
-		echo "{\"message\": \"API: Missing 'id' feild.\"}"; return;
+		echo "{\"error\": \"api\", \"message\": \"API: Missing 'id' feild.\"}"; return;
 	}
 	
 	$discussion = $_GET["id"];
 	
 	if (!array_key_exists("index", $_GET)) {
-		echo "{\"message\": \"API: Missing 'index' feild.\"}"; return;
+		echo "{\"error\": \"api\", \"message\": \"API: Missing 'index' feild.\"}"; return;
 	}
 	
 	$index = $_GET["index"]; // If it's -1 then it's a new comment
@@ -610,11 +602,11 @@ function discussion_update_new() {
 	$body = file_get_contents("php://input");
 	
 	if (strlen($body) < 1) {
-		echo "{\"message\": \"This comment does not have any content.\"}"; return;
+		echo "{\"error\": \"no_content\", \"message\": \"This comment does not have any content.\"}"; return;
 	}
 	
 	if (strlen($body) > 3500) {
-		echo "{\"message\": \"Your comment is too long! Please make sure your comment is less than 3500 characters.\"}"; return;
+		echo "{\"error\": \"too_long\", \"message\": \"Your comment is too long! Please make sure your comment is less than 3500 characters.\"}"; return;
 	}
 	
 	$discussion = new Discussion($discussion);
@@ -622,10 +614,10 @@ function discussion_update_new() {
 	if ($index == "-1") {
 		$discussion->add_comment($user->name, $body);
 		
-		echo "{\"message\": \"Your comment was posted successfully!\"}"; return;
+		echo "{\"error\": \"done\", \"message\": \"Your comment was posted successfully!\"}"; return;
 	}
 	else {
-		echo "{\"message\": \"Updating existing comments is not supported.\"}"; return;
+		echo "{\"error\": \"not_supported\", \"message\": \"Updating existing comments is not supported.\"}"; return;
 	}
 }
 
@@ -760,6 +752,7 @@ function discussion_poll() {
 	$result->anything = (sizeof($comments) !== 0);
 	$result->comments = $comments;
 	$result->actor = $user;
+	$result->next_sak = user_get_sak();
 	
 	// Send mimetype
 	header('Content-type: application/json');
