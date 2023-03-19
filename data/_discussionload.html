@@ -82,6 +82,11 @@
 		ds_request("GET", "./?a=discussion_poll&id=" + DiscussionID + "&index=0", ds_load_handle);
 	}
 	
+	function ds_clear() {
+		let discussion = document.getElementById("discussion-" + DiscussionID);
+		discussion.innerHTML = "<p style=\"text-align: center;\"><i>Discussions are loading...</i></p>";
+	}
+	
 	function ds_update_handle() {
 		if (this.readyState != 4) {
 			return;
@@ -91,22 +96,18 @@
 			let entry = document.getElementById("discussions-" + DiscussionID + "-entry");
 			entry.value = "";
 			console.log("Submitted comment!");
-			ds_load();
 		}
 		else {
 			let entry = document.getElementById("discussions-" + DiscussionID + "-error");
-			entry.innerHTML = "<i>Sorry, there was an error submitting your comment. Please try again.</i>";
+			entry.innerHTML = "<i>Sorry, there was an error submitting your comment. Please try again. (Status " + typeof(this.status) + " " + this.status + ")</i>";
 		}
+		
+		setTimeout(ds_load, 1);
 	}
 	
 	function ds_update() {
 		let body = document.getElementById("discussions-" + DiscussionID + "-entry").value;
-		ds_request("POST", "./?a=discussion_update&id=$this->id&index=$index&after=$url", ds_update_handle, body);
-	}
-	
-	function ds_clear() {
-		let discussion = document.getElementById("discussion-" + DiscussionID);
-		discussion.innerHTML = "<p style=\"text-align: center;\"><i>Discussions are loading...</i></p>";
+		ds_request("POST", "./?a=discussion_update&id=" + DiscussionID + "&index=-1&key=" + UserSAK + "&api=1", ds_update_handle, body);
 	}
 </script>
 <p><button class="button secondary" onclick="ds_clear(); ds_load();">Reload discussions</button></p>

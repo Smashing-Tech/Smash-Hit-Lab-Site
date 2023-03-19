@@ -212,7 +212,7 @@ class Discussion {
 		// enough.
 		// FIXED: This will soon be deprecated.
 		$url = $this->get_url();
-		$url = $url ? $url : $_GET['after'];
+		$url = ($url || !array_key_exists($_GET, "after")) ? $url : $_GET['after'];
 		
 		if (!str_starts_with($url, "./") || !str_starts_with($url, "/")) {
 			$url = "./" . $url;
@@ -526,6 +526,10 @@ function discussion_nuke_comments_by(string $author) {
 }
 
 function discussion_update() {
+	if (array_key_exists("api", $_GET)) {
+		return discussion_update_new();
+	}
+	
 	$user = get_name_if_authed();
 	
 	if (!$user || !array_key_exists("key", $_POST) || !user_verify_sak($_POST["key"])) {
@@ -572,6 +576,56 @@ function discussion_update() {
 	}
 	else {
 		sorry("Editing comments is not yet a feature.");
+	}
+}
+
+function discussion_update_new() {
+	$user = get_name_if_authed();
+	
+	// Send mimetype (we need to anyways)
+	header('Content-type: application/json');
+	
+	if (!$user || !array_key_exists("key", $_GET) || !user_verify_sak($_GET["key"])) {
+		echo "{\"message\": \"You need to log in first.\"}"; return;
+	}
+	
+	if (get_config("enable_discussions", "enabled") !== "enabled") {
+		echo "{\"message\": \"Discussions are currently inactive sitewide.\"}"; return;
+	}
+	
+	$user = new User($user);
+	
+	if (!array_key_exists("id", $_GET)) {
+		echo "{\"message\": \"API: Missing 'id' feild.\"}"; return;
+	}
+	
+	$discussion = $_GET["id"];
+	
+	if (!array_key_exists("index", $_GET)) {
+		echo "{\"message\": \"API: Missing 'index' feild.\"}"; return;
+	}
+	
+	$index = $_GET["index"]; // If it's -1 then it's a new comment
+	
+	$body = file_get_contents("php://input");
+	
+	if (strlen($body) < 1) {
+		echo "{\"message\": \"This comment does not have any content.\"}"; return;
+	}
+	
+	if (strlen($body) > 3500) {
+		echo "{\"message\": \"Your comment is too long! Please make sure your comment is less than 3500 characters.\"}"; return;
+	}
+	
+	$discussion = new Discussion($discussion);
+	
+	if ($index == "-1") {
+		$discussion->add_comment($user->name, $body);
+		
+		echo "{\"message\": \"Your comment was posted successfully!\"}"; return;
+	}
+	else {
+		echo "{\"message\": \"Updating existing comments is not supported.\"}"; return;
 	}
 }
 
