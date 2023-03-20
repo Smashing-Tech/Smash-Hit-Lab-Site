@@ -98,6 +98,7 @@ class Discussion {
 	public $comments;
 	public $url;
 	public $locked;
+	public $access;
 	
 	function __construct(string $id) {
 		$db = new Database("discussion");
@@ -110,6 +111,7 @@ class Discussion {
 			$this->comments = $info->comments;
 			$this->url = property_exists($info, "url") ? $info->url : null;
 			$this->locked = property_exists($info, "locked") ? $info->locked : false;
+			$this->access = property_exists($info, "access") ? $info->access : null;
 			
 			// Make sure that comments are Comment type objects
 			for ($i = 0; $i < sizeof($this->comments); $i++) {
@@ -122,6 +124,7 @@ class Discussion {
 			$this->comments = array();
 			$this->url = null;
 			$this->locked = false;
+			$this->access = null;
 		}
 	}
 	
@@ -162,6 +165,15 @@ class Discussion {
 		}
 		
 		$this->save();
+	}
+	
+	function set_access(string $handle) : void {
+		$this->access[] = $handle;
+		$this->save();
+	}
+	
+	function has_access(string $handle) : bool {
+		return ($this->access === null) || in_array($handle, $this->access);
 	}
 	
 	function is_locked() {
@@ -337,7 +349,7 @@ class Discussion {
 			$comments[$i]->display = $user->get_display();
 			$comments[$i]->image = $user->get_image();
 			$comments[$i]->body = rich_format($comments[$i]->body);
-			$comments[$i]->actions = array();
+			$comments[$i]->actions = array("reply");
 			
 			if (get_name_if_admin_authed() || (get_name_if_authed() == $user->name)) {
 				$comments[$i]->actions[] = "hide";
@@ -361,7 +373,7 @@ class Discussion {
 		switch ($enabled) {
 			case "enabled": {
 				if (!get_name_if_authed()) {
-					echo "<div class=\"comment-card comment-edit\"><p>Want to leave a comment? <a href=\"./?a=login\">Log in</a> or <a href=\"./?a=register\">create an account</a> to share your thoughts!</p></div>";
+					echo "<div id=\"discussion-$this->id-box\" class=\"comment-card comment-edit\"><p>Want to leave a comment? <a href=\"./?a=login\">Log in</a> or <a href=\"./?a=register\">create an account</a> to share your thoughts!</p></div>";
 					return;
 				}
 				
@@ -381,7 +393,7 @@ class Discussion {
 					$img = "./icon.png";
 				}
 				
-				echo "<div class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><div><p>$name</p><p><textarea id=\"discussions-$this->id-entry\" style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none; display: inline-block;\" name=\"body\" placeholder=\"What would you like to say?\">$body</textarea></p><p><input type=\"hidden\" name=\"key\" value=\"$sak\">";
+				echo "<div id=\"discussion-$this->id-box\" class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><div><p>$name</p><p><textarea id=\"discussions-$this->id-entry\" style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none; display: inline-block;\" name=\"body\" placeholder=\"What would you like to say?\">$body</textarea></p><p><input type=\"hidden\" name=\"key\" value=\"$sak\">";
 				echo "<button class=\"button\" onclick=\"ds_update();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">send</span> Post comment</button>";
 				echo "<span id=\"discussions-$this->id-error\"></span></p></div></div></div></div>";
 				break;
@@ -402,6 +414,10 @@ class Discussion {
 	
 	function display_title(string $title) {
 		echo "<h3 class=\"left-align\" style=\"margin-top: 0; position: relative; top: -10px;\">$title (" . $this->enumerate_shown() . ")</h3>";
+	}
+	
+	function display_reload() {
+		echo "<button class=\"button secondary\" onclick=\"ds_clear(); ds_load();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">refresh</span> Reload</button>";
 	}
 	
 	function display_follow() {
@@ -437,6 +453,8 @@ class Discussion {
 				$this->display_title($title);
 			echo "</div>";
 			echo "<div class=\"comments-header-data right-align\"><p>";
+				$this->display_reload();
+				echo " ";
 				$this->display_lock();
 				echo " ";
 				$this->display_follow();

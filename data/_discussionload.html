@@ -25,14 +25,18 @@
 		//return d.getUTCFullYear() + "-" + d.getUTCMonth() + "-" + d.getUTCDate() + " " + d.getUTCHours() + ":" + d.getUTCMinutes();
 	}
 	
-	function ds_render_actions(actions, index) {
+	function ds_render_actions(actions, index, author) {
 		let string = "<p>";
 		
 		// Render each action
 		for (let i = 0; i < actions.length; i++) {
 			switch (actions[i]) {
 				case "hide": {
-					string += "<a href=\"./?a=discussion_hide&id=" + DiscussionID + "&index=" + index + "&after=" + window.location + "&key=" + UserSAK + "\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">block</span> Hide</a>";
+					string += "<a href=\"./?a=discussion_hide&id=" + DiscussionID + "&index=" + index + "&after=" + window.location + "&key=" + UserSAK + "\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">block</span> Hide</button></a> ";
+					break;
+				}
+				case "reply": {
+					string += "<button class=\"button secondary\" onclick=\"ds_add_reply('" + author + "');\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">reply</span> Reply</button> ";
 					break;
 				}
 				default: {
@@ -45,7 +49,7 @@
 	}
 	
 	function ds_render_comment(image, author, display, time, body, actions, index) {
-		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"" + image + "\"/></div><div class=\"comment-card-inner-right\"><p><a href=\"./?u=" + author + "\">" + display + "</a> <span class=\"small-text\">(@" + author + " | " + time + ")</span></p><p>" + body + "</p>" + ds_render_actions(actions, index) + "</div></div></div>";
+		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"" + image + "\"/></div><div class=\"comment-card-inner-right\"><p><a href=\"./?u=" + author + "\">" + display + "</a> <span class=\"small-text\">(@" + author + " | " + time + ")</span></p><p>" + body + "</p>" + ds_render_actions(actions, index, author) + "</div></div></div>";
 	}
 	
 	function ds_load_handle() {
@@ -91,6 +95,13 @@
 		discussion.innerHTML = "<p style=\"text-align: center;\"><i>Discussions are loading...</i></p>";
 	}
 	
+	function ds_add_reply(user) {
+		let box = document.getElementById("discussions-" + DiscussionID + "-entry");
+		box.value = "@" + user + " " + box.value;
+		let url = window.location.href;
+		window.location = (url.split('#')[0]) + "#discussion-" + DiscussionID + "-box";
+	}
+	
 	function ds_update_error(code, text) {
 		let entry = document.getElementById("discussions-" + DiscussionID + "-error");
 		entry.innerHTML = "<i>" + text + " (Status " + typeof(code) + " " + code + ")</i>";
@@ -124,4 +135,3 @@
 		ds_request("POST", "./?a=discussion_update&id=" + DiscussionID + "&index=-1&key=" + UserSAK + "&api=1", ds_update_handle, body);
 	}
 </script>
-<p><button class="button secondary" onclick="ds_clear(); ds_load();">Reload discussions</button></p>
