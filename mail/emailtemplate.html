@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Smash Hit Lab Account Details</title>
+		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700&display=swap');
+			
+			.body {
+				background: #002624;
+				color: #0AFDEA;
+				font-family: "Titillium Web", monospace, sans-serif;
+			}
+			
+			.main {
+				margin: 1em auto;
+				background: #004741;
+				padding: 0.5em;
+				border-radius: 0.5em;
+				max-width: min(75%, 50em);
+			}
+			
+			a {
+				color: #0AFDEA;
+			}
+			
+			p {
+				font-size: 14pt;
+			}
+			
+			.box {
+				display: grid;
+				grid-template-columns: 8em auto;
+			}
+			
+			.box-key {
+				grid-column: 1;
+			}
+			
+			.box-value {
+				grid-column: 2;
+			}
+		</style>
+	</head>
+	<body class="body">
+		<div class="main">
+			<p>Hello $username!</p>
+			<p>It seems like you registered an account at the <a href="https://smashhitlab.000webhostapp.com/?p=home">Smash Hit Lab</a> from the IP address <a href="https://www.shodan.io/host/$ip">$ip</a>. If it wasn't you, please report this email to <a href="mailto:contactcdde@protonmail.ch">contactcdde@protonmail.ch</a> and do not mark it as spam.</p>
+			<p>Assuming this was you, the username and password for your account is:</p>
+			<div class="box">
+				<div class="box-key"><p><b>Username</b></p></div>
+				<div class="box-value"><p>$username</p></div>
+			</div>
+			<div class="box">
+				<div class="box-key"><p><b>Password</b></p></div>
+				<div class="box-value"><p>$password</p></div>
+			</div>
+			<p>You can <a href="https://smashhitlab.000webhostapp.com/?p=login">log in here</a>.</p>
+			<p>Thank you!</p>
+		</div>
+	</body>
+</html>
