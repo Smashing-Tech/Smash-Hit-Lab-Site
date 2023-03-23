@@ -9,14 +9,15 @@
 }
 
 :root {
-	--main-colour: #0AFDEA;
-	--main-colour-hover: #0AFDEA40;
-	--main-colour-hoverb: #0AFDEA80;
-	--main-colour-bg-bright: #004741;
-	--main-colour-bg-bright-hover: #00474140;
-	--main-colour-bg-bright-hoverb: #00474180;
-	--main-colour-bg: #002624;
-	--main-colour-bg-dark: #001917;
+	--main-colour: !(PrimaryColour);
+	--main-colour-hover: !(PrimaryColour)40;
+	--main-colour-hoverb: !(PrimaryColour)80;
+	--main-colour-bg-bright: !(LightBackground);
+	--main-colour-bg-bright-hover: !(LightBackground)40;
+	--main-colour-bg-bright-hoverb: !(LightBackground)80;
+	--main-colour-bg: !(Background);
+	--main-colour-bg-dark: !(DarkBackground);
+	
 	--font-face: "Titillium Web", sans-serif;
 	--font-mono: "JetBrains Mono", monospace;
 }

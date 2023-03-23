@@ -14,10 +14,10 @@ class Styles {
 	function __construct() {
 		$this->base = file_get_contents("../data/_styles.css");
 		
-		$this->db = new RevisionDB("site");
+		$this->db = new Database("site");
 		
 		if ($this->db->has("styles")) {
-			$this->vars = (array) $this->db->load("styles");
+			$this->vars = (array) $this->db->load("styles")->vars;
 		}
 		else {
 			$this->vars = [
@@ -30,7 +30,11 @@ class Styles {
 	}
 	
 	function save() : void {
+		// We don't save the actual css contents
+		$a = $this->base;
+		unset($this->base);
 		$this->db->save("styles", $this);
+		$this->base = $a;
 	}
 	
 	function get(string $key) : string {
@@ -51,7 +55,7 @@ class Styles {
 		
 		// Do the variable replacements
 		foreach ($this->vars as $key => $value) {
-			$out = str_replace("!(" . $key . ")", $value, $out);
+			$out = str_replace("!(" . $key . ")", $this->vars[$key], $out);
 		}
 		
 		return $out;
@@ -66,12 +70,13 @@ function site_styles_form(Page $page) {
 	$s = new Styles();
 	
 	$page->global_header();
+	$page->heading(1, "Site styles");
 	
 	$form = new Form("./?a=site-styles&submit=1");
 	$form->textbox("PrimaryColour", "Primary colour", "The primary site colour.", $s->get("PrimaryColour"));
 	$form->textbox("Background", "Background colour", "The colour of the site's background.", $s->get("Background"));
-	$form->textbox("DarkBackground", "Dark background colour", "todo", $s->get("DarkBackground"));
-	$form->textbox("LightBackground", "Dark background colour", "todo", $s->get("LightBackground"));
+	$form->textbox("DarkBackground", "Dark background colour", "The colour of the darker site surfaces, like the navbar.", $s->get("DarkBackground"));
+	$form->textbox("LightBackground", "Light background colour", "The colour of the site's lighter surfaces, like the comment cards.", $s->get("LightBackground"));
 	$form->submit("Update styles");
 	
 	$page->add($form);
