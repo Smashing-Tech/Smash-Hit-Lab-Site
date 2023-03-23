@@ -7,14 +7,26 @@ define("SANITISE_NONE", 3);
 class Page {
 	public $title;
 	public $body;
-	public $redirect;
-	public $download;
 	public $header;
 	public $footer;
-	public $type;
+	public $api;
+	
+	function __construct() {
+		$this->title = null;
+		$this->body = "";
+		$this->header = false;
+		$this->footer = false;
+		$this->api = false;
+	}
 	
 	function http_header(string $key, string $value) : void {
+		// TODO: Defer?
 		header("$key: $value");
+	}
+	
+	function cookie(string $key, string $value, int $expire) {
+		// TODO: Defer?
+		setcookie($key, $value, time() + $expire, "/");
 	}
 	
 	function redirect(string $url) : void {
@@ -29,7 +41,7 @@ class Page {
 		die();
 	}
 	
-	function get(string $key, bool $require = false, ?int $length = null, int $sanitise = SANITISE_HTML, $require_post = false) : ?string {
+	function get(string $key, bool $require = true, ?int $length = null, int $sanitise = SANITISE_HTML, $require_post = false) : ?string {
 		$value = null;
 		
 		if (array_key_exists($key, $_POST)) {
@@ -40,12 +52,17 @@ class Page {
 			$value = $_GET[$key];
 		}
 		
+		// We consider a blank string not to be a value
+		if ($value === "") {
+			$value = null;
+		}
+		
 		if ($require && !$value) {
 			$this->info("An error occured", "Error: parameter '$key' is required.");
 		}
 		
 		// Validate length
-		if (strlen($value) > $length) {
+		if ($length && strlen($value) > $length) {
 			if ($require) {
 				$this->info("Max length exceded", "The parameter '$key' is too long. The max length is $length characters.");
 			}
@@ -74,6 +91,14 @@ class Page {
 		return $value;
 	}
 	
+	function set(string $key, mixed $value) {
+		/**
+		 * Set an output value for JSON mode
+		 */
+		
+		$this->body[$key] = $value;
+	}
+	
 	function has(string $key) : bool {
 		return (array_key_exists($key, $_POST) || array_key_exists($key, $_GET));
 	}
@@ -98,8 +123,13 @@ class Page {
 		$this->footer = true;
 	}
 	
-	function add(string $data) : void {
-		$this->body .= $data;
+	function add(string | Form $data) : void {
+		if ($data instanceof Form) {
+			$this->body .= $data->render();
+		}
+		else {
+			$this->body .= $data;
+		}
 	}
 	
 	private function render_html() : string {
@@ -130,7 +160,17 @@ class Page {
 	}
 	
 	function send() : void {
+		if ($this->header) {
+			global $gTitle; $gTitle = $this->title;
+			include_header();
+		}
+		
 		echo $this->render();
+		
+		if ($this->footer) {
+			include_footer();
+		}
+		
 		die();
 	}
 }
