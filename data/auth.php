@@ -1,32 +1,35 @@
 <?php
 
-function auth_login_form(Page $page) {
-	$page->global_header();
+function auth_login_availability(Page $page, ?string $handle = null) {
+	/**
+	 * Check the status of being able to log in. The user handle should be passed
+	 * when actually logging in, but can be used to show login disabled messages
+	 * early if they are disabled sitewide.
+	 */
 	
-	$page->heading(1, "Log in");
-	$page->para("Enter your handle and password to log in to the Smash Hit Lab. Don't have an account? <a href=\"./?a=auth-register\">Create an account!</a>");
+	$verified = true;
+	$admin = true;
 	
-	$form = new Form("./?a=auth-login&submit=1");
-	$form->textbox("handle", "Handle", "The handle is the account name that you signed up for.");
-	$form->password("password", "Password", "Your password was sent to your email when your account was created.");
-	$form->submit("Login");
+	if ($handle) {
+		$u = new User($handle);
+		
+		$verified = $u->is_verified();
+		$admin = $u->is_admin();
+	}
 	
-	$page->add($form);
-	$page->global_footer();
-}
-
-function auth_login_availability(Page $page, string $handle) {
 	switch (get_config("enable_login", "users")) {
 		case "closed":
-			$page->info("Sorry!", "Logging in has been disabled. Please check Discord for updates.");
+			$page->info("Sorry!", "Logging in has been disabled for all users. Please join our Discord server for updates.");
 			break;
 		case "admins":
-			$u = new User($handle);
-			
-			if (!$u->is_admin()) {
+			if (!$admin) {
 				$page->info("Sorry!", "We have disabled logging in for most users at the moment. Please join our Discord for any updates.");
 			}
-			
+			break;
+		case "verified":
+			if (!$admin && !$verified) {
+				$page->info("Sorry!", "We have disabled logging in for most users at the moment. Please join our Discord for any updates.");
+			}
 			break;
 		case "users":
 			break;
@@ -36,13 +39,33 @@ function auth_login_availability(Page $page, string $handle) {
 	}
 }
 
+function auth_login_form(Page $page) {
+	$page->global_header();
+	
+	// Check if logins are enabled
+	auth_login_availability($page);
+	
+	// Heading and text
+	$page->heading(1, "Log in");
+	$page->para("Enter your handle and password to log in to the Smash Hit Lab. Don't have an account? <a href=\"./?a=auth-register\">Create an account!</a>");
+	
+	// Create the login form
+	$form = new Form("./?a=auth-login&submit=1");
+	$form->textbox("handle", "Handle", "The handle is the account name that you signed up for.");
+	$form->password("password", "Password", "Your password was sent to your email when your account was created.");
+	$form->submit("Login");
+	
+	$page->add($form);
+	$page->global_footer();
+}
+
 function auth_login_action(Page $page) {
 	$handle = $page->get("handle", true, 24, SANITISE_HTML, true);
 	$password = $page->get("password", true, 100, SANITISE_NONE, true);
 	$ip = crush_ip();
 	$real_ip = $_SERVER['REMOTE_ADDR'];
 	
-	// TODO migrate login function to here
+	// Check if logins are enabled
 	auth_login_availability($page, $handle);
 	
 	// Validate the handle
