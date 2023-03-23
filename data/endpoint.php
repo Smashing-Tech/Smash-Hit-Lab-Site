@@ -27,14 +27,13 @@ class EndpointManager {
 		 * successful.
 		 */
 		
-		try {
+		if (isset($this->endpoints[$name])) {
 			$this->endpoints[$name]($context);
+			return true;
 		}
-		catch (Exception) {
+		else {
 			return false;
 		}
-		
-		return true;
 	}
 }
 
