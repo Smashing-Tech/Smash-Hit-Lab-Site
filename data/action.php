@@ -31,6 +31,8 @@ function handle_login_availability(string $username) {
 }
 
 function do_login() {
+	inform("Login changes", "We are updating the site codebase, and part is that the login location has changed slightly, please click the button below to start and change bookmarks to the link!<br/><br/><a href=\"./?a=auth-login\"><button>Begin login</button></a>");
+	
 	$username = htmlspecialchars($_POST["username"]);
 	$password = $_POST["password"]; // We should not sanitise the password, bad things happen
 	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
