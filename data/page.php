@@ -34,6 +34,10 @@ class Page {
 		die();
 	}
 	
+	function type(string $contenttype) : void {
+		$this->http_header("Content-Type", $contenttype);
+	}
+	
 	function info($title = "Done", $desc = "The action completed successfully.") : void {
 		include_header();
 		echo "<h1>$title</h1><p>$desc</p>";
