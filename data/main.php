@@ -1,12 +1,23 @@
 <?php
 
-require_once "page.php";
+require_once "endpoint.php";
+
 require_once "action.php";
+require_once "admin.php";
+require_once "auth.php";
+require_once "block.php";
+require_once "config.php";
+require_once "database.php";
+require_once "discussion.php";
+require_once "main.php";
 require_once "mod.php";
 require_once "news.php";
-require_once "admin.php";
+require_once "notifications.php";
+require_once "page.php";
+require_once "templates.php";
+require_once "user.php";
 
-function handle_action($action) {
+function handle_action(string $action, Page $page) {
 	switch ($action) {
 	// ---- USER ACCOUNTS ---- //
 		case "register": do_register(); break;
@@ -50,15 +61,32 @@ function handle_action($action) {
 		case "admin_dashboard": do_admin_dashboard(); break;
 		case "alerts": do_admin_alerts(); break;
 		case "send_notification": do_send_notification(); break;
-		default:
-			sorry("The action you have requested is not currently implemented.");
+		// Transitioning to using Endpoint Manager
+		default: {
+			global $gEndMan; $okay = $gEndMan->run($action, $page);
+			
+			if (!$okay) {
+				sorry("The action you have requested is not currently implemented.");
+			}
+			/// @hack This is here for now b/c we can't have it elsewhere right now
+			else {
+				$page->send();
+			}
+			
 			break;
+		}
 	}
 }
 
 function main() {
+	/**
+	 * Called in the index.php script
+	 */
+	
+	$page = new Page();
+	
 	if (array_key_exists("a", $_GET)) {
-		handle_action($_GET["a"]);
+		handle_action($_GET["a"], $page);
 	}
 	else if (array_key_exists("m", $_GET)) {
 		display_mod();
@@ -77,7 +105,7 @@ function main() {
 	}
 	else {
 		// Redirect to home page
-		header("Location: /?p=home");
+		header("Location: /?n=home");
 		die();
 	}
 }

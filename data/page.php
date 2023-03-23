@@ -1,24 +1,137 @@
 <?php
 
-require_once "user.php";
+define("SANITISE_HTML", 1);
+define("SANITISE_EMAIL", 2);
+define("SANITISE_NONE", 3);
 
 class Page {
 	public $title;
 	public $body;
 	public $redirect;
 	public $download;
+	public $header;
+	public $footer;
+	public $type;
 	
-	function set_title(string $title) {
+	function http_header(string $key, string $value) : void {
+		header("$key: $value");
+	}
+	
+	function redirect(string $url) : void {
+		$this->http_header("Location", $url);
+		die();
+	}
+	
+	function info($title = "Done", $desc = "The action completed successfully.") : void {
+		include_header();
+		echo "<h1>$title</h1><p>$desc</p>";
+		include_footer();
+		die();
+	}
+	
+	function get(string $key, bool $require = false, ?int $length = null, int $sanitise = SANITISE_HTML, $require_post = false) : ?string {
+		$value = null;
+		
+		if (array_key_exists($key, $_POST)) {
+			$value = $_POST[$key];
+		}
+		
+		if (!$require_post && array_key_exists($key, $_GET)) {
+			$value = $_GET[$key];
+		}
+		
+		if ($require && !$value) {
+			$this->info("An error occured", "Error: parameter '$key' is required.");
+		}
+		
+		// Validate length
+		if (strlen($value) > $length) {
+			if ($require) {
+				$this->info("Max length exceded", "The parameter '$key' is too long. The max length is $length characters.");
+			}
+			else {
+				return null;
+			}
+		}
+		
+		// If we have the value, we finally need to sanitise it.
+		if ($value) {
+			switch ($sanitise) {
+				case SANITISE_HTML: {
+					$value = htmlspecialchars($value);
+					break;
+				}
+				case SANITISE_NONE: {
+					break;
+				}
+				default: {
+					$value = "";
+					break;
+				}
+			}
+		}
+		
+		return $value;
+	}
+	
+	function has(string $key) : bool {
+		return (array_key_exists($key, $_POST) || array_key_exists($key, $_GET));
+	}
+	
+	function title(string $title) : void {
 		$this->title = $title;
 	}
 	
-	function add_header() {
-		global $gTitle; $gTitle = $this->title;
-		include_header();
+	function heading(int $level, string $data) : void {
+		$this->add("<h$level>$data</h$level>");
 	}
 	
-	function append(string $data) {
+	function para(string $text) : void {
+		$this->add("<p>$text</p>");
+	}
+	
+	function global_header() : void {
+		$this->header = true;
+	}
+	
+	function global_footer() : void {
+		$this->footer = true;
+	}
+	
+	function add(string $data) : void {
+		$this->body .= $data;
+	}
+	
+	private function render_html() : string {
+		$data = "";
 		
+		// Global header
+		if ($this->header) {
+			//global $gTitle; $gTitle = $this->title;
+			//require_once("_header.html");
+		}
+		
+		$data .= $this->body;
+		
+		// Global footer
+		if ($this->footer) {
+			//require_once("_footer.html");
+		}
+		
+		return $data;
+	}
+	
+	private function render_json() : string {
+		return json_encode($body);
+	}
+	
+	function render() : string {
+		return $this->render_html();
+	}
+	
+	function send() : void {
+		echo $this->render();
+		die();
 	}
 }
 
