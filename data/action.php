@@ -140,12 +140,14 @@ function handle_register_availability() {
 }
 
 function handle_register() {
-	if (!isset($_POST["username"]) || !isset($_POST["email"]) || !isset($_POST["day"]) || !isset($_POST["month"]) || !isset($_POST["year"])) {
+	$email_required = get_config("email_required", true);
+	
+	if (!isset($_POST["username"]) || (!isset($_POST["email"]) && $email_required) || !isset($_POST["day"]) || !isset($_POST["month"]) || !isset($_POST["year"])) {
 		sorry("You did not fill out the entire form. Please try again.");
 	}
 	
 	$username = htmlspecialchars($_POST["username"]);
-	$email = htmlspecialchars($_POST["email"]);
+	$email = (array_key_exists("email", $_POST)) ? htmlspecialchars($_POST["email"]) : "example@example.com";
 	$ip = htmlspecialchars($_SERVER['REMOTE_ADDR']);
 	$birthdate = strtotime($_POST["day"] . "-" . $_POST["month"] . "-" . $_POST["year"]);
 	
@@ -190,17 +192,26 @@ function handle_register() {
 	// HTML file. :)
 	$body = "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<title>Smash Hit Lab Account Details</title>\n\t\t<style>\n\t\t\t@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700&display=swap');\n\t\t\t\n\t\t\t.body {\n\t\t\t\tfont-family: \"Titillium Web\", monospace, sans-serif;\n\t\t\t}\n\t\t\t\n\t\t\t.main {\n\t\t\t\tmargin: 1em auto;\n\t\t\t\tpadding: 0.5em;\n\t\t\t\tborder-radius: 0.5em;\n\t\t\t\tmax-width: min(75%, 50em);\n\t\t\t}\n\t\t\t\n\t\t\tp {\n\t\t\t\tfont-size: 14pt;\n\t\t\t}\n\t\t\t\n\t\t\t.box {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgrid-template-columns: 150px auto;\n\t\t\t}\n\t\t\t\n\t\t\t.box-key {\n\t\t\t\tgrid-column: 1;\n\t\t\t\tgrid-row: 1;\n\t\t\t}\n\t\t\t\n\t\t\t.box-value {\n\t\t\t\tgrid-column: 2;\n\t\t\t\tgrid-row: 1;\n\t\t\t}\n\t\t</style>\n\t</head>\n\t<body class=\"body\">\n\t\t<div class=\"main\">\n\t\t\t<p>Hello $username!</p>\n\t\t\t<p>It seems like you registered an account at the <a href=\"https://smashhitlab.000webhostapp.com/?p=home\">Smash Hit Lab</a> from the IP address <a href=\"https://www.shodan.io/host/$ip\">$ip</a>. If it wasn't you, please report this email to <a href=\"mailto:contactcdde@protonmail.ch\">contactcdde@protonmail.ch</a> and do not mark it as spam.</p>\n\t\t\t<p>Assuming this was you, the username and password for your account is:</p>\n\t\t\t<div class=\"box\">\n\t\t\t\t<div class=\"box-key\"><p><b>Username</b></p></div>\n\t\t\t\t<div class=\"box-value\"><p>$username</p></div>\n\t\t\t</div>\n\t\t\t<div class=\"box\">\n\t\t\t\t<div class=\"box-key\"><p><b>Password</b></p></div>\n\t\t\t\t<div class=\"box-value\"><p>$password</p></div>\n\t\t\t</div>\n\t\t\t<p>You can <a href=\"https://smashhitlab.000webhostapp.com/?p=login\">log in here</a>.</p>\n\t\t\t<p>Thank you!</p>\n\t\t</div>\n\t</body>\n</html>\n";
 	
-	mail($email, "Smash Hit Lab Registration", $body, array("MIME-Version" => "1.0", "Content-Type" => "text/html; charset=utf-8"));
+	if ($email_required) {
+		mail($email, "Smash Hit Lab Registration", $body, array("MIME-Version" => "1.0", "Content-Type" => "text/html; charset=utf-8"));
+	}
 	
 	// Alert the admins of the new account
 	alert("New user account $username was registered", "./?u=$username");
 	
-	// Print message
-	include_header();
-	echo "<h1>Account created!</h1>";
-	echo "<p>We sent an email to " . $email . " that contains your username and password.</p>";
-	include_footer();
+	// Save the user data
 	$user->save();
+	
+	// Print message
+	if ($email_required) {
+		include_header();
+		echo "<h1>Account created!</h1>";
+		echo "<p>We sent an email to " . $email . " that contains your username and password.</p>";
+		include_footer();
+	}
+	else {
+		inform("Account created!", "Your account was created successfully!</p><p>Your password is: " . htmlspecialchars($password));
+	}
 }
 
 function do_register() {
