@@ -21,10 +21,11 @@ class Styles {
 		}
 		else {
 			$this->vars = [
-				"PrimaryColour" => "#ffffff",
-				"Background" => "#000000",
-				"DarkBackground" => "#000000",
-				"LightBackground" => "#000000",
+				"PrimaryColour" => "#00aaff",
+				"Background" => "#ffffff",
+				"DarkBackground" => "#d0d0d0",
+				"LightBackground" => "#e8e8e8",
+				"TextColour" => "#000000",
 			];
 		}
 	}

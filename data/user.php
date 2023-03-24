@@ -320,7 +320,7 @@ function get_image_accent_colour(string $url) {
 	 * Get the accent colour of the image at the given URL.
 	 */
 	
-	if (!$url) {
+	if (!$url || !function_exists("imagecreatefromjpeg")) {
 		return null;
 	}
 	
@@ -421,6 +421,7 @@ function validate_username(string $name) : bool {
 	return true;
 }
 
+#[AllowDynamicProperties]
 class User {
 	// NOTE These are not updated and since I don't have to add them I'm not
 	//      going to do that.

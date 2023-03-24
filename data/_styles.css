@@ -10,6 +10,7 @@
 
 :root {
 	--main-colour: !(PrimaryColour);
+	--main-colour-dark: !(PrimaryColour);
 	--main-colour-hover: !(PrimaryColour)40;
 	--main-colour-hoverb: !(PrimaryColour)80;
 	--main-colour-bg-bright: !(LightBackground);
@@ -17,6 +18,8 @@
 	--main-colour-bg-bright-hoverb: !(LightBackground)80;
 	--main-colour-bg: !(Background);
 	--main-colour-bg-dark: !(DarkBackground);
+	--main-colour-text: !(TextColour);
+	--main-colour-text-on-primary: !(TextColour);
 	
 	--font-face: "Titillium Web", sans-serif;
 	--font-mono: "JetBrains Mono", monospace;
@@ -28,8 +31,8 @@ h1, h2, h3, h4, p, li, summary {
 	margin-bottom: 0.5em;
 }
 
-h1 { font-size: 42pt; color: var(--main-colour); text-align: center; margin: 0.75em; margin-top: 0; text-shadow: 0 0 2em var(--main-colour-hoverb); }
-h2 { font-size: 28pt; color: var(--main-colour); text-align: center; }
+h1 { font-size: 42pt; color: var(--main-colour-text); text-align: center; margin: 0.75em; margin-top: 0; text-shadow: 0 0 2em var(--main-colour-hoverb); }
+h2 { font-size: 28pt; color: var(--main-colour-text); text-align: center; }
 h3 { font-size: 22pt; font-weight: 400; padding-top: 0.8em; padding-bottom: 0.2em; }
 h4 { font-size: 18pt; }
 p, ul { font-size: 14pt; margin-bottom: 0.75em; }
@@ -61,7 +64,7 @@ code, pre {
 }
 
 a {
-	color: var(--main-colour);
+	color: var(--main-colour-text);
 	text-decoration-line: none;
 	font-weight: bold;
 	
@@ -69,8 +72,8 @@ a {
 }
 
 a:hover {
-	color: #fff;
-	text-shadow: 0 0 1.0em #fff8;
+	color: var(--main-colour-dark);
+	text-shadow: 0 0 1.0em var(--main-colour-dark);
 }
 
 a.insecure-link::after {
@@ -83,7 +86,7 @@ img {
 
 ::selection {
 	background: var(--main-colour);
-	color: #000;
+	color: var(--main-colour-bg);
 }
 
 body {
@@ -93,7 +96,7 @@ body {
 
 .main-section {
 	border: none;
-	color: var(--main-colour);
+	color: var(--main-colour-text);
 	max-width: 75em;
 	margin: auto;
 	margin-top: 5em;
@@ -107,8 +110,8 @@ input[type=text], input[type=password], textarea, select {
 	border: none;
 	border-bottom: 2px solid var(--main-colour-bg-bright);
 	border-radius: 0.5em 0.5em 0 0;
-	caret-color: var(--main-colour);
-	color: var(--main-colour);
+	caret-color: var(--main-colour-text);
+	color: var(--main-colour-text);
 	font-family: var(--font-face);
 	font-size: 14pt;
 	padding: 0.5em;
@@ -133,7 +136,7 @@ input[type=submit], button, .button {
 	background: var(--main-colour);
 	border: none;
 	border-radius: 1.25em;
-	color: #000;
+	color: var(--main-colour-text-on-primary);
 	cursor: pointer;
 	font-family: var(--font-face);
 	font-size: 14pt;
@@ -245,7 +248,7 @@ input[type=submit]:hover, button:hover, .button:hover {
 
 .show-navbar-section {
 	background: var(--main-colour-bg-dark);
-	color: var(--main-colour);
+	color: var(--main-colour-text);
 	border: none;
 	padding: 1em;
 	position: fixed;
@@ -311,7 +314,7 @@ input[type=submit]:hover, button:hover, .button:hover {
 	display: inline-block;
 	vertical-align: middle;
 	font-family: var(--font-face);
-	color: var(--main-colour);
+	color: var(--main-colour-text);
 }
 
 .nc-top {
@@ -365,6 +368,7 @@ input[type=submit]:hover, button:hover, .button:hover {
 	}
 }
 
+/* DEPRECATED
 .carambola-download-box {
 	padding: 1em;
 	border-radius: 0.5em;
@@ -388,8 +392,9 @@ input[type=submit]:hover, button:hover, .button:hover {
 .carambola-download-box:active {
 	background: #fff;
 	box-shadow: 0 0 0 #00000080;
-}
+}*/
 
+/* DEPRECATED
 .carambola-download-left {
 	float: left;
 	width: 50px;
@@ -399,11 +404,13 @@ input[type=submit]:hover, button:hover, .button:hover {
 	float: right;
 	width: calc(100% - 50px - 0.4em);
 	padding-left: 0.4em;
-}
+}*/
 
 .small-text {
 	font-size: 10pt;
 }
+
+/* ************************************************************************** */
 
 .mod-edit-property {
 	display: grid;
