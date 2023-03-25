@@ -15,6 +15,7 @@ require_once "mod.php";
 require_once "news.php";
 require_once "notifications.php";
 require_once "page.php";
+require_once "setup.php";
 require_once "styles.php";
 require_once "templates.php";
 require_once "user.php";

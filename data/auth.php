@@ -177,6 +177,12 @@ function auth_register_availability(Page $page) {
 	}
 }
 
+function auth_register_first_user() {
+	$db = new Database("user");
+	
+	return (sizeof($db->enumerate()) === 0);
+}
+
 function auth_register_form(Page $page) {
 	// Global header
 	$page->global_header();
@@ -258,7 +264,11 @@ function auth_register_action(Page $page) {
 	
 	// Anything bad that can happen should be taken care of by the database...
 	$user = new User($handle);
-	$user->set_email($email);
+	
+	// If we require emails, or one was given anyways, set it
+	if ($email) {
+		$user->set_email($email);
+	}
 	
 	// Generate the new password
 	$password = $user->new_password();
@@ -275,6 +285,11 @@ function auth_register_action(Page $page) {
 	
 	// Alert the admins of the new account
 	alert("New user account @$handle was registered", "./?u=$handle");
+	
+	// If this is the first user, grant them all roles
+	if (auth_register_first_user()) {
+		$user->set_roles(["headmaster", "admin", "mod"]);
+	}
 	
 	// Save the user's data
 	$user->save();

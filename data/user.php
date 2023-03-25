@@ -443,7 +443,7 @@ class User {
 			$this->display = (property_exists($info, "display") ? $info->display : $info->name);
 			$this->password = $info->password;
 			$this->tokens = $info->tokens;
-			$this->email = $info->email;
+			$this->email = $info->email ? $info->email : "";
 			$this->allow_messages = (property_exists($info, "allow_messages") ? $info->allow_messages : false);
 			$this->created = (property_exists($info, "created") ? $info->created : time());
 			$this->verified = property_exists($info, "verified") ? $info->verified : null;
@@ -481,7 +481,7 @@ class User {
 			$this->display = $name;
 			$this->password = null;
 			$this->tokens = array();
-			$this->email = null;
+			$this->email = "";
 			$this->created = time();
 			$this->verified = null;
 			$this->admin = false;
