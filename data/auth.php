@@ -154,15 +154,38 @@ $gEndMan->add("auth-login", function($page) {
  * REGISTER FORM
  */
 
+function auth_register_availability(Page $page) {
+	switch (get_config("register", "anyone")) {
+		case "closed":
+			$page->info("An error occured", "User account registration has been disabled for the moment. Please try again later and make sure to join the Discord for updates.");
+			break;
+		case "admins":
+			if (!get_name_if_admin_authed()) {
+				$page->info("An error occured", "We have disabled new account creation for most users at the moment. Please join our Discord and contact an admin to have them create an account for you.");
+			}
+			break;
+		case "users":
+			if (!get_name_if_authed()) {
+				$page->info("An error occured", "Only existing users can create new accounts at the moment. If you have a friend who uses this site, have them enter your desired username and email for you. Otherwise, please ask staff to create an account for you.");
+			}
+			break;
+		case "anyone":
+			break;
+		default:
+			$page->info("An error occured", "The site operator has not configured the site corrently. To be safe, accounts will not be created. Please have the hosting party delete the invalid file at \"data/db/site/settings\", then user account creation will be enabled again.");
+			break;
+	}
+}
+
 function auth_register_form(Page $page) {
 	// Global header
 	$page->global_header();
 	
 	// Check if logins are enabled
-	auth_login_availability($page);
+	auth_register_availability($page);
 	
 	// Create the login form
-	$form = new Form("./?a=auth-login&submit=1");
+	$form = new Form("./?a=auth-register&submit=1");
 	//$form->set_container_type(FORM_CONTAINER_BLANK);
 	$form->textbox("handle", "Handle", "Pick a handle name that you would like. Please note that you can't change it later.");
 	$form->textbox("email", "Email", "The email address you wish to assocaite with your account.");
@@ -202,11 +225,74 @@ function auth_register_form(Page $page) {
 	$page->global_footer();
 }
 
-$gEndMan->add("auth-register", function($page) {
+function auth_register_action(Page $page) {
+	$email_required = get_config("email_required", true);
+	
+	$handle = $page->get("handle", true, 24);
+	$email = $page->get("email", $email_required, 300);
+	$ip = crush_ip();
+	$birthdate = datetounix($page->get("birth-day"), $page->get("birth-month"), $page->get("birth-year"));
+	
+	// Check if we can register
+	auth_register_availability($page);
+	
+	// Blocked IP address check
+	if (is_ip_blocked($ip)) {
+		$page->info("Blocked location", "This location has been denylisted and cannot be used for logins or account registers.");
+	}
+	
+	// Make sure the handle is valid
+	if (!validate_username($handle)) {
+		$page->info("Bad handle", "Your handle isn't valid. Handles can be at most 24 characters and must only use upper and lower case A - Z as well as underscores (<code>_</code>), dashes (<code>-</code>) and fullstops (<code>.</code>).");
+	}
+	
+	// See if the user already exists
+	if (user_exists($handle)) {
+		$page->info("User already exists", "There is already a user with the handle that you chose. Please try another handle.");
+	}
+	
+	// Check if the user is of age
+	if ($birthdate > (time() - 60 * 60 * 24 * 365 * 16)) {
+		$page->info("Too young", "Unforunately, you are too young to use our website. If you entered your birthday incorrectly, please try again.");
+	}
+	
+	// Anything bad that can happen should be taken care of by the database...
+	$user = new User($handle);
+	$user->set_email($email);
+	
+	// Generate the new password
+	$password = $user->new_password();
+	
+	// Password email
+	// Yes there is a more readable version of this available as the original
+	// HTML file. :)
+	$body = "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<title>Smash Hit Lab Account Details</title>\n\t\t<style>\n\t\t\t@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700&display=swap');\n\t\t\t\n\t\t\t.body {\n\t\t\t\tfont-family: \"Titillium Web\", monospace, sans-serif;\n\t\t\t}\n\t\t\t\n\t\t\t.main {\n\t\t\t\tmargin: 1em auto;\n\t\t\t\tpadding: 0.5em;\n\t\t\t\tborder-radius: 0.5em;\n\t\t\t\tmax-width: min(75%, 50em);\n\t\t\t}\n\t\t\t\n\t\t\tp {\n\t\t\t\tfont-size: 14pt;\n\t\t\t}\n\t\t\t\n\t\t\t.box {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgrid-template-columns: 150px auto;\n\t\t\t}\n\t\t\t\n\t\t\t.box-key {\n\t\t\t\tgrid-column: 1;\n\t\t\t\tgrid-row: 1;\n\t\t\t}\n\t\t\t\n\t\t\t.box-value {\n\t\t\t\tgrid-column: 2;\n\t\t\t\tgrid-row: 1;\n\t\t\t}\n\t\t</style>\n\t</head>\n\t<body class=\"body\">\n\t\t<div class=\"main\">\n\t\t\t<p>Hello $handle!</p>\n\t\t\t<p>It seems like you registered an account at the <a href=\"https://smashhitlab.000webhostapp.com/?p=home\">Smash Hit Lab</a> from the IP address <a href=\"https://www.shodan.io/host/$ip\">$ip</a>. If it wasn't you, please report this email to <a href=\"mailto:contactcdde@protonmail.ch\">contactcdde@protonmail.ch</a> and do not mark it as spam.</p>\n\t\t\t<p>Assuming this was you, the username and password for your account is:</p>\n\t\t\t<div class=\"box\">\n\t\t\t\t<div class=\"box-key\"><p><b>Username</b></p></div>\n\t\t\t\t<div class=\"box-value\"><p>$handle</p></div>\n\t\t\t</div>\n\t\t\t<div class=\"box\">\n\t\t\t\t<div class=\"box-key\"><p><b>Password</b></p></div>\n\t\t\t\t<div class=\"box-value\"><p>$password</p></div>\n\t\t\t</div>\n\t\t\t<p>You can <a href=\"https://smashhitlab.000webhostapp.com/?p=login\">log in here</a>.</p>\n\t\t\t<p>Thank you!</p>\n\t\t</div>\n\t</body>\n</html>\n";
+	
+	// If we are configured to send passwords by email, then do so
+	if ($email_required) {
+		mail($email, "Smash Hit Lab Registration", $body, array("MIME-Version" => "1.0", "Content-Type" => "text/html; charset=utf-8"));
+	}
+	
+	// Alert the admins of the new account
+	alert("New user account @$handle was registered", "./?u=$handle");
+	
+	// Save the user's data
+	$user->save();
+	
+	// Print message
+	if ($email_required) {
+		$page->info("Account created!", "We sent an email to $email that contains your username and password.</p><p>");
+	}
+	else {
+		$page->info("Account created!", "Your account was created successfully!</p><p>Your password is: " . htmlspecialchars($password));
+	}
+}
+
+$gEndMan->add("auth-register", function(Page $page) {
 	$submitting = $page->has("submit");
 	
 	if ($submitting) {
-		auth_login_action($page);
+		auth_register_action($page);
 	}
 	else {
 		auth_register_form($page);

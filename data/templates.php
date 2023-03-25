@@ -420,3 +420,7 @@ function list_folder(string $path) {
 	
 	return $array;
 }
+
+function datetounix($d, $m, $y) {
+	return strtotime("$d-$m-$y");
+}
