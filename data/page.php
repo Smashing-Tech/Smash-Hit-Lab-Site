@@ -61,7 +61,9 @@ class Page {
 			$value = null;
 		}
 		
-		if ($require && !$value) {
+		// NOTE We need account for the fact that the string zero in php is
+		// considered truthy :/
+		if ($require && !$value && $value !== "0") {
 			$this->info("An error occured", "Error: parameter '$key' is required.");
 		}
 		

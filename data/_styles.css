@@ -163,7 +163,7 @@ input[type=submit], button, .button {
 
 input[type=submit]:hover, button:hover, .button:hover {
 	background: var(--colour-primary-darker);
-	box-shadow: 0 0.2em 0.2em var(--colour-primary-darker-b);
+	box-shadow: 0 !(Button.Glow.Offset) !(Button.Glow.Radius) var(--colour-primary-darker);
 }
 
 .button.secondary {

@@ -1204,7 +1204,7 @@ function display_user_accent_script(User $user) {
 		echo "<script>var qs = document.querySelector(':root');";
 		
 		duas_setvar("--colour-primary", $bright);
-		duas_setvar("--colour-primary-darker", $bright);
+		duas_setvar("--colour-primary-darker", "#ffffff");
 		duas_setvar("--colour-primary-hover", "#ffffff");
 		duas_setvar("--colour-primary-a", $bright . "40");
 		duas_setvar("--colour-primary-b", $bright . "80");

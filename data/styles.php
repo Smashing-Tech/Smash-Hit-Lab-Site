@@ -32,6 +32,8 @@ class Styles {
 				"DarkBackground" => "#a5cfff",
 				"DarkBackground.Text" => "#000000",
 				"DarkBackground.TextHover" => "#000000",
+				"Button.Glow.Offset" => "0.2em",
+				"Button.Glow.Radius" => "0.4em",
 			];
 		}
 	}
@@ -92,6 +94,8 @@ function site_styles_form(Page $page) {
 	$form->textbox("DarkBackground", "DarkBackground", "", $s->get("DarkBackground"));
 	$form->textbox("DarkBackground-Text", "DarkBackground.Text", "", $s->get("DarkBackground.Text"));
 	$form->textbox("DarkBackground-TextHover", "DarkBackground.TextHover", "", $s->get("DarkBackground.TextHover"));
+	$form->textbox("Button-Glow-Offset", "Button.Glow.Offset", "", $s->get("Button.Glow.Offset"));
+	$form->textbox("Button-Glow-Radius", "Button.Glow.Radius", "", $s->get("Button.Glow.Radius"));
 	
 	$form->submit("Update styles");
 	
@@ -117,7 +121,8 @@ function site_styles_update(Page $page) {
 	$s->set("Background.Text", $page->get("Background-Text", true, 9));
 	$s->set("DarkBackground", $page->get("DarkBackground", true, 9));
 	$s->set("DarkBackground.Text", $page->get("DarkBackground-Text", true, 9));
-	$s->set("DarkBackground.TextHover", $page->get("DarkBackground-TextHover", true, 9));
+	$s->set("Button.Glow.Offset", $page->get("Button-Glow-Offset", true, 9));
+	$s->set("Button.Glow.Radius", $page->get("Button-Glow-Radius", true, 9));
 	
 	$s->save();
 	
