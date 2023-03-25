@@ -22,10 +22,15 @@ class Styles {
 		else {
 			$this->vars = [
 				"PrimaryColour" => "#00aaff",
-				"Background" => "#ffffff",
-				"DarkBackground" => "#d0d0d0",
+				"PrimaryColour.Darker" => "#007fbf",
+				"PrimaryColour.Text" => "#ffffff",
 				"LightBackground" => "#e8e8e8",
-				"TextColour" => "#000000",
+				"LightBackground.Text" => "#000000",
+				"Background" => "#ffffff",
+				"Background.Text" => "#000000",
+				"DarkBackground" => "#d0d0d0",
+				"DarkBackground.Text" => "#000000",
+				"DarkBackground.TextHover" => "#000000",
 			];
 		}
 	}

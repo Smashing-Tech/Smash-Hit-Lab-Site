@@ -45,9 +45,9 @@
 				display: none;
 				position: absolute;
 				right: 1px;
-				border-radius: 0.5em;
+				border-radius: 0.75em;
 				padding: 0.75em 0;
-				background: var(--main-colour-bg);
+				background: var(--colour-background);
 				box-shadow: 0 0.4em 0.7em #0005;
 				transition: display 0.2s;
 			}
@@ -61,11 +61,10 @@
 				grid: auto / 32px auto;
 				height: 32px;
 				padding: 0.5em 1.5em;
-/* 				border-radius: 0.5em; */
 			}
 			
 			.shl-old-profile-dropdown-item:hover {
-				background: var(--main-colour-bg-bright);
+				background: var(--colour-background-light);
 			}
 			
 			.shl-old-profile-dropdown-item-icon {
@@ -132,7 +131,7 @@
 							
 							echo "<div class=\"cb-top-item\">";
 							echo "<div class=\"shl-old-profile-dropdown-button\">";
-							echo "<img class=\"navabr-profile\" src=\"$image\"/>";
+							echo "<img class=\"navbar-profile\" src=\"$image\"/>";
 							echo "<div class=\"shl-old-profile-dropdown-main\">";
 							
 							nav_dropdown_item("account_circle", "Profile", "./?u=$user_name");

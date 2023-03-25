@@ -9,30 +9,45 @@
 }
 
 :root {
-	--main-colour: !(PrimaryColour);
-	--main-colour-dark: !(PrimaryColour);
-	--main-colour-hover: !(PrimaryColour)40;
-	--main-colour-hoverb: !(PrimaryColour)80;
-	--main-colour-bg-bright: !(LightBackground);
-	--main-colour-bg-bright-hover: !(LightBackground)40;
-	--main-colour-bg-bright-hoverb: !(LightBackground)80;
-	--main-colour-bg: !(Background);
-	--main-colour-bg-dark: !(DarkBackground);
-	--main-colour-text: !(TextColour);
-	--main-colour-text-on-primary: !(TextColour);
+	--colour-primary: !(PrimaryColour);
+	--colour-primary-darker: !(PrimaryColour.Darker);
+	--colour-primary-hover: !(PrimaryColour.Hover);
+	--colour-primary-a: !(PrimaryColour)40;
+	--colour-primary-b: !(PrimaryColour)80;
+	--colour-primary-c: !(PrimaryColour)c0;
+	--colour-primary-text: !(PrimaryColour.Text);
 	
-	--font-face: "Titillium Web", sans-serif;
+	--colour-background-light: !(LightBackground);
+	--colour-background-light-a: !(LightBackground)40;
+	--colour-background-light-b: !(LightBackground)80;
+	--colour-background-light-c: !(LightBackground)c0;
+	--colour-background-light-text: !(LightBackground.Text);
+	
+	--colour-background: !(Background);
+	--colour-background-a: !(Background)40;
+	--colour-background-b: !(Background)80;
+	--colour-background-c: !(Background)c0;
+	--colour-background-text: !(Background.Text);
+	
+	--colour-background-dark: !(DarkBackground);
+	--colour-background-dark-a: !(DarkBackground)40;
+	--colour-background-dark-b: !(DarkBackground)80;
+	--colour-background-dark-c: !(DarkBackground)c0;
+	--colour-background-dark-text: !(DarkBackground.Text);
+	--colour-background-dark-text-hover: !(DarkBackground.TextHover);
+	
+	--font-main: "Titillium Web", sans-serif;
 	--font-mono: "JetBrains Mono", monospace;
 }
 
 h1, h2, h3, h4, p, li, summary {
-	font-family: var(--font-face);
+	font-family: var(--font-main);
 	margin-top: 0.15em;
 	margin-bottom: 0.5em;
 }
 
-h1 { font-size: 42pt; color: var(--main-colour-text); text-align: center; margin: 0.75em; margin-top: 0; text-shadow: 0 0 2em var(--main-colour-hoverb); }
-h2 { font-size: 28pt; color: var(--main-colour-text); text-align: center; }
+h1 { font-size: 42pt; text-align: center; margin: 0.75em; margin-top: 0; text-shadow: 0 0 2em var(--colour-background-b); }
+h2 { font-size: 28pt; text-align: center; }
 h3 { font-size: 22pt; font-weight: 400; padding-top: 0.8em; padding-bottom: 0.2em; }
 h4 { font-size: 18pt; }
 p, ul { font-size: 14pt; margin-bottom: 0.75em; }
@@ -52,7 +67,7 @@ ul { margin-left: 1.5em; }
 }
 
 code, pre {
-	background: var(--main-colour-bg-dark);
+	background: var(--colour-background-dark-b);
 	border-radius: 0.325em;
 	padding: 0.325em;
 	font-family: var(--font-mono);
@@ -64,7 +79,7 @@ code, pre {
 }
 
 a {
-	color: var(--main-colour-text);
+	color: var(--colour-background-text);
 	text-decoration-line: none;
 	font-weight: bold;
 	
@@ -72,8 +87,8 @@ a {
 }
 
 a:hover {
-	color: var(--main-colour-dark);
-	text-shadow: 0 0 1.0em var(--main-colour-dark);
+	color: var(--colour-primary);
+	text-shadow: 0 0 1.0em var(--colour-primary);
 }
 
 a.insecure-link::after {
@@ -85,18 +100,18 @@ img {
 }
 
 ::selection {
-	background: var(--main-colour);
-	color: var(--main-colour-bg);
+	background: var(--colour-primary);
+	color: var(--colour-primary-text);
 }
 
 body {
-	background: var(--main-colour-bg);
-	color: #fff;
+	background: var(--colour-background);
+	color: var(--colour-background-text);
 }
 
 .main-section {
 	border: none;
-	color: var(--main-colour-text);
+	color: var(--colour-background-text);
 	max-width: 75em;
 	margin: auto;
 	margin-top: 5em;
@@ -106,13 +121,13 @@ body {
 
 /* Interactive widgets */
 input[type=text], input[type=password], textarea, select {
-	background: var(--main-colour-bg-dark);
+	background: var(--colour-background-dark-b);
 	border: none;
-	border-bottom: 2px solid var(--main-colour-bg-bright);
+	border-bottom: 2px solid var(--colour-background-light);
 	border-radius: 0.5em 0.5em 0 0;
-	caret-color: var(--main-colour-text);
-	color: var(--main-colour-text);
-	font-family: var(--font-face);
+	caret-color: var(--colour-background-dark-text);
+	color: var(--colour-background-dark-text);
+	font-family: var(--font-main);
 	font-size: 14pt;
 	padding: 0.5em;
 	outline: none;
@@ -120,7 +135,8 @@ input[type=text], input[type=password], textarea, select {
 }
 
 input[type=text]:focus, input[type=password]:focus, textarea:focus, select:focus {
-	border-bottom: 2px solid var(--main-colour);
+	background: var(--colour-background-dark-c);
+	border-bottom: 2px solid var(--colour-primary);
 }
 
 textarea {
@@ -133,12 +149,12 @@ textarea {
 }
 
 input[type=submit], button, .button {
-	background: var(--main-colour);
+	background: var(--colour-primary);
 	border: none;
 	border-radius: 1.25em;
-	color: var(--main-colour-text-on-primary);
+	color: var(--colour-primary-text);
 	cursor: pointer;
-	font-family: var(--font-face);
+	font-family: var(--font-main);
 	font-size: 14pt;
 	padding: 0.5em 1.25em;
 	outline: none;
@@ -146,67 +162,44 @@ input[type=submit], button, .button {
 }
 
 input[type=submit]:hover, button:hover, .button:hover {
-	background: #fff;
-	box-shadow: 0 0 1.0em #fff8;
+	background: var(--colour-primary-darker);
+	box-shadow: 0 0 1.0em var(--colour-primary-darker);
 }
 
 .button.secondary {
 	background: transparent;
-	border: 1px solid var(--main-colour-hover);
-	color: var(--main-colour);
+	border: 1px solid var(--colour-primary-a);
+	color: var(--colour-primary);
 }
 
 .button.secondary:hover {
-	background: var(--main-colour-hover);
+	background: var(--colour-primary-a);
 	box-shadow: none;
 }
 
-/* Warning */
-.warning-main {
-	background: var(--main-colour-bg-dark);
-	border-radius: 0.5em;
-	overflow: auto;
-	padding: 0.5em;
-}
-
-.tip-main {
-	background: var(--main-colour-bg-dark);
-	border-radius: 0.5em;
-	overflow: auto;
-	padding: 0.5em;
-}
-
-.warning-left {
-	float: left;
-	width: 32px;
-}
-
-.warning-right {
-	float: right;
-	width: calc(100% - 32px - 1em);
-	padding-left: 1em;
-}
-
 .news-article-card {
-	background: var(--main-colour-bg-bright);
+	background: var(--colour-background-light);
 	border-radius: 0.5em;
-	box-shadow: 0 0 3em var(--main-colour-bg-bright-hover);
+	box-shadow: 0 0 3em var(--colour-background-light-a);
 	overflow: auto;
 	padding: 0.5em;
 	margin: 1em 0;
 }
 
-/* Since I am using the news-article-card for others things that might break if
+/* HACK:
+ * 
+ * Since I am using the news-article-card for others things that might break if
  * I change this, I am just putting this here... */
 .new-news-article-card {
-	background: var(--main-colour-bg-bright);
+	background: var(--colour-background-light);
 	border-radius: 0.5em;
-	box-shadow: 0 0 3em var(--main-colour-bg-bright-hover);
+	box-shadow: 0 0 3em var(--colour-background-light-a);
 	overflow: auto;
 	padding: 1em;
 	margin: 0.25em 0.75em;
 }
 
+/* ==== COMMENT BADGES ==== */
 .staff-badge {
 	background: #261e00;
 	border-radius: 1em;
@@ -230,7 +223,7 @@ input[type=submit]:hover, button:hover, .button:hover {
 
 /* Navbar */
 .navbar-section {
-	background: var(--main-colour-bg-dark);
+	background: var(--colour-background-dark);
 	border: none;
 	padding: 1em;
 	position: fixed;
@@ -247,8 +240,8 @@ input[type=submit]:hover, button:hover, .button:hover {
 }
 
 .show-navbar-section {
-	background: var(--main-colour-bg-dark);
-	color: var(--main-colour-text);
+	background: var(--colour-background-dark);
+	color: var(--colour-background-dark-text);
 	border: none;
 	padding: 1em;
 	position: fixed;
@@ -268,7 +261,8 @@ input[type=submit]:hover, button:hover, .button:hover {
 	padding-top: 1em;
 }
 
-.navabr-profile {
+/* NOTE Changed this from a typo - did it maybe break something? */
+.navbar-profile {
 	position: relative;
 	top: 5px;
 	width: 32px;
@@ -279,20 +273,20 @@ input[type=submit]:hover, button:hover, .button:hover {
 /* ============ */
 
 .bottom-section {
-	background: var(--main-colour-bg-bright);
+	background: var(--colour-background-light);
 	border-radius: 0.5em;
-	padding: 0.5em;
+	padding: 1em;
 	margin-top: 1em;
 }
 
-.cb-top-item {
+.cb-top-item { /* TODO Rename to navbar-item */
 	margin: 0;
 	padding: 0;
 	margin-right: 1.0em;
 	font-size: 14pt;
 	display: inline-block;
 	vertical-align: middle;
-	font-family: var(--font-face);
+	font-family: var(--font-main);
 	max-height: 64px; /* Why did this fix it? */
 }
 
@@ -308,13 +302,13 @@ input[type=submit]:hover, button:hover, .button:hover {
 	margin-left: 1.0em;
 }
 
-.cb-logo-item {
+.cb-logo-item { /* TODO Rename to navbar-logo */
 	margin-right: 2em;
 	font-size: 18pt;
 	display: inline-block;
 	vertical-align: middle;
-	font-family: var(--font-face);
-	color: var(--main-colour-text);
+	font-family: var(--font-main);
+	color: var(--colour-background-dark-text);
 }
 
 .nc-top {
@@ -348,63 +342,6 @@ input[type=submit]:hover, button:hover, .button:hover {
 	font-size: 24pt;
 	font-weight: 700;
 }
-
-.carambola-download p {
-	margin: 0;
-}
-
-.carambola-download {
-	float: right;
-	max-width: 20em;
-	padding: 0.75em;
-}
-
-@keyframes glow {
-	from {
-		box-shadow: 0 0 2.5em var(--main-colour);
-	}
-	to {
-		box-shadow: 0 0 3.25em var(--main-colour);
-	}
-}
-
-/* DEPRECATED
-.carambola-download-box {
-	padding: 1em;
-	border-radius: 0.5em;
-	background: var(--main-colour);
-	color: #000;
-	cursor: pointer;
-	overflow: auto;
-	margin-bottom: 0.75em;
-	transition: box-shadow 0.3s, background 0.3s;
-}
-
-.carambola-download-box:hover {
-	background: #fff;
-	animation-name: glow;
-	animation-duration: 3s;
-	animation-direction: alternate;
-	animation-iteration-count: infinite;
-	animation-timing-function: ease-in-out;
-}
-
-.carambola-download-box:active {
-	background: #fff;
-	box-shadow: 0 0 0 #00000080;
-}*/
-
-/* DEPRECATED
-.carambola-download-left {
-	float: left;
-	width: 50px;
-}
-
-.carambola-download-right {
-	float: right;
-	width: calc(100% - 50px - 0.4em);
-	padding-left: 0.4em;
-}*/
 
 .small-text {
 	font-size: 10pt;
@@ -477,9 +414,11 @@ input[type=submit]:hover, button:hover, .button:hover {
 }
 
 .comment-card {
-	background: var(--main-colour-bg-bright);
+	/* TODO Consider removing the seperation between comments and the rest
+	 * of the page. */
+	background: var(--colour-background-light);
 	border-radius: 0.5em;
-	box-shadow: 0 0 3em var(--main-colour-bg-bright-hover);
+	box-shadow: 0 0 3em var(--colour-background-light-a);
 	overflow: auto;
 	padding: 1em;
 	margin: 1em 0;
