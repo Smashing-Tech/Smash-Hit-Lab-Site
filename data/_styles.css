@@ -87,8 +87,8 @@ a {
 }
 
 a:hover {
-	color: var(--colour-primary);
-	text-shadow: 0 0 1.0em var(--colour-primary);
+	color: var(--colour-primary-hover);
+	text-shadow: 0 0 1.0em var(--colour-primary-hover);
 }
 
 a.insecure-link::after {
@@ -163,7 +163,7 @@ input[type=submit], button, .button {
 
 input[type=submit]:hover, button:hover, .button:hover {
 	background: var(--colour-primary-darker);
-	box-shadow: 0 0 1.0em var(--colour-primary-darker);
+	box-shadow: 0 0.2em 0.2em var(--colour-primary-darker-b);
 }
 
 .button.secondary {

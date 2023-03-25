@@ -21,14 +21,15 @@ class Styles {
 		}
 		else {
 			$this->vars = [
-				"PrimaryColour" => "#00aaff",
-				"PrimaryColour.Darker" => "#007fbf",
+				"PrimaryColour" => "#107cff",
+				"PrimaryColour.Darker" => "#0b5ab4",
+				"PrimaryColour.Hover" => "#0b5ab4",
 				"PrimaryColour.Text" => "#ffffff",
-				"LightBackground" => "#e8e8e8",
+				"LightBackground" => "#cde4ff",
 				"LightBackground.Text" => "#000000",
-				"Background" => "#ffffff",
+				"Background" => "#ebf4ff",
 				"Background.Text" => "#000000",
-				"DarkBackground" => "#d0d0d0",
+				"DarkBackground" => "#a5cfff",
 				"DarkBackground.Text" => "#000000",
 				"DarkBackground.TextHover" => "#000000",
 			];
@@ -79,10 +80,19 @@ function site_styles_form(Page $page) {
 	$page->heading(1, "Site styles");
 	
 	$form = new Form("./?a=site-styles&submit=1");
-	$form->textbox("PrimaryColour", "Primary colour", "The primary site colour.", $s->get("PrimaryColour"));
-	$form->textbox("Background", "Background colour", "The colour of the site's background.", $s->get("Background"));
-	$form->textbox("DarkBackground", "Dark background colour", "The colour of the darker site surfaces, like the navbar.", $s->get("DarkBackground"));
-	$form->textbox("LightBackground", "Light background colour", "The colour of the site's lighter surfaces, like the comment cards.", $s->get("LightBackground"));
+	
+	$form->textbox("PrimaryColour", "PrimaryColour", "", $s->get("PrimaryColour"));
+	$form->textbox("PrimaryColour-Darker", "PrimaryColour.Darker", "", $s->get("PrimaryColour.Darker"));
+	$form->textbox("PrimaryColour-Hover", "PrimaryColour.Hover", "", $s->get("PrimaryColour.Hover"));
+	$form->textbox("PrimaryColour-Text", "PrimaryColour.Text", "", $s->get("PrimaryColour.Text"));
+	$form->textbox("LightBackground", "LightBackground", "", $s->get("LightBackground"));
+	$form->textbox("LightBackground-Text", "LightBackground.Text", "", $s->get("LightBackground.Text"));
+	$form->textbox("Background", "Background", "", $s->get("Background"));
+	$form->textbox("Background-Text", "Background.Text", "", $s->get("Background.Text"));
+	$form->textbox("DarkBackground", "DarkBackground", "", $s->get("DarkBackground"));
+	$form->textbox("DarkBackground-Text", "DarkBackground.Text", "", $s->get("DarkBackground.Text"));
+	$form->textbox("DarkBackground-TextHover", "DarkBackground.TextHover", "", $s->get("DarkBackground.TextHover"));
+	
 	$form->submit("Update styles");
 	
 	$page->add($form);
@@ -98,9 +108,17 @@ function site_styles_update(Page $page) {
 	$s = new Styles();
 	
 	$s->set("PrimaryColour", $page->get("PrimaryColour", true, 9));
-	$s->set("Background", $page->get("Background", true, 9));
-	$s->set("DarkBackground", $page->get("DarkBackground", true, 9));
+	$s->set("PrimaryColour.Darker", $page->get("PrimaryColour-Darker", true, 9));
+	$s->set("PrimaryColour.Hover", $page->get("PrimaryColour-Hover", true, 9));
+	$s->set("PrimaryColour.Text", $page->get("PrimaryColour-Text", true, 9));
 	$s->set("LightBackground", $page->get("LightBackground", true, 9));
+	$s->set("LightBackground.Text", $page->get("LightBackground-Text", true, 9));
+	$s->set("Background", $page->get("Background", true, 9));
+	$s->set("Background.Text", $page->get("Background-Text", true, 9));
+	$s->set("DarkBackground", $page->get("DarkBackground", true, 9));
+	$s->set("DarkBackground.Text", $page->get("DarkBackground-Text", true, 9));
+	$s->set("DarkBackground.TextHover", $page->get("DarkBackground-TextHover", true, 9));
+	
 	$s->save();
 	
 	$page->info("Styles saved", "The site styles were updated successfully! You might have to clear your browser's cache in order to see the changes, though.");

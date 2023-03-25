@@ -1190,6 +1190,10 @@ function display_user_banner(User $user) {
 	echo "</div>";
 }
 
+function duas_setvar(string $var, string $val) {
+	echo "qs.style.setProperty('$var', '$val');";
+}
+
 function display_user_accent_script(User $user) {
 	if ($user->accent) {
 		$darkest = $user->accent[0];
@@ -1198,14 +1202,34 @@ function display_user_accent_script(User $user) {
 		$bright = $user->accent[3];
 		
 		echo "<script>var qs = document.querySelector(':root');";
-		echo "qs.style.setProperty('--main-colour-bg-dark', '$darkest');";
-		echo "qs.style.setProperty('--main-colour-bg', '$dark');";
-		echo "qs.style.setProperty('--main-colour-bg-bright', '$darkish');";
-		echo "qs.style.setProperty('--main-colour-bg-bright-hover', '$darkish"."40');";
-		echo "qs.style.setProperty('--main-colour-bg-bright-hoverb', '$darkish"."80');";
-		echo "qs.style.setProperty('--main-colour', '$bright');";
-		echo "qs.style.setProperty('--main-colour-hover', '$bright"."40');";
-		echo "qs.style.setProperty('--main-colour-hoverb', '$bright"."80');";
+		
+		duas_setvar("--colour-primary", $bright);
+		duas_setvar("--colour-primary-darker", $bright);
+		duas_setvar("--colour-primary-hover", "#ffffff");
+		duas_setvar("--colour-primary-a", $bright . "40");
+		duas_setvar("--colour-primary-b", $bright . "80");
+		duas_setvar("--colour-primary-c", $bright . "c0");
+		duas_setvar("--colour-primary-text", "#000000");
+		
+		duas_setvar("--colour-background-light", $darkish);
+		duas_setvar("--colour-background-light-a", $darkish . "40");
+		duas_setvar("--colour-background-light-b", $darkish . "80");
+		duas_setvar("--colour-background-light-c", $darkish . "c0");
+		duas_setvar("--colour-background-light-text", $bright);
+		
+		duas_setvar("--colour-background", $dark);
+		duas_setvar("--colour-background-a", $dark . "40");
+		duas_setvar("--colour-background-b", $dark . "80");
+		duas_setvar("--colour-background-c", $dark . "c0");
+		duas_setvar("--colour-background-text", $bright);
+		
+		duas_setvar("--colour-background-dark", $darkest);
+		duas_setvar("--colour-background-dark-a", $darkest . "40");
+		duas_setvar("--colour-background-dark-b", $darkest . "80");
+		duas_setvar("--colour-background-dark-c", $darkest . "c0");
+		duas_setvar("--colour-background-dark-text", $bright);
+		duas_setvar("--colour-background-dark-text-hover", $bright);
+		
 		echo "</script>";
 	}
 }
