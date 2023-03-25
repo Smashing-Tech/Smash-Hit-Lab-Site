@@ -34,6 +34,9 @@ class Styles {
 				"DarkBackground.TextHover" => "#000000",
 				"Button.Glow.Offset" => "0.2em",
 				"Button.Glow.Radius" => "0.4em",
+				"NavBar.Radius" => "1.2em",
+				"Font.Main" => "Titillium Web",
+				"Font.Main.Escaped" => "Titillium+Web",
 			];
 		}
 	}
@@ -83,6 +86,7 @@ function site_styles_form(Page $page) {
 	
 	$form = new Form("./?a=site-styles&submit=1");
 	
+	$form->container("About styles", "A note about this page.", "This page contains the raw variables (also called design tokens) used for the size, colour and positoning of elements. It is not really meant to be edited by hand, but it is provided so that you can customise your site in any way you like.");
 	$form->textbox("PrimaryColour", "PrimaryColour", "", $s->get("PrimaryColour"));
 	$form->textbox("PrimaryColour-Darker", "PrimaryColour.Darker", "", $s->get("PrimaryColour.Darker"));
 	$form->textbox("PrimaryColour-Hover", "PrimaryColour.Hover", "", $s->get("PrimaryColour.Hover"));
@@ -96,6 +100,8 @@ function site_styles_form(Page $page) {
 	$form->textbox("DarkBackground-TextHover", "DarkBackground.TextHover", "", $s->get("DarkBackground.TextHover"));
 	$form->textbox("Button-Glow-Offset", "Button.Glow.Offset", "", $s->get("Button.Glow.Offset"));
 	$form->textbox("Button-Glow-Radius", "Button.Glow.Radius", "", $s->get("Button.Glow.Radius"));
+	$form->textbox("NavBar-Radius", "NavBar.Radius", "", $s->get("NavBar.Radius"));
+	$form->textbox("Font-Main", "Font.Main", "", $s->get("Font.Main"));
 	
 	$form->submit("Update styles");
 	
@@ -123,6 +129,11 @@ function site_styles_update(Page $page) {
 	$s->set("DarkBackground.Text", $page->get("DarkBackground-Text", true, 9));
 	$s->set("Button.Glow.Offset", $page->get("Button-Glow-Offset", true, 9));
 	$s->set("Button.Glow.Radius", $page->get("Button-Glow-Radius", true, 9));
+	$s->set("NavBar.Radius", $page->get("NavBar-Radius", true, 9));
+	
+	$font = $page->get("Font-Main", true, 100);
+	$s->set("Font.Main", $font);
+	$s->set("Font.Main.Escaped", str_replace(" ", "+", $font));
 	
 	$s->save();
 	

@@ -16,6 +16,7 @@ function random_discussion_name() : string {
 	return bin2hex(random_bytes(8));
 }
 
+#[AllowDynamicProperties]
 class Comment {
 	/**
 	 * This is the comment class, which represents a signle comment as part of

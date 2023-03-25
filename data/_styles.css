@@ -1,5 +1,5 @@
 /* Carambola Website CSS */
-@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=!(Font.Main.Escaped):wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
 
 /* Remove default padding */
@@ -36,7 +36,7 @@
 	--colour-background-dark-text: !(DarkBackground.Text);
 	--colour-background-dark-text-hover: !(DarkBackground.TextHover);
 	
-	--font-main: "Titillium Web", sans-serif;
+	--font-main: "!(Font.Main)", sans-serif;
 	--font-mono: "JetBrains Mono", monospace;
 }
 
@@ -230,6 +230,7 @@ input[type=submit]:hover, button:hover, .button:hover {
 	top: 0;
 	width: calc(100vw - 32px);
 	z-index: 100;
+	border-radius: 0 0 !(NavBar.Radius) !(NavBar.Radius);
 }
 
 @media (max-width: 1200px) {
