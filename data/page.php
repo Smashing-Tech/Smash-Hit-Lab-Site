@@ -113,8 +113,9 @@ class Page {
 		$this->title = $title;
 	}
 	
-	function heading(int $level, string $data) : void {
-		$this->add("<h$level>$data</h$level>");
+	function heading(int $level, string $data, ?string $size = null) : void {
+		$size = ($size) ? (" style=\"font-size: $size;\"") : ("");
+		$this->add("<h$level$size>$data</h$level>");
 	}
 	
 	function para(string $text) : void {

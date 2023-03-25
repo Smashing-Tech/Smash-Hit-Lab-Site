@@ -79,7 +79,7 @@ code, pre {
 }
 
 a {
-	color: var(--colour-background-text);
+	color: var(--colour-primary);
 	text-decoration-line: none;
 	font-weight: bold;
 	
@@ -131,7 +131,7 @@ input[type=text], input[type=password], textarea, select {
 	font-size: 14pt;
 	padding: 0.5em;
 	outline: none;
-	width: 80%;
+	width: 90%;
 }
 
 input[type=text]:focus, input[type=password]:focus, textarea:focus, select:focus {
@@ -231,6 +231,10 @@ input[type=submit]:hover, button:hover, .button:hover {
 	width: calc(100vw - 32px);
 	z-index: 100;
 	border-radius: 0 0 !(NavBar.Radius) !(NavBar.Radius);
+}
+
+.navbar-section a {
+	color: var(--colour-background-dark-text);
 }
 
 @media (max-width: 1200px) {
@@ -457,4 +461,14 @@ input[type=submit]:hover, button:hover, .button:hover {
 
 .centred {
 	text-align: center;
+}
+
+.auth-form-box {
+	background: var(--colour-background-dark-a);
+	border-radius: 0.5em;
+	box-shadow: 0 0.3em 0.4em var(--colour-background-dark-c);
+	padding: 1.0em;
+	margin: auto;
+	margin-bottom: 4.0em;
+	max-width: 40em;
 }

@@ -5,7 +5,13 @@
  * - Database locks. These are important!
  */
 
-$database_path = "../data/db/";
+$gDatabasePath = "../data/db/";
+
+/**
+ * Which databases should use the global database versus which should use the
+ * local database. Ignored in single instance mode.
+ */
+$gGlobalDatabases = ["user"];
 
 class RDBObject {
 	/**
@@ -81,9 +87,9 @@ class Database {
 	public $path;
 	
 	function __construct(string $name) {
-		global $database_path;
+		global $gDatabasePath;
 		
-		$this->path = $database_path . $name . "/";
+		$this->path = $gDatabasePath . $name . "/";
 		
 		// Make database folder if it doesn't exist
 		if (!file_exists($this->path)) {
@@ -284,9 +290,9 @@ function enumerate_stores() {
 	 * Enumerate available database stores
 	 */
 	
-	global $database_path;
+	global $gDatabasePath;
 	
-	$array = scandir($database_path);
+	$array = scandir($gDatabasePath);
 	array_shift($array);
 	array_shift($array);
 	return $array;
@@ -297,7 +303,7 @@ function backup_database() : string {
 	 * Back up the databse to a zip file
 	 */
 	
-	global $database_path;
+	global $gDatabasePath;
 	
 	$zip = new ZipArchive();
 	
@@ -315,7 +321,7 @@ function backup_database() : string {
 		$zip->addEmptyDir("db/" . $stores[$j]);
 		
 		for ($i = 0; $i < sizeof($files); $i++) {
-			$zip->addFile($database_path . "/" . $stores[$j] . "/" . $files[$i], "db/" . $stores[$j] . "/" . $files[$i]);
+			$zip->addFile($gDatabasePath . "/" . $stores[$j] . "/" . $files[$i], "db/" . $stores[$j] . "/" . $files[$i]);
 		}
 	}
 	

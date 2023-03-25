@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * LOGIN FORM
+ */
+
 function auth_login_availability(Page $page, ?string $handle = null) {
 	/**
 	 * Check the status of being able to log in. The user handle should be passed
@@ -40,22 +44,31 @@ function auth_login_availability(Page $page, ?string $handle = null) {
 }
 
 function auth_login_form(Page $page) {
+	// Global header
 	$page->global_header();
 	
 	// Check if logins are enabled
 	auth_login_availability($page);
 	
-	// Heading and text
-	$page->heading(1, "Log in");
-	$page->para("Enter your handle and password to log in to the Smash Hit Lab. Don't have an account? <a href=\"./?a=auth-register\">Create an account!</a>");
-	
 	// Create the login form
 	$form = new Form("./?a=auth-login&submit=1");
+	$form->set_container_type(FORM_CONTAINER_BLANK);
 	$form->textbox("handle", "Handle", "The handle is the account name that you signed up for.");
 	$form->password("password", "Password", "Your password was sent to your email when your account was created.");
 	$form->submit("Login");
 	
+	$page->add("<div class=\"auth-form-box\">");
+	
+	// Heading and text
+	$page->heading(1, "Log in", "20pt");
+	$page->para("Enter your handle and password to log in to the Smash Hit Lab. Don't have an account? <a href=\"./?a=auth-register\">Create an account!</a>");
+	
+	// Add form
 	$page->add($form);
+	
+	$page->add("</div>");
+	
+	// Add the global footer
 	$page->global_footer();
 }
 
@@ -137,6 +150,65 @@ $gEndMan->add("auth-login", function($page) {
 	}
 });
 
+/**
+ * REGISTER FORM
+ */
+
+function auth_register_form(Page $page) {
+	// Global header
+	$page->global_header();
+	
+	// Check if logins are enabled
+	auth_login_availability($page);
+	
+	// Create the login form
+	$form = new Form("./?a=auth-login&submit=1");
+	//$form->set_container_type(FORM_CONTAINER_BLANK);
+	$form->textbox("handle", "Handle", "Pick a handle name that you would like. Please note that you can't change it later.");
+	$form->textbox("email", "Email", "The email address you wish to assocaite with your account.");
+	$form->day("birth", "Birthday", "Please enter your birthday so we can verify that you are old enough to join the Smash Hit Lab.");
+	$form->container("Password", "A special string of characters you need in order to log in to your account.", "
+			<ul>
+				<li>We will generate a secure password and send it to your email. You do not need to worry about choosing a password.</li>
+				<li>We recommend using some kind of password manager &mdash; preferably locally stored &mdash; to store your password as it will be long and random.</li>
+			</ul>");
+	$form->container("Terms", "Terms help protect us from each other and set standards on how we should behave.", "
+			<p>When you sign up for an account, you agree to the following documents:</p>
+			<ul>
+				<li><a href=\"./?p=tos\">Terms of Service</a></li>
+				<li><a href=\"./?p=privacy\">Privacy Policy</a></li>
+				<li><a href=\"./?p=disclaimer\">General Disclaimers</a></li>
+			</ul>
+			<p>Most importantly:</p>
+			<ul>
+				<li>You need to be 16 or older in order to use the Smash Hit Lab. We will remove your account if we find that you are under 16 years old.</li>
+				<li>We do not provide warranty or support unless required by law, and we shouldn't be held liable for damages related to the site unless required by law.</li>
+				<li>We can update the terms of our contracts at any time and force you to stop using our services if you disagree with the new terms.</li>
+			</ul>");
+	$form->submit("Create account");
+	
+	$page->add("<div class=\"auth-form-box\">");
+	
+	// Heading and text
+	$page->heading(1, "Create an account", "20pt");
+	$page->para("To create an account at the Smash Hit Lab, decide what your handle will be, enter your email address and brithdate, then create your account. Already have an account? <a href=\"./?a=auth-login\">Log in!</a>");
+	
+	// Add form
+	$page->add($form);
+	
+	$page->add("</div>");
+	
+	// Add the global footer
+	$page->global_footer();
+}
+
 $gEndMan->add("auth-register", function($page) {
-	$page->redirect("./?a=register");
+	$submitting = $page->has("submit");
+	
+	if ($submitting) {
+		auth_login_action($page);
+	}
+	else {
+		auth_register_form($page);
+	}
 });

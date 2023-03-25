@@ -7,14 +7,26 @@ function form_feild($name, $type, $title, $desc, $value, $enabled = true, $optio
 }
 
 function form_textbox($name, $title, $desc, $value = "") : void {
+	/**
+	 * @deprecated Use forms
+	 */
+	
 	form_feild($name, "text", $title, $desc, $value);
 }
 
 function form_textarea($name, $title, $desc, $value = "") : void {
+	/**
+	 * @deprecated Use forms
+	 */
+	
 	form_feild($name, "textarea", $title, $desc, $value);
 }
 
 function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $options = null) : void {
+	/**
+	 * @deprecated Use forms
+	 */
+	
 	if (!$value) {
 		$value = "";
 	}
@@ -85,11 +97,19 @@ function edit_feild($name, $type, $title, $desc, $value, $enabled = true, $optio
 }
 
 function form_start(string $url, string $method = "post", string $csrf = "") {
+	/**
+	 * @deprecated Use forms
+	 */
+	
 	$url = htmlspecialchars($url);
 	echo "<form action=\"$url\" method=\"$method" . (($csrf) ? "&key=" . $csrf : "") . "\">";
 }
 
 function form_end(string $submit_text = "Submit form") {
+	/**
+	 * @deprecated Use forms
+	 */
+	
 	//echo "<input type=\"submit\" value=\"$submit_text\"/>";
 	edit_feild(null, "submit", null, $submit_text, null);
 	echo "</form>";
@@ -122,6 +142,10 @@ function mod_property($title, $desc, $value, $conditional = false) : void {
 }
 
 function sorry(string $why = "There was a problem.", string $extra = "") {
+	/**
+	 * @deprecated Use page->info()
+	 */
+	
 	global $gTitle;
 	$gTitle = "There was an error !!!";
 	
@@ -133,6 +157,10 @@ function sorry(string $why = "There was a problem.", string $extra = "") {
 }
 
 function inform(string $title = "Success", string $why = "The action completed successfully.", string $extra = "") {
+	/**
+	 * @deprecated Use page->info()
+	 */
+	
 	global $gTitle;
 	$gTitle = "Success !!!";
 	
