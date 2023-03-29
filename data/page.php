@@ -209,5 +209,5 @@ function include_static_page() {
 }
 
 function include_footer() {
-	readfile("../data/_footer.html");
+	require_once("../data/_footer.html");
 }

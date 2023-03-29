@@ -10,12 +10,12 @@ require_once "config.php";
 require_once "database.php";
 require_once "discussion.php";
 require_once "form.php";
-require_once "main.php";
 require_once "mod.php";
 require_once "news.php";
 require_once "notifications.php";
 require_once "page.php";
 require_once "setup.php";
+require_once "site.php";
 require_once "styles.php";
 require_once "templates.php";
 require_once "user.php";
@@ -23,12 +23,12 @@ require_once "user.php";
 function handle_action(string $action, Page $page) {
 	switch ($action) {
 	// ---- USER ACCOUNTS ---- //
-		case "register": do_register(); break;
-		case "login": do_login(); break;
-		case "logout": do_logout(); break;
+		case "register": do_register(); break; // DEPRECATED
+		case "login": do_login(); break; // DEPRECATED
+		case "logout": do_logout(); break; // DEPRECATED
 	// ---- MOD PAGES ---- //
 		case "mod_update":
-		case "edit_mod": edit_mod(); break;
+		/*DEPRECATED*/ case "edit_mod": edit_mod(); break;
 		case "save_mod": save_mod(); break;
 		case "mod_history": mod_history(); break;
 		case "mod_delete":
@@ -69,7 +69,7 @@ function handle_action(string $action, Page $page) {
 			global $gEndMan; $okay = $gEndMan->run($action, $page);
 			
 			if (!$okay) {
-				sorry("The action you have requested is not currently implemented.");
+				$page->info("Sorry", "The action you have requested is not currently implemented.");
 			}
 			/// @hack This is here for now b/c we can't have it elsewhere right now
 			else {

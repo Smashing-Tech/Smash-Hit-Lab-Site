@@ -13,10 +13,10 @@
 		global $gTitle;
 		
 		if (!isset($gTitle)) {
-			echo "<title>Smash Hit Lab</title>";
+			echo "<title>" . get_site_name() . "</title>";
 		}
 		else {
-			echo "<title>$gTitle &mdash; Smash Hit Lab</title>";
+			echo "<title>$gTitle &mdash; " . get_site_name() . "</title>";
 		}
 		?>
 		<script>
@@ -80,12 +80,12 @@
 	</head>
 	<body>
 		<div id="navbar-button" class="show-navbar-section" onclick="shownavbar();">
-			<div class="cb-logo-item">Explore Smash Hit Lab <span class="material-icons" style="position: relative; top: 4px; left: 10px;">arrow_forward</span></div>
+			<div class="cb-logo-item">Explore <?php echo get_site_name(); ?> <span class="material-icons" style="position: relative; top: 4px; left: 10px;">arrow_forward</span></div>
 		</div>
 		<div id="navbar" class="navbar-section">
 			<div class="header-container">
 				<div class="header-container-left">
-					<div class="cb-logo-item">Smash Hit Lab</div>
+					<div class="cb-logo-item"><?php echo get_site_name(); ?></div>
 					<?php
 					function header_item(string $icon, string $title, string $link) : void {
 						echo "<div class=\"cb-top-item\"><a href=\"$link\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">$icon</span> $title</a></div>";
