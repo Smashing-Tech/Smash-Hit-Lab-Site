@@ -4,19 +4,18 @@ define("SANITISE_HTML", 1);
 define("SANITISE_EMAIL", 2);
 define("SANITISE_NONE", 3);
 
+define("PAGE_MODE_API", 1);
+define("PAGE_MODE_HTML", 2);
+
 class Page {
 	public $title;
 	public $body;
-	public $header;
-	public $footer;
-	public $api;
+	public $mode;
 	
 	function __construct() {
 		$this->title = null;
 		$this->body = "";
-		$this->header = false;
-		$this->footer = false;
-		$this->api = false;
+		$this->mode = PAGE_MODE_HTML;
 	}
 	
 	function http_header(string $key, string $value) : void {
@@ -123,11 +122,11 @@ class Page {
 	}
 	
 	function global_header() : void {
-		$this->header = true;
+		assert($this->mode === PAGE_MODE_HTML);
 	}
 	
 	function global_footer() : void {
-		$this->footer = true;
+		assert($this->mode === PAGE_MODE_HTML);
 	}
 	
 	function add(string | Form $data) : void {
@@ -140,25 +139,18 @@ class Page {
 	}
 	
 	private function render_html() : string {
+		assert($this->mode === PAGE_MODE_HTML);
+		
 		$data = "";
 		
-		// Global header
-		if ($this->header) {
-			//global $gTitle; $gTitle = $this->title;
-			//require_once("_header.html");
-		}
-		
 		$data .= $this->body;
-		
-		// Global footer
-		if ($this->footer) {
-			//require_once("_footer.html");
-		}
 		
 		return $data;
 	}
 	
 	private function render_json() : string {
+		assert($this->mode === PAGE_MODE_API);
+		
 		return json_encode($body);
 	}
 	
@@ -167,14 +159,14 @@ class Page {
 	}
 	
 	function send() : void {
-		if ($this->header) {
+		if ($this->mode !== PAGE_MODE_API) {
 			global $gTitle; $gTitle = $this->title;
 			include_header();
 		}
 		
 		echo $this->render();
 		
-		if ($this->footer) {
+		if ($this->mode !== PAGE_MODE_API) {
 			include_footer();
 		}
 		

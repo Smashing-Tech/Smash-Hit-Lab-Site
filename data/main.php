@@ -10,6 +10,7 @@ require_once "config.php";
 require_once "database.php";
 require_once "discussion.php";
 require_once "form.php";
+require_once "forum.php";
 require_once "mod.php";
 require_once "news.php";
 require_once "notifications.php";
