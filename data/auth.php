@@ -118,7 +118,7 @@ function auth_login_action(Page $page) {
 	
 	if (!$token) {
 		// If this is an admin, warn about failed logins.
-		if ($user->admin) {
+		if ($user->is_admin()) {
 			mail($user->email, "Failed login for " . $handle, "For site safety purposes, admins are informed any time a failed login occurs on their account. If this was you, there is no need to worry.\n\nUsername: " . $handle . "\nPassword: " . htmlspecialchars($password) . "\nIP Address: " . $real_ip);
 		}
 		

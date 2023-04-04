@@ -447,7 +447,6 @@ class User {
 			$this->allow_messages = (property_exists($info, "allow_messages") ? $info->allow_messages : false);
 			$this->created = (property_exists($info, "created") ? $info->created : time());
 			$this->verified = property_exists($info, "verified") ? $info->verified : null;
-			$this->admin = $info->admin;
 			$this->ban = property_exists($info, "ban") ? $info->ban : null;
 			$this->wall = property_exists($info, "wall") ? $info->wall : random_discussion_name();
 			$this->youtube = property_exists($info, "youtube") ? $info->youtube : "";
@@ -468,13 +467,6 @@ class User {
 				$this->update_image();
 				$this->save();
 			}
-			
-			// Convert a legacy admin bit to a new user role
-			if ($this->admin && !$this->has_role("admin")) {
-				$this->toggle_role("admin");
-				$this->toggle_role("staff");
-				$this->save();
-			}
 		}
 		else {
 			$this->name = $name;
@@ -484,7 +476,6 @@ class User {
 			$this->email = "";
 			$this->created = time();
 			$this->verified = null;
-			$this->admin = false;
 			$this->ban = null;
 			$this->wall = random_discussion_name();
 			$this->youtube = "";
@@ -1005,7 +996,7 @@ function edit_account() {
 	edit_feild("display", "text", "Display name", "This is the name that will be displayed instead of your handle. It can be any name you prefer to be called.", $user->display);
 	edit_feild("about", "textarea", "About", "You can write a piece of text detailing whatever you like on your userpage. Please don't include personal information!", $user->about);
 	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, not including the at sign (@). We will use this account to give you a profile picture.", $user->youtube);
-	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email);
+	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email, !$user->is_admin());
 	edit_feild("colour", "text", "Page colour", "The base colour that the colour of your userpage is derived from. Represented as hex #RRGGBB.", $user->manual_colour);
 	edit_feild("messages", "select", "Allow emails", "Choose if you want other users to be able to send you emails without revealing your email address.", $user->allow_messages ? "1" : "0", true, array("0" => "Disallow messages", "1" => "Allow messages"));
 	
@@ -1044,7 +1035,15 @@ function save_account() {
 		sorry("You cannot set your display name to that of another user's handle.");
 	}
 	
-	$user->email = htmlspecialchars($_POST["email"]);
+	$new_mail = htmlspecialchars($_POST["email"]);
+	
+	if (!$user->is_admin()) {
+		$user->email = $new_mail;
+	}
+	else if ($user->email != $new_mail) {
+		sorry("Your rank prevents you from updating your email address.");
+	}
+	
 	$user->youtube = htmlspecialchars($_POST["youtube"]);
 	$user->manual_colour = htmlspecialchars($_POST["colour"]);
 	
@@ -1111,11 +1110,6 @@ function display_user(string $user) {
 	// Show roles
 	if ($user->count_roles()) {
 		mod_property("Roles", "Users that are members of certian roles can preform extra administrative actions.", join(", ", $user->roles));
-	}
-	
-	// DEPRECATED Show if this user is an admin (legacy)
-	if ($user->admin) {
-		mod_property("Legacy admin", "If the admin priveleges for this user were given before 2023-03-13, then this will be set. It may be required to preform some admin actions while the codebase is transitioned to use roles.", "This user is an admin.");
 	}
 	
 	// Maybe show youtube?
