@@ -1,7 +1,12 @@
 <?php
 
+// Main endpoint manager
 require_once "endpoint.php";
 
+// Parsedown library for markdown formatting
+require_once "Parsedown.php";
+
+// Everying Everywhere All At Once
 require_once "action.php";
 require_once "admin.php";
 require_once "auth.php";

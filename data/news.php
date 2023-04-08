@@ -1,10 +1,5 @@
 <?php
 
-require_once "database.php";
-require_once "templates.php";
-require_once "user.php";
-require_once "discussion.php";
-
 function push_recent(string $name) {
 	/**
 	 * Add an article to the list of recently updated artcles.
@@ -113,7 +108,12 @@ class Article {
 		 * Get a news article as HTML.
 		 */
 		
-		return rich_format($this->body, true);
+		// Legacy formatting
+		//return rich_format($this->body, true);
+		
+		// Parsedown
+		$p = new Parsedown();
+		return $p->text($this->body);
 	}
 	
 	function update(string $title, string $content, string $whom = "") {
