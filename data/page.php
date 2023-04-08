@@ -6,6 +6,7 @@ define("SANITISE_NONE", 3);
 
 define("PAGE_MODE_API", 1);
 define("PAGE_MODE_HTML", 2);
+define("PAGE_MODE_RAW", 3);
 
 class Page {
 	public $title;
@@ -16,6 +17,10 @@ class Page {
 		$this->title = null;
 		$this->body = "";
 		$this->mode = PAGE_MODE_HTML;
+	}
+	
+	function set_mode(int $mode) : void {
+		$this->mode = $mode;
 	}
 	
 	function http_header(string $key, string $value) : void {
@@ -155,18 +160,28 @@ class Page {
 	}
 	
 	function render() : string {
-		return $this->render_html();
+		switch ($this->mode) {
+			case PAGE_MODE_HTML:
+				return $this->render_html();
+				break;
+			case PAGE_MODE_API:
+				return $this->render_json();
+				break;
+			default:
+				return $this->body;
+				break;
+		}
 	}
 	
 	function send() : void {
-		if ($this->mode !== PAGE_MODE_API) {
+		if ($this->mode === PAGE_MODE_HTML) {
 			global $gTitle; $gTitle = $this->title;
 			include_header();
 		}
 		
 		echo $this->render();
 		
-		if ($this->mode !== PAGE_MODE_API) {
+		if ($this->mode === PAGE_MODE_HTML) {
 			include_footer();
 		}
 		

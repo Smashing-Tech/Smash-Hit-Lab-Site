@@ -166,6 +166,7 @@ $gEndMan->add("site-css", function(Page $page) {
 	$s = new Styles();
 	
 	$page->type("text/css");
+	$page->set_mode(PAGE_MODE_RAW);
 	$page->add($s->render());
 	$page->send();
 });
