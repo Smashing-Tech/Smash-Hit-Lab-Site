@@ -58,3 +58,24 @@ Responds with a format like this:
   * `actions`: What actions should be available for this comment
 * `actor`: The handle of the person who made the poll request
 * `next_sak`: The next action key for the user
+
+### `POST` `/?a=discussion_update` `&api=1` `&id=<discussion-id>` `&index=<comment-index>`
+
+```
+<comment-body>
+```
+
+* `<discussion-id>`: Discussion ID to edit/post the comment on.
+* `<comment-index>`: The index of the comment to update, or `-1` if you want to make a new comment.
+* `<comment-body>`: The body of the comment.
+* Note: `&api=1` is required to get the JSON API version of this endpoint; otherwise, a web forms version will be used.
+
+It returns responses like:
+
+```json
+{"error": "not_supported", "message": "Updating existing comments is not supported."}
+```
+
+```json
+{"error": "done", "message": "Your comment was posted successfully!"}
+```
