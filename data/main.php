@@ -108,9 +108,7 @@ function main() {
 	}
 	// DEPRECATED: Static pages are deprecated, should use news articles now!
 	else if (array_key_exists("p", $_GET)) {
-		include_header();
-		include_static_page();
-		include_footer();
+		$page->redirect("./?n=" . $_GET["p"]);
 	}
 	else {
 		// Redirect to home page
