@@ -107,8 +107,9 @@ function main() {
 		display_news($_GET["n"]);
 	}
 	// DEPRECATED: Static pages are deprecated, should use news articles now!
+	// Update: They now redirect to news articles.
 	else if (array_key_exists("p", $_GET)) {
-		$page->redirect("./?n=" . $_GET["p"]);
+		display_news($_GET["p"]);
 	}
 	else {
 		// Redirect to home page

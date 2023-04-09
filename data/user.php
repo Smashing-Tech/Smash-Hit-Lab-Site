@@ -162,6 +162,8 @@ class Token {
 		
 		// Not the same IP (TODO: Needs some extra conditions so it's not annoying)
 		if ($this->ip !== crush_ip()) {
+			$this->delete(); // We also destroy the token in case someone has been
+			                 // tampering with it.
 			return null;
 		}
 		
