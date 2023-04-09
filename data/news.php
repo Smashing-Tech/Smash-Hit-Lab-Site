@@ -147,6 +147,28 @@ class Article {
 		
 		echo "<h1>$this->title</h1>";
 		
+		// Make icons
+		$icon_date = "<span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">today</span>";
+		$icon_people = "<span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">supervisor_account</span>";
+		
+		// Make editor list
+		$editors = "";
+		
+		for ($i = 0; $i < sizeof($this->authors); $i++) {
+			$editors .= get_nice_display_name($this->authors[$i]);
+			
+			// Nice ands and commas
+			if (($i + 2) == sizeof($this->authors)) {
+				$editors .= " and ";
+			}
+			else if (($i + 1) != sizeof($this->authors)) {
+				$editors .= ", ";
+			}
+		}
+		
+		// Display article creation date
+		echo "<p style=\"text-align: center; opacity: 0.7;\">$icon_date Created " . date("Y-m-d", $this->created) . (($this->created != $this->updated) ? (" (edited " . date("Y-m-d", $this->updated) . ")") : ("")) . "<span style=\"padding-left: 1em\"/>$icon_people Edited by $editors</p>";
+		
 		// Edit button for article
 		show_news_edit_button($this->name);
 		
@@ -154,25 +176,8 @@ class Article {
 		echo $this->get_html();
 		echo "</div>";
 		
-		// Display article creation date
-		echo "<p class=\"small-text\">Created on " . date("Y-m-d H:i", $this->created) . " and last updated at " . date("Y-m-d H:i", $this->updated) . "</p>";
-		
-		// Display article editors
-		echo "<p class=\"small-text\">This article was edited by ";
-		
-		for ($i = 0; $i < sizeof($this->authors); $i++) {
-			echo get_nice_display_name($this->authors[$i]);
-			
-			// Nice ands and commas
-			if (($i + 2) == sizeof($this->authors)) {
-				echo " and ";
-			}
-			else if (($i + 1) != sizeof($this->authors)) {
-				echo ", ";
-			}
-		}
-		
-		echo "</p>";
+		// Divider for comments
+		echo "<div style=\"border-bottom: 1px solid var(--colour-primary-b); margin-bottom: 1em;\"></div>";
 		
 		// Display comments
 		$disc = new Discussion($this->comments);
