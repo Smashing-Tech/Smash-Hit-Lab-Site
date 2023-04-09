@@ -1,4 +1,12 @@
-<form action="./?a=save_news&amp;n=<?= $this->name ?>">
+<script>
+function disable_scroll() {
+	document.getElementById("body").style.overflow = "hidden";
+}
+
+disable_scroll();
+</script>
+<div class="editor-main-ving"></div>
+<form action="./?a=save_news&amp;n=<?= $this->name ?>" method="post">
 	<div class="editor-main">
 		<div class="editor-main-toolbar">
 			<div class="editor-main-toolbar-title">
@@ -11,7 +19,7 @@
 				</select>
 			</div>
 			<div class="editor-main-toolbar-button">
-				<button class="editor-main-control-submit">Save</button>
+				<input type="submit" class="editor-main-control-submit" value="Save"/>
 			</div>
 		</div>
 		<div class="editor-main-text">
