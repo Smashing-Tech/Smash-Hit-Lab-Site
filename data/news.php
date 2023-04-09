@@ -137,13 +137,7 @@ class Article {
 	}
 	
 	function display_update() {
-		echo "<h1>Editing $this->title</h1>";
-		echo "<form action=\"./?a=save_news&amp;n=$this->name\" method=\"post\">";
-		edit_feild("title", "text", "Title", "Real title of the article.", $this->title);
-		edit_feild("body", "textarea", "Body", "The actual article's contents.", $this->body);
-		edit_feild("permissions", "select", "Visibility", "Controls weather the article can be seen by the public or not.", $this->permissions, true, array("private" => "Private", "public" => "Public"));
-		echo "<input type=\"submit\" value=\"Save article\"/>";
-		echo "</form>";
+		require("../data/_news_editor.html");
 	}
 	
 	function display() {

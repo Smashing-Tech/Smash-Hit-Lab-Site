@@ -1,0 +1,21 @@
+<form action="./?a=save_news&amp;n=<?= $this->name ?>">
+	<div class="editor-main">
+		<div class="editor-main-toolbar">
+			<div class="editor-main-toolbar-title">
+				<input name="title" class="editor-main-control editor-main-control-title" type="text" placeholder="Page title" value="<?= $this->title ?>"/>
+			</div>
+			<div class="editor-main-toolbar-visible">
+				<select name="permissions" class="editor-main-control">
+					<option value="private" <?php echo ($this->permissions == "private" ? "selected" : ""); ?>>Private</option>
+					<option value="public" <?php echo ($this->permissions == "public" ? "selected" : ""); ?>>Public</option>
+				</select>
+			</div>
+			<div class="editor-main-toolbar-button">
+				<button class="editor-main-control-submit">Save</button>
+			</div>
+		</div>
+		<div class="editor-main-text">
+			<textarea name="body" class="editor-main-text-box"><?= htmlspecialchars($this->body) ?></textarea>
+		</div>
+	</div>
+</form>
