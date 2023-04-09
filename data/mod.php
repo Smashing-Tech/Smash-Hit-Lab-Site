@@ -87,9 +87,13 @@ class ModPage {
 			echo "</p>";
 		}
 		
-		echo "<h3>About</h3>";
-		
-		echo ($this->description) ? rich_format($this->description) : "<p><i>We don't have an about section for this mod right now.</i></p>";
+		if ($this->description) {
+			echo "<h3>About</h3>";
+			
+			$pd = new Parsedown();
+			$pd->setSafeMode(true);
+			echo $pd->text($this->description);
+		}
 		
 		if ($this->download || $this->version || $this->creators || $this->security) {
 			echo "<h3>Basic info</h3>";

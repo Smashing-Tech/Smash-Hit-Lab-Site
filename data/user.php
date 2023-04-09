@@ -1103,7 +1103,10 @@ function display_user(string $user) {
 	// If the user has an about section, then we should show it.
 	if ($user->about) {
 		echo "<h3>About</h3>";
-		echo rich_format($user->about);
+		
+		$pd = new Parsedown();
+		$pd->setSafeMode(true);
+		echo $pd->text($user->about);
 	}
 	
 	echo "<h3>Details</h3>";

@@ -3,11 +3,6 @@
  * Discssions for comments and reviews
  */
 
-require_once "user.php";
-require_once "notifications.php";
-require_once "templates.php";
-require_once "config.php";
-
 function random_discussion_name() : string {
 	/**
 	 * Cryptographically secure random hex values modified for discussion names.
@@ -69,23 +64,10 @@ class Comment {
 		return $this->hidden;
 	}
 	
-	function render(string $id, int $index) {
-		if ($this->is_hidden()) {
-			return "";
-		}
-		
-		$date = date("Y-m-d H:i:s", $this->created);
-		$name = get_nice_display_name($this->author);
-		$img = get_profile_image($this->author);
-		
-		$img = "<img src=\"$img\"/>";
-		$text = rich_format($this->body);
-		$after = htmlspecialchars($_SERVER['REQUEST_URI']);
-		$hidden_text = ($this->is_hidden()) ? "Unhide" : "<span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">block</span> Hide";
-		$sak = user_get_sak();
-		$actions = (get_name_if_admin_authed() || (get_name_if_authed() === $this->author)) ? "<p><a href=\"./?a=discussion_hide&id=$id&index=$index&after=$after&key=$sak\">$hidden_text</a></p>" : "";
-		
-		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\">$img</div><div class=\"comment-card-inner-right\"><p>$name <span class=\"small-text\">(@$this->author | $date)</span></p><p>$text</p>$actions</div></div></div>";
+	function render_body() {
+		$pd = new Parsedown();
+		$pd->setSafeMode(true);
+		return $pd->text($this->body);
 	}
 }
 
@@ -349,7 +331,7 @@ class Discussion {
 			
 			$comments[$i]->display = $user->get_display();
 			$comments[$i]->image = $user->get_image();
-			$comments[$i]->body = rich_format($comments[$i]->body);
+			$comments[$i]->body = $comments[$i]->render_body();
 			$comments[$i]->actions = array("reply");
 			
 			if (get_name_if_admin_authed() || (get_name_if_authed() == $user->name)) {
