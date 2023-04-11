@@ -1100,15 +1100,22 @@ function display_user(string $user) {
 	
 	display_user_banner($user);
 	
+	// Include the tabs script
+	readfile("../data/_user_tabs.html");
+	
 	// If the user has an about section, then we should show it.
+	echo "<div class=\"user-tab-data about\">";
 	if ($user->about) {
-		echo "<h3>About</h3>";
-		
 		$pd = new Parsedown();
 		$pd->setSafeMode(true);
 		echo $pd->text($user->about);
 	}
+	else {
+		echo "<p><i>This user has not added any information to their about page.</i></p>";
+	}
+	echo "</div>";
 	
+	echo "<div class=\"user-tab-data details\">";
 	echo "<h3>Details</h3>";
 	mod_property("Join date", "The date that the user joined the Smash Hit Lab.", Date("Y-m-d", $user->created));
 	
@@ -1132,11 +1139,9 @@ function display_user(string $user) {
 		mod_property("Email", "You can send a private message to this user via email.", "<a href=\"./?a=user_email&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">email</span> Send email</button></a>");
 	}
 	
+	// Edit profile button
 	if ($stalker && $stalker->name === $user->name) {
-		echo "<h3>Account actions</h3>";
-		mod_property("Settings",
-			"You can edit your details and customise your exprience by editing your account settings.",
-			"<a href=\"./?a=edit_account\"><button class=\"button\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">manage_accounts</span> Account settings</button></a>");
+		echo "<a href=\"./?a=edit_account\"><button style=\"position: fixed; bottom: 2em; right: 2em;\" class=\"button\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit profile</button></a>";
 	}
 	
 	// Admins can view some extra data like emails
@@ -1160,11 +1165,17 @@ function display_user(string $user) {
 		
 		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "<a href=\"./?a=user_verify&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">verified</span> Toggle verified status</button></a>");
 	}
+	echo "</div>";
 	
 	// Finally the message wall for this user
 	// Display comments
+	echo "<div class=\"user-tab-data wall\">";
 	$disc = new Discussion($user->wall);
 	$disc->display_reverse("Message wall", "./?u=" . $user->name);
+	echo "</div>";
+	
+	// User tab script
+	echo "<script>user_tabs_init();</script>";
 	
 	// Colourful user profile, if we can show it
 	display_user_accent_script($user);

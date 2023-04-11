@@ -1,0 +1,42 @@
+<script>
+function user_tabs_select(selected_tab) {
+	// Tab classes
+	let buttons = document.getElementsByClassName("user-tabs-ent");
+	
+	// Life tip: Never fucking use for .. in .. in javascript, it's completely
+	// fucked when it's not an actual list.
+	for (i = 0; i < buttons.length; i++) {
+		// Remove all selected parts
+		if (buttons[i].classList.contains("selected")) {
+			buttons[i].classList.remove("selected");
+		}
+		
+		// Add it if it's the tab we want
+		if (buttons[i].classList.contains(selected_tab)) {
+			buttons[i].classList.add("selected");
+		}
+	}
+	
+	// Real content
+	let tabs = document.getElementsByClassName("user-tab-data");
+	
+	for (i = 0; i < tabs.length; i++) {
+		tabs[i].style.display = (tabs[i].classList.contains(selected_tab)) ? "block" : "none";
+	}
+}
+
+function user_tabs_init() {
+	user_tabs_select('about');
+}
+</script>
+<div class="user-tabs">
+	<div class="user-tabs-ent about" onclick="user_tabs_select('about')">
+		<p class="user-tabs-tab">About</p>
+	</div>
+	<div class="user-tabs-ent wall" onclick="user_tabs_select('wall')">
+		<p class="user-tabs-tab">Message Wall</p>
+	</div>
+	<div class="user-tabs-ent details" onclick="user_tabs_select('details')">
+		<p class="user-tabs-tab">Details</p>
+	</div>
+</div>
