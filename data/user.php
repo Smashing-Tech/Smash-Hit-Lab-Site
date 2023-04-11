@@ -1105,6 +1105,7 @@ function display_user(string $user) {
 	
 	// If the user has an about section, then we should show it.
 	echo "<div class=\"user-tab-data about\">";
+	echo "<h3>About</h3>";
 	if ($user->about) {
 		$pd = new Parsedown();
 		$pd->setSafeMode(true);

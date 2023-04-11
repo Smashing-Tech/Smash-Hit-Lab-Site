@@ -3,25 +3,23 @@ function user_tabs_select(selected_tab) {
 	// Tab classes
 	let buttons = document.getElementsByClassName("user-tabs-ent");
 	
-	// Life tip: Never fucking use for .. in .. in javascript, it's completely
-	// fucked when it's not an actual list.
-	for (i = 0; i < buttons.length; i++) {
+	for (button of buttons) {
 		// Remove all selected parts
-		if (buttons[i].classList.contains("selected")) {
-			buttons[i].classList.remove("selected");
+		if (button.classList.contains("selected")) {
+			button.classList.remove("selected");
 		}
 		
 		// Add it if it's the tab we want
-		if (buttons[i].classList.contains(selected_tab)) {
-			buttons[i].classList.add("selected");
+		if (button.classList.contains(selected_tab)) {
+			button.classList.add("selected");
 		}
 	}
 	
 	// Real content
 	let tabs = document.getElementsByClassName("user-tab-data");
 	
-	for (i = 0; i < tabs.length; i++) {
-		tabs[i].style.display = (tabs[i].classList.contains(selected_tab)) ? "block" : "none";
+	for (tab of tabs) {
+		tab.style.display = (tab.classList.contains(selected_tab)) ? "block" : "none";
 	}
 }
 
