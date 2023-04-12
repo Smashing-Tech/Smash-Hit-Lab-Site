@@ -575,11 +575,15 @@ blockquote {
 
 .user-tabs {
 	display: grid;
-	grid-template-columns: auto auto auto;
+	grid-template-columns: auto auto auto auto;
 }
 
 .user-tabs-ent {
 	cursor: pointer;
+}
+
+.user-tabs-ent:hover {
+	border-bottom: 0.25em solid var(--colour-primary-a);
 }
 
 .user-tabs-ent.about {
@@ -592,6 +596,10 @@ blockquote {
 
 .user-tabs-ent.details {
 	grid-column: 3;
+}
+
+.user-tabs-ent.actions {
+	grid-column: 4;
 }
 
 .user-tabs-ent.selected {

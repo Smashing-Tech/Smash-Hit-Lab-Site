@@ -1135,24 +1135,22 @@ function display_user(string $user) {
 		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "Verified by $user->verified");
 	}
 	
+	echo "</div>";
+	echo "<div class=\"user-tab-data actions\">";
+	
+	echo "<h3>Actions</h3>";
+	
 	// Show the email action if the user allows it
 	if ($stalker && $user->allow_messages) {
 		mod_property("Email", "You can send a private message to this user via email.", "<a href=\"./?a=user_email&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">email</span> Send email</button></a>");
 	}
-	
-	// Edit profile button
-	if ($stalker && $stalker->name === $user->name) {
-		echo "<a href=\"./?a=edit_account\"><button style=\"position: fixed; bottom: 2em; right: 2em;\" class=\"button\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit profile</button></a>";
+	// We can offer the user to use the message wall
+	else {
+		mod_property("Send message", "You can send this user a message publicly via their wall.", "<button class=\"button secondary\" onclick=\"user_tabs_select('wall')\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">forum</span> Message wall</button>");
 	}
 	
 	// Admins can view some extra data like emails
 	if ($stalker && $stalker->is_admin()) {
-		echo "<h3>Admin-only info and actions</h3>";
-		
-		if ($user->email) {
-			mod_property("Email", "This user's email address.", "<a href=\"mailto:$user->email\">$user->email</a>");
-		}
-		
 		if ($user->is_banned()) {
 			mod_property("Unban time", "The time at which this user will be allowed to log in again.", $user->unban_date());
 		}
@@ -1174,6 +1172,11 @@ function display_user(string $user) {
 	$disc = new Discussion($user->wall);
 	$disc->display_reverse("Message wall", "./?u=" . $user->name);
 	echo "</div>";
+	
+	// Edit profile button
+	if ($stalker && $stalker->name === $user->name) {
+		echo "<a href=\"./?a=edit_account\"><button style=\"position: fixed; bottom: 2em; right: 2em;\" class=\"button\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit profile</button></a>";
+	}
 	
 	// User tab script
 	echo "<script>user_tabs_init();</script>";
