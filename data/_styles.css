@@ -231,6 +231,7 @@ input[type=submit]:hover, button:hover, .button:hover {
 
 .navbar-section a {
 	color: var(--colour-background-dark-text);
+	text-shadow: none;
 }
 
 @media (max-width: 1200px) {
@@ -283,12 +284,17 @@ input[type=submit]:hover, button:hover, .button:hover {
 .cb-top-item { /* TODO Rename to navbar-item */
 	margin: 0;
 	padding: 0;
-	margin-right: 1.0em;
+	padding: 0.1em 0.5em;
 	font-size: 14pt;
 	display: inline-block;
 	vertical-align: middle;
 	font-family: var(--font-main);
 	max-height: 64px; /* Why did this fix it? */
+	border-radius: 0.25em;
+}
+
+.cb-top-item:hover {
+	background: var(--colour-background-light);
 }
 
 @media (max-width: 1200px) {
