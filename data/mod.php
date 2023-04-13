@@ -47,6 +47,10 @@ class ModPage {
 			if (!property_exists($mod, "reviews")) {
 				$this->save();
 			}
+			
+			// Update discussions URL
+			$disc = new Discussion($this->reviews);
+			$disc->set_url("./?m=$this->package");
 		}
 		else {
 			$this->package = $package;
@@ -101,11 +105,12 @@ class ModPage {
 		
 		if (get_name_if_authed()) {
 			echo "<p class=\"centred\">";
-			echo "<a href=\"./?a=edit_mod&m=$this->package\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit mod info</button></a> ";
-			echo "<a href=\"./?a=mod_history&m=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">history</span> Revision history</button></a>";
+			echo "<a href=\"./?a=edit_mod&m=$this->package\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit this mod</button></a> ";
+			echo "<a href=\"./?a=mod_history&m=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">history</span> History</button></a> ";
+			echo "<a href=\"./?a=mod-rename&oldslug=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit_location</span> Rename</button></a> ";
 			
 			if (get_name_if_admin_authed()) {
-				echo "<a href=\"./?a=mod_delete&package=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">delete</span> Delete page</button></a>";
+				echo "<a href=\"./?a=mod_delete&package=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">delete</span> Delete</button></a> ";
 			}
 			
 			echo "</p>";
@@ -379,8 +384,8 @@ $gEndMan->add("mod-rename", function(Page $page) {
 	$user = get_name_if_authed();
 	
 	if ($user) {
-		if ($page->has("submit")) {
-			$form = new Form();
+		if (!$page->has("submit")) {
+			$form = new Form("./?a=mod-rename&submit=1");
 			$form->hidden("oldslug", $page->get("oldslug"));
 			$form->textbox("newslug", "New name", "What do you want the new name of the page to be?", $page->get("oldslug"));
 			$form->submit("Rename page");
@@ -397,7 +402,8 @@ $gEndMan->add("mod-rename", function(Page $page) {
 			$result = $mod->rename($new_slug);
 			
 			if ($result) {
-				$page->info("Page renamed!", "This page was renamed successfully!");
+				alert("@$user renamed mod page '$old_slug' to '$new_slug'", "./?m=$new_slug");
+				$page->redirect("./?m=$new_slug");
 			}
 			else {
 				$page->info("Something happened", "A page with this name already exists.");

@@ -84,6 +84,9 @@ class Article {
 			if (!property_exists($info, "comments")) {
 				$this->save();
 			}
+			
+			$disc = new Discussion($this->comments);
+			$disc->set_url("./?n=$this->name");
 		}
 		else {
 			$this->name = $name;

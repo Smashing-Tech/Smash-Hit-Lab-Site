@@ -95,7 +95,7 @@ class Form {
 	}
 	
 	function hidden(string $name, string $value) {
-		$this->body .= "<input name=\"$name\" type=\"hidden\" value=\"$value\"/>";
+		$this->body .= "<input name=\"$name\" type=\"hidden\" value=\"$value\" readonly/>";
 	}
 	
 	function day(string $name, string $title, string $desc) {

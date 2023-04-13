@@ -193,6 +193,8 @@ class Discussion {
 		else {
 			return false;
 		}
+		
+		$this->save();
 	}
 	
 	function add_comment(string $author, string $body) {
@@ -206,6 +208,7 @@ class Discussion {
 		// HACK I think if we start with "./" for now, it should be secure
 		// enough.
 		// FIXED: This will soon be deprecated.
+		// NOTE I'm not sure WHAT THE FUCK IS HAPPENING???
 		$url = $this->get_url();
 		$url = ($url || !array_key_exists("after", $_GET)) ? $url : $_GET['after'];
 		

@@ -441,6 +441,7 @@ class User {
 		if ($db->has($name)) {
 			$info = $db->load($name);
 			
+			$this->schema = (property_exists($info, "schema") ? $info->schema : 0);
 			$this->name = $info->name;
 			$this->display = (property_exists($info, "display") ? $info->display : $info->name);
 			$this->password = $info->password;
@@ -467,6 +468,15 @@ class User {
 			// If we didn't have a pfp before, find and save it now!
 			if ((!$this->image) || (!$this->accent)) {
 				$this->update_image();
+				$this->save();
+			}
+			
+			// Schema R1: Update discussions URL
+			if ($this->schema < 1) {
+				$disc = new Discussion($this->wall);
+				$disc->set_url("./?m=$this->name");
+				
+				$this->schema = 1;
 				$this->save();
 			}
 		}
