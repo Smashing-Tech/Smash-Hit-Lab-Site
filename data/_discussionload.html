@@ -22,7 +22,6 @@
 		let d = new Date(t * 1000);
 		
 		return d.toLocaleString();
-		//return d.getUTCFullYear() + "-" + d.getUTCMonth() + "-" + d.getUTCDate() + " " + d.getUTCHours() + ":" + d.getUTCMinutes();
 	}
 	
 	function ds_render_actions(actions, index, author) {
@@ -48,8 +47,8 @@
 		return string + "</p>";
 	}
 	
-	function ds_render_comment(image, author, display, time, body, actions, index) {
-		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"" + image + "\"/></div><div class=\"comment-card-inner-right\"><p><a href=\"./?u=" + author + "\">" + display + "</a> <span class=\"small-text\">(@" + author + " | " + time + ")</span></p><p>" + body + "</p>" + ds_render_actions(actions, index, author) + "</div></div></div>";
+	function ds_render_comment(image, author, display, time, body, actions, index, badge) {
+		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"" + image + "\"/></div><div class=\"comment-card-inner-right\"><p><a href=\"./?u=" + author + "\">" + display + "</a> " + badge + " <span class=\"small-text\">(@" + author + " | " + time + ")</span></p><p>" + body + "</p>" + ds_render_actions(actions, index, author) + "</div></div></div>";
 	}
 	
 	function ds_load_handle() {
@@ -73,7 +72,7 @@
 					let body = comment["body"]; // Will already be escaped
 					let date = format_time(comment["updated"]);
 					
-					discussion.innerHTML += ds_render_comment(image, author, display, date, body, comment["actions"], comment["index"]);
+					discussion.innerHTML += ds_render_comment(image, author, display, date, body, comment["actions"], comment["index"], comment["badge"]);
 				}
 				
 				UserSAK = data["next_sak"];

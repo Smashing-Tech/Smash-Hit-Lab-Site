@@ -723,6 +723,14 @@ class User {
 		return $this->has_role("admin");
 	}
 	
+	function is_mod() : bool {
+		/**
+		 * Check if the user can preform moderation tasks.
+		 */
+		
+		return $this->has_role("mod") || $this->is_admin();
+	}
+	
 	function update_image() : void {
 		/**
 		 * Update the profile image
@@ -957,18 +965,31 @@ function get_nice_display_name(string $user, bool $badge = true) {
 	}
 	
 	if ($badge) {
-		if ($user->is_admin()) {
-			$string = $string . " <span class=\"small-text staff-badge\">staff</span>";
-		}
-		else if ($user->is_banned()) {
-			$string = $string . " <span class=\"small-text banned-badge\">banned</span>";
-		}
-		else if ($user->is_verified()) {
-			$string = $string . " <span class=\"small-text verified-badge\">verified</span>";
-		}
+		$string .= " " . get_user_badge($user);
 	}
 	
 	return $string;
+}
+
+function get_user_badge(User $user) {
+	/**
+	 * Get a user's badge.
+	 */
+	
+	if ($user->is_admin()) {
+		return "<span class=\"small-text staff-badge\">staff</span>";
+	}
+	else if ($user->is_banned()) {
+		return "<span class=\"small-text banned-badge\">banned</span>";
+	}
+	else if ($user->is_mod()) {
+		return "<span class=\"small-text moderator-badge\">moderator</span>";
+	}
+	else if ($user->is_verified()) {
+		return "<span class=\"small-text verified-badge\">verified</span>";
+	}
+	
+	return "";
 }
 
 function get_profile_image(string $user) {

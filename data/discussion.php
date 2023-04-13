@@ -328,6 +328,8 @@ class Discussion {
 			if (get_name_if_admin_authed() || (get_name_if_authed() == $user->name)) {
 				$comments[$i]->actions[] = "hide";
 			}
+			
+			$comments[$i]->badge = get_user_badge($user);
 		}
 		
 		return $comments;
