@@ -72,6 +72,30 @@ class ModPage {
 		$db->save($this->package, $this);
 	}
 	
+	function rename(string $new_slug) : bool {
+		/**
+		 * Rename the page, checking if it already exists.
+		 * 
+		 * Returns: false = page already exists, true = renamed successfully
+		 */
+		
+		$db = new RevisionDB("mod");
+		
+		// Check if page already exists
+		if ($db->has($new_slug)) {
+			return false;
+		}
+		
+		// Delete old page
+		$db->delete($this->package);
+		
+		// Create new page
+		$this->package = $new_slug;
+		$this->save();
+		
+		return true;
+	}
+	
 	function display() {
 		echo "<h1>" . ($this->name ? $this->name : $this->package) . "</h1>";
 		
@@ -350,3 +374,37 @@ function list_mods() : void {
 	echo "</ul>";
 	include_footer();
 }
+
+$gEndMan->add("mod-rename", function(Page $page) {
+	$user = get_name_if_authed();
+	
+	if ($user) {
+		if ($page->has("submit")) {
+			$form = new Form();
+			$form->hidden("oldslug", $page->get("oldslug"));
+			$form->textbox("newslug", "New name", "What do you want the new name of the page to be?", $page->get("oldslug"));
+			$form->submit("Rename page");
+			
+			$page->heading(1, "Rename page");
+			$page->add($form);
+		}
+		else {
+			$old_slug = $page->get("oldslug");
+			$new_slug = $page->get("newslug");
+			
+			// Rename the page
+			$mod = new ModPage($old_slug);
+			$result = $mod->rename($new_slug);
+			
+			if ($result) {
+				$page->info("Page renamed!", "This page was renamed successfully!");
+			}
+			else {
+				$page->info("Something happened", "A page with this name already exists.");
+			}
+		}
+	}
+	else {
+		$page->info("Sorry!", "You need to be logged in to rename pages.");
+	}
+});

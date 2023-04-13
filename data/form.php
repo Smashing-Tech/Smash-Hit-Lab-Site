@@ -94,6 +94,10 @@ class Form {
 		$this->container($title, $desc, $data);
 	}
 	
+	function hidden(string $name, string $value) {
+		$this->body .= "<input name=\"$name\" type=\"hidden\" value=\"$value\"/>";
+	}
+	
 	function day(string $name, string $title, string $desc) {
 		$data = "";
 		
