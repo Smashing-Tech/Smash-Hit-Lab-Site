@@ -210,6 +210,13 @@ input[type=submit]:hover, button:hover, .button:hover {
 	padding: 0.0625em 0.25em;
 }
 
+.moderator-badge {
+	background: #060026;
+	border-radius: 1em;
+	color: #00d4ff;
+	padding: 0.0625em 0.25em;
+}
+
 .verified-badge {
 	background: #1b2600;
 	border-radius: 1em;
