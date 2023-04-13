@@ -220,7 +220,7 @@ class Discussion {
 		notify_scan($body, $url);
 		
 		// Admin alert!
-		alert("Discssion $this->id updated by $author", "./" . $url);
+		alert("Discussion $this->id updated by $author", "./" . $url);
 	}
 	
 	function update_comment(int $index, string $author, string $body) {

@@ -152,7 +152,7 @@ class ModPage {
 		edit_feild("code", "text", "Source code", "A link to where the source code for a mod can be found.", $this->code);
 		edit_feild("tags", "text", "Tags", "Keywords and categorical description of this mod.", create_comma_array($this->tags));
 		
-		edit_feild("status", "select", "Status", "A short description of the mod's development status.", $this->status, true, array("" => "None", "Released" => "Released", "Abandoned" => "Abandoned", "Completed" => "Completed", "On haitus" => "On haitus"));
+		edit_feild("status", "select", "Status", "A short description of the mod's development status.", $this->status, true, array("" => "None", "Released" => "Released", "Abandoned" => "Abandoned", "Completed" => "Completed", "On hiatus" => "On hiatus"));
 		form_end("Save edits");
 	}
 	
