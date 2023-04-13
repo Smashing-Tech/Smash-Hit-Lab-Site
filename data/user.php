@@ -472,11 +472,11 @@ class User {
 			}
 			
 			// Schema R1: Update discussions URL
-			if ($this->schema < 1) {
+			if ($this->schema < 2) {
 				$disc = new Discussion($this->wall);
-				$disc->set_url("./?m=$this->name");
+				$disc->set_url("./?u=$this->name");
 				
-				$this->schema = 1;
+				$this->schema = 2;
 				$this->save();
 			}
 		}

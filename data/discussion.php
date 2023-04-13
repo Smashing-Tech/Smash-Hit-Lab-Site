@@ -178,7 +178,7 @@ class Discussion {
 		 * Get the URL where this discussion appears
 		 */
 		
-		return $this->url;
+		return ($this->url) ? $this->url : "";
 	}
 	
 	function set_url(string $url) : bool {
@@ -186,15 +186,14 @@ class Discussion {
 		 * Set the URL assocaited with the discussion, if not already set.
 		 */
 		
-		if (!$this->url) {
+		if ($this->url === null) {
 			$this->url = $url;
+			$this->save();
 			return true;
 		}
 		else {
 			return false;
 		}
-		
-		$this->save();
 	}
 	
 	function add_comment(string $author, string $body) {
@@ -202,19 +201,8 @@ class Discussion {
 		$this->save();
 		
 		// Notify users
-		// I hate having to use &after= on this, but it's really the only
-		// way to do things without having each discussion assocaited with a
-		// URL (which is probably a good idea, actually).
-		// HACK I think if we start with "./" for now, it should be secure
-		// enough.
-		// FIXED: This will soon be deprecated.
-		// NOTE I'm not sure WHAT THE FUCK IS HAPPENING???
+		// We start by grabbing the assocaited URL
 		$url = $this->get_url();
-		$url = ($url || !array_key_exists("after", $_GET)) ? $url : $_GET['after'];
-		
-		if (!str_starts_with($url, "./") || !str_starts_with($url, "/")) {
-			$url = "./" . $url;
-		}
 		
 		// Notify post followers
 		notify_many($this->followers, "New message from @$author", $url);
@@ -223,7 +211,7 @@ class Discussion {
 		notify_scan($body, $url);
 		
 		// Admin alert!
-		alert("Discussion $this->id updated by $author", "./" . $url);
+		alert("Discussion $this->id updated by $author", $url);
 	}
 	
 	function update_comment(int $index, string $author, string $body) {
