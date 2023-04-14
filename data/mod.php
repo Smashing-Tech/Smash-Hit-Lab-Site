@@ -387,7 +387,16 @@ function list_mods() : void {
 		}
 		
 		$url = "./?m=" . htmlspecialchars($mp->package);
-		echo "<li><a href=\"$url\">$title</a><br/>$desc</li>";
+		$img = $mp->image ? $mp->image : "./icon.png";
+		//echo "<li><a href=\"$url\">$title</a><br/>$desc</li>";
+		echo "<a href=\"$url\">
+		<div class=\"mod-card-outer\">
+			<div class=\"mod-card-image\" style=\"background-image: url('$img');\"></div>
+			<div class=\"mod-card-data\">
+				<h4>$title</h4>
+				<p>$desc</p>
+			</div>
+		</div></a>";
 	}
 	
 	echo "</ul>";

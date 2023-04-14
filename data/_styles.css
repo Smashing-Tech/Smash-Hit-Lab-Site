@@ -634,3 +634,24 @@ blockquote {
 	color: #fff;
 	text-shadow: 0 0.2em 0.5em #0008;
 }
+
+.mod-card-outer {
+	width: 12em;
+	height: 16em;
+	margin: 0.5em;
+	padding: 1px;
+	display: inline-block;
+	overflow: hidden;
+}
+
+.mod-card-image {
+	width: 12em;
+	height: 8em;
+	background-position: center;
+	background-size: cover;
+	outline: 1px solid #0008;
+	border-radius: 0.5em;
+}
+
+.mod-card-data {
+}
