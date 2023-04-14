@@ -170,3 +170,49 @@ $gEndMan->add("site-css", function(Page $page) {
 	$page->add($s->render());
 	$page->send();
 });
+
+$gEndMan->add("generate-logo-coloured", function(Page $page) {
+	$cb = str_split(md5($page->get("seed")), 6);
+	
+	$bg = $cb[0];
+	$fg = $cb[1];
+	
+	$page->type("image/svg+xml");
+	$page->add("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+<svg
+   width=\"256\"
+   height=\"256\"
+   viewBox=\"0 0 67.733332 67.733335\"
+   version=\"1.1\"
+   id=\"svg5\"
+   xmlns=\"http://www.w3.org/2000/svg\"
+   xmlns:svg=\"http://www.w3.org/2000/svg\">
+  <defs
+     id=\"defs2\" />
+  <g
+     id=\"layer1\">
+    <rect
+       style=\"fill:#$bg;stroke-width:0.264583\"
+       id=\"rect163\"
+       width=\"67.73333\"
+       height=\"67.73333\"
+       x=\"0\"
+       y=\"0\"
+       ry=\"0\" />
+    <path
+       id=\"path1506\"
+       style=\"fill:#$fg;stroke:none;stroke-width:0.112875px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\"
+       d=\"M 33.866665,4.9708017 4.970501,33.866965 33.866665,62.762531 62.762829,33.866965 Z\" />
+    <path
+       id=\"path226\"
+       style=\"fill:#$bg;stroke:none;stroke-width:0.0798143px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\"
+       d=\"M 48.314708,19.418624 H 19.418622 l 2.99e-4,28.895785 28.895787,3e-4 z\" />
+    <path
+       id=\"path232\"
+       style=\"fill:#$fg;stroke:none;stroke-width:0.0564364px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\"
+       d=\"M 33.866665,19.418971 19.41882,33.866816 33.866665,48.314362 48.31451,33.866816 Z\" />
+  </g>
+</svg>");
+	$page->set_mode(PAGE_MODE_RAW);
+	$page->send();
+});

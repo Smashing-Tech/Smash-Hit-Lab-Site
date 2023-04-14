@@ -395,8 +395,8 @@ function list_mods() : void {
 		}
 		
 		$url = "./?m=" . htmlspecialchars($mp->package);
-		$img = $mp->image ? $mp->image : "./icon.png";
-		//echo "<li><a href=\"$url\">$title</a><br/>$desc</li>";
+		$img = $mp->image ? $mp->image : "./?a=generate-logo-coloured&seed=$title";
+		
 		echo "<a href=\"$url\">
 		<div class=\"mod-card-outer\">
 			<div class=\"mod-card-image\" style=\"background-image: url('$img');\"></div>
