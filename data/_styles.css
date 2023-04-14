@@ -630,6 +630,17 @@ blockquote {
 	background-size: cover;
 }
 
+.mod-listing {
+}
+
+.mod-listing a {
+	font-weight: normal;
+}
+
+.mod-listing a:hover {
+	text-shadow: none;
+}
+
 .mod-banner h1 {
 	color: #fff;
 	text-shadow: 0 0.2em 0.5em #0008;
@@ -638,10 +649,15 @@ blockquote {
 .mod-card-outer {
 	width: 12em;
 	height: 16em;
-	margin: 0.5em;
+	margin: 0.75em;
 	padding: 1px;
 	display: inline-block;
 	overflow: hidden;
+	transition: scale 0.3s;
+}
+
+.mod-card-outer:hover {
+	scale: 1.08;
 }
 
 .mod-card-image {
@@ -654,4 +670,8 @@ blockquote {
 }
 
 .mod-card-data {
+	text-align: left;
+	height: 8em;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }

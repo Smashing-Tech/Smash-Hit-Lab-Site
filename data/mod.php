@@ -61,7 +61,7 @@ class ModPage {
 			$this->updated = time();
 			$this->created = time();
 			$this->author = "";
-			$this->security = "No potentially insecure modifications";
+			$this->security = "";
 			$this->status = "Released";
 			$this->reviews = random_discussion_name();
 			$this->image = "";
@@ -193,7 +193,15 @@ class ModPage {
 		edit_feild("code", "text", "Source code", "A link to where the source code for a mod can be found.", $this->code);
 		edit_feild("tags", "text", "Tags", "Keywords and categorical description of this mod.", create_comma_array($this->tags));
 		
-		edit_feild("status", "select", "Status", "A short description of the mod's development status.", $this->status, true, array("" => "None", "Released" => "Released", "Abandoned" => "Abandoned", "Completed" => "Completed", "On hiatus" => "On hiatus"));
+		edit_feild("status", "select", "Status", "A short description of the mod's development status.", $this->status, true, [
+			"" => "None",
+			"Released" => "Released",
+			"Abandoned" => "Abandoned",
+			"Completed" => "Completed",
+			"On hiatus" => "On hiatus",
+			"Incomplete" => "Incomplete",
+			"Planning" => "Planning"
+		]);
 		form_end("Save edits");
 	}
 	
@@ -375,7 +383,7 @@ function list_mods() : void {
 		readfile("../data/_mkmod.html");
 	}
 	
-	echo "<ul>";
+	echo "<div class=\"mod-listing\">";
 	
 	for ($i = 0; $i < sizeof($list); $i++) {
 		$mp = new ModPage($list[$i]);
@@ -399,7 +407,7 @@ function list_mods() : void {
 		</div></a>";
 	}
 	
-	echo "</ul>";
+	echo "</div>";
 	include_footer();
 }
 
