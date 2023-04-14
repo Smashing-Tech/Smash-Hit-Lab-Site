@@ -166,7 +166,7 @@ $gEndMan->add("site-css", function(Page $page) {
 	$s = new Styles();
 	
 	$page->type("text/css");
-	$page->http_header("Cache-Control", "max-age=86400");
+	$page->allow_cache();
 	$page->set_mode(PAGE_MODE_RAW);
 	$page->add($s->render());
 	$page->send();
@@ -179,6 +179,7 @@ $gEndMan->add("generate-logo-coloured", function(Page $page) {
 	$fg = $cb[1];
 	
 	$page->type("image/svg+xml");
+	$page->allow_cache();
 	$page->add("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
 <svg
    width=\"256\"

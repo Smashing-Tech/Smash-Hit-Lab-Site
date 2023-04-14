@@ -42,6 +42,10 @@ class Page {
 		$this->http_header("Content-Type", $contenttype);
 	}
 	
+	function allow_cache() : void {
+		$this->http_header("Cache-Control", "max-age=86400");
+	}
+	
 	function info($title = "Done", $desc = "The action completed successfully.") : void {
 		include_header();
 		echo "<h1>$title</h1><p>$desc</p>";
