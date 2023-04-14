@@ -1,10 +1,5 @@
 <?php
 
-require_once "database.php";
-require_once "user.php";
-require_once "templates.php";
-require_once "discussion.php";
-
 class ModPage {
 	public $package;
 	public $name;
@@ -42,6 +37,7 @@ class ModPage {
 			$this->security = $mod->security;
 			$this->status = $mod->status;
 			$this->reviews = property_exists($mod, "reviews") ? $mod->reviews : random_discussion_name();
+			$this->image = property_exists($mod, "image") ? $mod->image : "";
 			
 			// If there weren't discussions before, save them now.
 			if (!property_exists($mod, "reviews")) {
@@ -68,6 +64,7 @@ class ModPage {
 			$this->security = "No potentially insecure modifications";
 			$this->status = "Released";
 			$this->reviews = random_discussion_name();
+			$this->image = "";
 		}
 	}
 	
@@ -100,9 +97,21 @@ class ModPage {
 		return true;
 	}
 	
+	function get_display_name() {
+		return ($this->name ? $this->name : $this->package);
+	}
+	
 	function display() {
-		echo "<h1>" . ($this->name ? $this->name : $this->package) . "</h1>";
+		if ($this->image) {
+			echo "<div class=\"mod-banner\" style=\"background-image: linear-gradient(to top, #222c, #0008), url('$this->image');\">";
+			echo "<h1>" . $this->get_display_name() . "</h1>";
+			echo "</div>";
+		}
+		else {
+			echo "<h1>" . $this->get_display_name() . "</h1>";
+		}
 		
+		// Header
 		if (get_name_if_authed()) {
 			echo "<p class=\"centred\">";
 			echo "<a href=\"./?a=edit_mod&m=$this->package\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit this mod</button></a> ";
@@ -171,12 +180,15 @@ class ModPage {
 		echo "<h3>Main</h3>";
 		edit_feild("name", "text", "Name", "The name that will be displayed with the mod.", $this->name);
 		edit_feild("description", "textarea", "About", "One or two paragraphs that describe the mod.", htmlspecialchars($this->description));
+		
 		echo "<h3>Basic</h3>";
+		edit_feild("image", "text", "Banner image", "The URL of the banner image to use for this mod.", $this->image, get_name_if_admin_authed() !== null);
 		edit_feild("download", "text", "Download", "A link to where the mod can be downloaded.", $this->download);
 		edit_feild("version", "text", "Version", "The latest version of this mod.", $this->version);
 		edit_feild("creators", "text", "Creators", "The people who created this mod.", create_comma_array($this->creators));
 		edit_feild("security", "text", "Security", "A short statement on this mod's security.", $this->security);
 		edit_feild("wiki", "text", "Wiki article", "A relevant wiki article about the mod.", $this->wiki);
+		
 		echo "<h3>Extra</h3>";
 		edit_feild("code", "text", "Source code", "A link to where the source code for a mod can be found.", $this->code);
 		edit_feild("tags", "text", "Tags", "Keywords and categorical description of this mod.", create_comma_array($this->tags));
@@ -190,6 +202,7 @@ class ModPage {
 		validate_length("creators", $_POST["creators"], 300);
 		validate_length("wiki", $_POST["wiki"], 500);
 		validate_length("description", $_POST["description"], 2000);
+		validate_length("image", $_POST["image"], 1000);
 		validate_length("download", $_POST["download"], 500);
 		validate_length("code", $_POST["code"], 500);
 		validate_length("tags", $_POST["tags"], 300);
@@ -201,6 +214,7 @@ class ModPage {
 		$this->creators = parse_comma_array(htmlspecialchars($_POST["creators"]));
 		$this->wiki = htmlspecialchars($_POST["wiki"]);
 		$this->description = $_POST["description"]; // Rich text feild
+		$this->image = htmlspecialchars($_POST["image"]);
 		$this->download = htmlspecialchars($_POST["download"]);
 		$this->code = htmlspecialchars($_POST["code"]);
 		$this->tags = parse_comma_array(htmlspecialchars($_POST["tags"]));

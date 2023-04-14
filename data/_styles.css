@@ -622,3 +622,15 @@ blockquote {
 .user-tabs-tab {
 	text-align: center;
 }
+
+.mod-banner {
+	padding: 14em 0 1em 0;
+	border-radius: 1em;
+	background-position: center;
+	background-size: cover;
+}
+
+.mod-banner h1 {
+	color: #fff;
+	text-shadow: 0 0.2em 0.5em #0008;
+}
