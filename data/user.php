@@ -246,21 +246,22 @@ function has_gravatar_image(string $email) {
 	return !!(@file_get_contents(get_gravatar_image($email, "404")));
 }
 
-function find_pfp($user) {
+function find_pfp($user) : string | null {
 	/**
 	 * One time find a user's pfp url
 	 */
 	
-	$img_youtube = get_yt_image($user->youtube);
-	$img_gravatar = get_gravatar_image($user->email);
-	
-	// In the case where there is no gravatar but a yt image, display that
-	// instead.
-	if (!has_gravatar_image($user->email) && $img_youtube) {
-		$img_gravatar = null;
+	switch ($user->image_type) {
+		case "gravatar": {
+			return get_gravatar_image($user->email);
+		}
+		case "youtube": {
+			return get_yt_image($user->youtube);
+		}
+		default: {
+			return "./?a=generate-logo-coloured&seed=$user->name";
+		}
 	}
-	
-	return $img_gravatar ? $img_gravatar : $img_youtube;
 }
 
 function dechexa(int $num) {
@@ -453,6 +454,7 @@ class User {
 			$this->ban = property_exists($info, "ban") ? $info->ban : null;
 			$this->wall = property_exists($info, "wall") ? $info->wall : random_discussion_name();
 			$this->youtube = property_exists($info, "youtube") ? $info->youtube : "";
+			$this->image_type = property_exists($info, "image_type") ? $info->image_type : "gravatar";
 			$this->image = property_exists($info, "image") ? $info->image : "";
 			$this->accent = property_exists($info, "accent") ? $info->accent : null;
 			$this->about = property_exists($info, "about") ? $info->about : "";
@@ -491,6 +493,7 @@ class User {
 			$this->ban = null;
 			$this->wall = random_discussion_name();
 			$this->youtube = "";
+			$this->image_type = "gravatar";
 			$this->image = "";
 			$this->accent = null;
 			$this->about = "";
@@ -1028,6 +1031,11 @@ function edit_account() {
 	
 	edit_feild("display", "text", "Display name", "This is the name that will be displayed instead of your handle. It can be any name you prefer to be called.", $user->display);
 	edit_feild("about", "textarea", "About", "You can write a piece of text detailing whatever you like on your userpage. Please don't include personal information!", $user->about);
+	edit_feild("image_type", "select", "Profile image source", "Please chose what service your profile image should be derived from.", $user->image_type, true, [
+		"gravatar" => "Gravatar",
+		"youtube" => "YouTube",
+		"generated" => "Lab Logo",
+	]);
 	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, not including the at sign (@). We will use this account to give you a profile picture.", $user->youtube);
 	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email, !$user->is_admin());
 	edit_feild("colour", "text", "Page colour", "The base colour that the colour of your userpage is derived from. Represented as hex #RRGGBB.", $user->manual_colour);
@@ -1060,6 +1068,7 @@ function save_account() {
 	validate_length("YouTube", $_POST["youtube"], 30);
 	validate_length("Colour", $_POST["colour"], 7);
 	validate_length("About", $_POST["about"], 2000);
+	validate_length("Image type", $_POST["image_type"], 15);
 	
 	$user = new User($user);
 	$user->display = htmlspecialchars($_POST["display"]);
@@ -1089,6 +1098,7 @@ function save_account() {
 		$user->youtube = substr($user->youtube, 1);
 	}
 	
+	$user->image_type = $_POST["image_type"];
 	$user->update_image();
 	
 	// Finally the about section
