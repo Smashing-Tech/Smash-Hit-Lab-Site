@@ -110,13 +110,13 @@ function do_admin_alerts() {
 	 * ADMINNNNNNNNNNNNNNNNNNNNNNNN!!!!!!!!!
 	 */
 	
-	$user = get_name_if_admin_authed();
+	$user = new User(get_name_if_authed());
 	
-	if ($user) {
+	if ($user->is_mod()) {
 		include_header();
 		echo "<h1>Alerts</h1>";
 		
-		$un = new UserNotifications($user, "alert");
+		$un = new UserNotifications($user->name, "alert");
 		$un->display("");
 		$un->clear();
 		
@@ -443,3 +443,51 @@ function do_user_roles() {
 		sorry("The action you have requested is not currently implemented.");
 	}
 }
+
+$gEndMan->add("admin-impersonate", function(Page $page) {
+	$actor = get_name_if_admin_authed();
+	
+	if ($actor) {
+		$handle = $page->get("handle");
+		
+		if (!user_exists($handle)) {
+			$page->info("No such user", "You cannot impersonate this user becuase they do not exist.");
+		}
+		
+		$user = new User($handle);
+		
+		if (!$user->has_role("impersonateable")) {
+			$page->info("Not impersonateable", "You cannot impersonate this user becuase they lack the impersonateable role.");
+		}
+		
+		// Make the token without consent
+		$token = $user->make_token();
+		
+		// Move old cookies
+		$page->cookie("tk1", $page->get_cookie("tk"));
+		$page->cookie("lb1", $page->get_cookie("lb"));
+		
+		// Set the cookies
+		$page->cookie("tk", $token->get_id(), 86400);
+		$page->cookie("lb", $token->make_lockbox(), 86400);
+		
+		// Redirect to user page
+		$page->redirect("./?u=$handle");
+	}
+	else {
+		$page->info("Sorry", "The action you have requested is not currently implemented.");
+	}
+});
+
+$gEndMan->add("admin-return", function(Page $page) {
+	$tk = $page->get_cookie("tk1");
+	
+	if ($tk) {
+		$page->cookie("tk", $page->get_cookie("tk1"));
+		$page->cookie("lb", $page->get_cookie("lb1"));
+		$page->cookie("tk1", "invalid", 0);
+		$page->cookie("lb1", "invalid", 0);
+	}
+	
+	$page->redirect("./?n=home");
+});

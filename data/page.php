@@ -28,9 +28,17 @@ class Page {
 		header("$key: $value");
 	}
 	
-	function cookie(string $key, string $value, int $expire) {
+	function cookie(string $key, string $value, int $expire = 1209600) {
 		// TODO: Defer?
 		setcookie($key, $value, time() + $expire, "/");
+	}
+	
+	function get_cookie(string $key) {
+		if (array_key_exists($key, $_COOKIE)) {
+			return $_COOKIE[$key];
+		}
+		
+		return null;
 	}
 	
 	function redirect(string $url) : void {

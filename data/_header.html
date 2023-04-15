@@ -143,13 +143,23 @@
 							echo "<div class=\"shl-old-profile-dropdown-main\">";
 							
 							nav_dropdown_item("account_circle", "Profile", "./?u=$user_name");
-							if (get_name_if_admin_authed()) {
+							if ($u->is_admin()) {
 								nav_dropdown_item("apps", "Dashboard", "./?a=admin_dashboard");
+							}
+							if ($u->is_mod()) {
 								nav_dropdown_item("new_releases", "Alerts", "./?a=alerts");
 							}
 							nav_dropdown_item("manage_accounts", "Account", "./?a=edit_account");
 							nav_dropdown_item("notifications", "Notifications", "./?a=notifications");
-							nav_dropdown_item("logout", "Logout", "./?a=logout");
+							if ($u->is_admin()) {
+								nav_dropdown_item("domain", "SHL Account", "./?a=admin-impersonate&handle=smashhitlab");
+							}
+							if (!$u->has_role("impersonateable")) {
+								nav_dropdown_item("logout", "Logout", "./?a=logout");
+							}
+							else {
+								nav_dropdown_item("logout", "Switch back", "./?a=admin-return");
+							}
 							
 							echo "</div>";
 							echo "</div>";

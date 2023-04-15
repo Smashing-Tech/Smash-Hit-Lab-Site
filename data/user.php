@@ -691,6 +691,19 @@ class User {
 		return password_verify($password, $this->password);
 	}
 	
+	function make_token() {
+		/**
+		 * Make a token assigned to this user
+		 */
+		
+		$token = new Token();
+		$name = $token->set_user($this->name);
+		$this->tokens[] = $name;
+		$this->save();
+		
+		return $token;
+	}
+	
 	function issue_token(string $password) {
 		/**
 		 * Add a new token for this user and return its name.
@@ -705,10 +718,7 @@ class User {
 		}
 		
 		// Create a new token
-		$token = new Token();
-		$name = $token->set_user($this->name);
-		$this->tokens[] = $name;
-		$this->save();
+		$token = $this->make_token();
 		
 		return $token;
 	}
@@ -980,7 +990,7 @@ function get_user_badge(User $user) {
 	 */
 	
 	if ($user->is_admin()) {
-		return "<span class=\"small-text staff-badge\">staff</span>";
+		return "<span class=\"small-text staff-badge\">administrator</span>";
 	}
 	else if ($user->is_banned()) {
 		return "<span class=\"small-text banned-badge\">banned</span>";
