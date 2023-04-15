@@ -158,8 +158,8 @@ function do_user_ban() {
 			$user = new User($handle);
 			
 			// Check if the user is admin
-			if ($user->is_admin()) {
-				alert("Admin $banner tried to ban $user->name", "./?u=$banner");
+			if ($user->is_admin() || $user->is_mod()) {
+				alert("@$banner tried to ban @$user->name", "./?u=$banner");
 				sorry("You cannot ban a staff member. This action has been reported.");
 			}
 			
@@ -399,6 +399,10 @@ function do_user_roles() {
 			
 			if ($user->has_role("headmaster") && ($actor->name !== $user->name)) {
 				sorry("Only the person who has the headmaster role can demote themselves.");
+			}
+			
+			if ($user->has_role("impersonateable")) {
+				sorry("This user has the impersonateable role and must be manually updated in the database.");
 			}
 			
 			if ($user->get_role_score() > $actor->get_role_score()) {
