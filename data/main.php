@@ -3,6 +3,9 @@
 // Main endpoint manager
 require_once "endpoint.php";
 
+// Event manager
+require_once "event.php";
+
 // Parsedown library for markdown formatting
 require_once "Parsedown.php";
 
