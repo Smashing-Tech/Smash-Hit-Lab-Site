@@ -1430,3 +1430,16 @@ function account_delete() {
 		sorry("The action you have requested is not currently implemented.");
 	}
 }
+
+/**
+ * Welcome message after user has registered.
+ */
+$gEvents->add("user.register.after", function(Page $page) {
+	$handle = $page->get("handle");
+	
+	$user = new User($handle);
+	
+	$wall = new Discussion($user->wall);
+	
+	$wall->add_comment("smashhitlab", "Welcome to the Smash Hit Lab!\n\nIf you ever have any issues, please let one of our staff know — they will have a badge that says \"moderator\" or \"admin\" next to their name.\n\nIf you find any bugs or glitches, please report them to [knot126](./?u=knot126).\n\nDon't be afraid to say hello, and we hope you enjoy your stay!");
+});

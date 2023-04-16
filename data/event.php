@@ -33,7 +33,7 @@ class EventManager {
 		$triggers = $this->events[$name];
 		$i = 0;
 		
-		for (; $i < sizeof($tirggers); $i++) {
+		for (; $i < sizeof($triggers); $i++) {
 			$triggers[$i]($extra);
 		}
 		

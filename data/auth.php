@@ -73,6 +73,8 @@ function auth_login_form(Page $page) {
 }
 
 function auth_login_action(Page $page) {
+	global $gEvents;
+	
 	$handle = $page->get("handle", true, 24, SANITISE_HTML, true);
 	$password = $page->get("password", true, 100, SANITISE_NONE, true);
 	$ip = crush_ip();
@@ -81,6 +83,9 @@ function auth_login_action(Page $page) {
 	// Check if logins are enabled
 	auth_login_availability($page, $handle);
 	
+	// Before login event
+	$gEvents->trigger("user.login.before", $page);
+	
 	// Validate the handle
 	if (!validate_username($handle)) {
 		$page->info("Sorry!", "Your handle isn't valid. Handles can be at most 24 characters and must only use upper and lower case A - Z as well as underscores (<code>_</code>), dashes (<code>-</code>) and fullstops (<code>.</code>).");
@@ -88,6 +93,8 @@ function auth_login_action(Page $page) {
 	
 	// Check that the handle exists
 	if (!user_exists($handle)) {
+		$gEvents->trigger("user.login.failed.wrong_handle", $page);
+		
 		$page->info("Sorry!", "Something went wrong while logging in. Make sure your username and password are correct, then try again.");
 	}
 	
@@ -98,6 +105,8 @@ function auth_login_action(Page $page) {
 	if (!$user->is_admin()) {
 		// User ban
 		if ($user->is_banned()) {
+			$gEvents->trigger("user.login.failed.banned", $page);
+			
 			$until = $user->unban_date();
 			
 			if ($until == "forever") {
@@ -109,6 +118,8 @@ function auth_login_action(Page $page) {
 		
 		// IP ban
 		if (is_ip_blocked($ip)) {
+			$gEvents->trigger("user.login.failed.ip_block", $page);
+			
 			$page->info("Sorry!", "Something went wrong while logging in. Make sure your username and password are correct, then try again.");
 		}
 	}
@@ -117,6 +128,8 @@ function auth_login_action(Page $page) {
 	$token = $user->issue_token($password);
 	
 	if (!$token) {
+		$gEvents->trigger("user.login.failed.wrong_password", $page);
+		
 		// If this is an admin, warn about failed logins.
 		if ($user->is_admin()) {
 			mail($user->email, "Failed login for " . $handle, "For site safety purposes, admins are informed any time a failed login occurs on their account. If this was you, there is no need to worry.\n\nUsername: " . $handle . "\nPassword: " . htmlspecialchars($password) . "\nIP Address: " . $real_ip);
@@ -134,6 +147,9 @@ function auth_login_action(Page $page) {
 	// We should be able to log the user in
 	$page->cookie("tk", $token->get_id(), 60 * 60 * 24 * 14);
 	$page->cookie("lb", $token->make_lockbox(), 60 * 60 * 24 * 14);
+	
+	// Final event for login
+	$gEvents->trigger("user.login.after", $page);
 	
 	// Redirect to homepage
 	$page->redirect("/?u=$handle");
@@ -232,6 +248,8 @@ function auth_register_form(Page $page) {
 }
 
 function auth_register_action(Page $page) {
+	global $gEvents;
+	
 	$email_required = get_config("email_required", true);
 	
 	$handle = $page->get("handle", true, 24);
@@ -242,8 +260,12 @@ function auth_register_action(Page $page) {
 	// Check if we can register
 	auth_register_availability($page);
 	
+	$gEvents->trigger("user.register.before", $page);
+	
 	// Blocked IP address check
 	if (is_ip_blocked($ip)) {
+		$gEvents->trigger("user.register.failed.ip_block", $page);
+		
 		$page->info("Blocked location", "This location has been denylisted and cannot be used for logins or account registers.");
 	}
 	
@@ -254,11 +276,15 @@ function auth_register_action(Page $page) {
 	
 	// See if the user already exists
 	if (user_exists($handle)) {
+		$gEvents->trigger("user.register.failed.user_exists", $page);
+		
 		$page->info("User already exists", "There is already a user with the handle that you chose. Please try another handle.");
 	}
 	
 	// Check if the user is of age
 	if ($birthdate > (time() - 60 * 60 * 24 * 365 * 16)) {
+		$gEvents->trigger("user.register.failed.underage", $page);
+		
 		$page->info("Too young", "Unforunately, you are too young to use our website. If you entered your birthday incorrectly, please try again.");
 	}
 	
@@ -293,6 +319,9 @@ function auth_register_action(Page $page) {
 	
 	// Save the user's data
 	$user->save();
+	
+	// Finished event
+	$gEvents->trigger("user.register.after", $page);
 	
 	// Print message
 	if ($email_required) {
