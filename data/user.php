@@ -426,15 +426,12 @@ function validate_username(string $name) : bool {
 
 #[AllowDynamicProperties]
 class User {
-	// NOTE These are not updated and since I don't have to add them I'm not
-	//      going to do that.
-	public $name; // Yes, it would probably be better to store users by ID.
-	public $display; // The display name of the user
-	public $password; // Password hash and salt
-	public $tokens; // Currently active tokens
-	public $email; // The user's email address
-	public $created; // The time the user joined our site
-	public $admin; // If the user is an admin
+	/**
+	 * Represents a user and most of the state that comes with that. Unforunately,
+	 * the decision to combine everything into one big table was made early on, and
+	 * is not a mistake I would repeat, though switching to something better would
+	 * require some effort.
+	 */
 	
 	function __construct(string $name) {
 		$db = new Database("user");
@@ -450,6 +447,7 @@ class User {
 			$this->email = $info->email ? $info->email : "";
 			$this->allow_messages = (property_exists($info, "allow_messages") ? $info->allow_messages : false);
 			$this->created = (property_exists($info, "created") ? $info->created : time());
+			$this->login_wait = (property_exists($info, "login_wait") ? $info->login_wait : 0);
 			$this->verified = property_exists($info, "verified") ? $info->verified : null;
 			$this->ban = property_exists($info, "ban") ? $info->ban : null;
 			$this->wall = property_exists($info, "wall") ? $info->wall : random_discussion_name();
@@ -489,6 +487,7 @@ class User {
 			$this->tokens = array();
 			$this->email = "";
 			$this->created = time();
+			$this->login_wait = 0;
 			$this->verified = null;
 			$this->ban = null;
 			$this->wall = random_discussion_name();
@@ -704,10 +703,34 @@ class User {
 		return $token;
 	}
 	
-	function issue_token(string $password) {
+	function login_rate_limited() {
 		/**
-		 * Add a new token for this user and return its name.
+		 * Check if the user's login should be denied because they are trying
+		 * to log in too soon after trying a first time.
 		 */
+		
+		// The login isn't allowed if they have logged in too recently.
+		if ($this->login_wait >= time()) {
+			return true;
+		}
+		
+		// It has been long enough to allow, also reset the counter.
+		$this->login_wait = time() + 5;
+		$this->save();
+		
+		return false;
+	}
+	
+	function issue_token(string $password, string $mfa = null) {
+		/**
+		 * Given the password and MFA string, add a new token for this user
+		 * and return its name.
+		 */
+		
+		// Deny requests coming too soon
+		if ($this->login_rate_limited()) {
+			return null;
+		}
 		
 		// First, run maintanance
 		$this->clean_foreign_tokens();
