@@ -5,10 +5,10 @@
 
 function random_discussion_name() : string {
 	/**
-	 * Cryptographically secure random hex values modified for discussion names.
+	 * Cryptographically secure random values modified for discussion names.
 	 */
 	
-	return bin2hex(random_bytes(8));
+	return random_base32(24);
 }
 
 #[AllowDynamicProperties]

@@ -15,6 +15,7 @@ require_once "admin.php";
 require_once "auth.php";
 require_once "block.php";
 require_once "config.php";
+require_once "crypto.php";
 require_once "database.php";
 require_once "discussion.php";
 require_once "form.php";
