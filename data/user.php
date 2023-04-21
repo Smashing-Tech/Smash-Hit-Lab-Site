@@ -424,6 +424,25 @@ function validate_username(string $name) : bool {
 	return true;
 }
 
+function generate_new_user_id() {
+	/**
+	 * Generate a new, original user ID.
+	 */
+	
+	$id = null;
+	$db = new Database("user");
+	
+	while ($id == null) {
+		$id = random_base32(20);
+		
+		if ($db->has($id)) {
+			$id = null;
+		}
+	}
+	
+	return $id;
+}
+
 #[AllowDynamicProperties]
 class User {
 	/**
@@ -440,6 +459,7 @@ class User {
 			$info = $db->load($name);
 			
 			$this->schema = (property_exists($info, "schema") ? $info->schema : 0);
+			$this->id = 
 			$this->name = $info->name;
 			$this->display = (property_exists($info, "display") ? $info->display : $info->name);
 			$this->password = $info->password;
@@ -1150,10 +1170,6 @@ function display_user(string $user) {
 	
 	$stalker = get_name_if_authed();
 	
-	// if (!$stalker) {
-	// 	sorry("Only logged in users can view profile pages.");
-	// }
-	
 	// We need this so admins can have some extra options like banning users
 	$stalker = $stalker ? (new User($stalker)) : null;
 	
@@ -1162,6 +1178,11 @@ function display_user(string $user) {
 	}
 	
 	$user = new User($user);
+	
+	// Handle user blocks at this point
+	if ($stalker && user_block_has($stalker, $user->name, true, false)) {
+		notify("Blocked user", "This user has blocked you from viewing their profile page.");
+	}
 	
 	// HACK Page title
 	global $gTitle; $gTitle = ($user->display ? $user->display : $user->name) . " (@$user->name)";

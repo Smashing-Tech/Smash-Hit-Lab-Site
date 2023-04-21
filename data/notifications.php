@@ -166,7 +166,9 @@ function notify_scan(string $text, string $where) : void {
 				// Skip the handle text
 				$i += strlen($handle);
 				
-				notify($handle, "You were mentioned in a post", $where);
+				if (!user_block_has($handle, get_name_if_authed())) {
+					notify($handle, "You were mentioned in a post", $where);
+				}
 			}
 		}
 	}
