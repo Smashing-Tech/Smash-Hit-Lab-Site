@@ -148,6 +148,13 @@ class Article {
 		 * Echo out a news article.
 		 */
 		
+		$has_sidebar = ($this->name != "sidebar" && $this->name != "home");
+		
+		if ($has_sidebar) {
+			echo "<div class=\"article-page-body\">";
+			echo "<div class=\"article-page-body-main\">";
+		}
+		
 		echo "<h1>$this->title</h1>";
 		
 		// Make icons
@@ -185,6 +192,15 @@ class Article {
 		// Display comments
 		$disc = new Discussion($this->comments);
 		$disc->display("Comments", "./?n=" . $this->name);
+		
+		// Has sidebar ?
+		if ($has_sidebar) {
+			echo "</div>";
+			echo "<div class=\"article-page-body-sidebar\">";
+			echo (new Article("sidebar"))->get_html();
+			echo "</div>";
+			echo "</div>";
+		}
 	}
 }
 

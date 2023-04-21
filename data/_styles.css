@@ -147,7 +147,7 @@ textarea {
 input[type=submit], button, .button {
 	background: var(--colour-primary);
 	border: none;
-	border-radius: 1.25em;
+	border-radius: 1000em;
 	color: var(--colour-primary-text);
 	cursor: pointer;
 	font-family: var(--font-main);
@@ -422,7 +422,30 @@ input[type=submit]:hover, button:hover, .button:hover {
 	height: 100%;
 }
 
-.article-body p {
+@media (min-width: calc(75em + 50px)) {
+	.article-page-body {
+		display: grid;
+		grid-template-columns: auto 375px;
+	}
+	
+	.article-page-body-main {
+		grid-column: 1;
+	}
+	
+	.article-page-body-sidebar {
+		position: relative;
+		left: 50px;
+		padding-left: 25px;
+		grid-column: 2;
+	}
+}
+
+.article-body {
+	margin-top: 2em;
+	margin-bottom: 2em;
+}
+
+.article-body p, .article-body li {
 	font-size: 16pt !important;
 	line-height: 1.5;
 }
