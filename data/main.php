@@ -29,6 +29,7 @@ require_once "site.php";
 require_once "styles.php";
 require_once "templates.php";
 require_once "user.php";
+require_once "userblock.php";
 
 function handle_action(string $action, Page $page) {
 	switch ($action) {

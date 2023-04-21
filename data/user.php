@@ -1181,7 +1181,7 @@ function display_user(string $user) {
 	
 	// Handle user blocks at this point
 	if ($stalker && user_block_has($stalker->name, $user->name, true, false)) {
-		notify("Blocked user", "This user has blocked you from viewing their profile page.");
+		inform("Blocked user", "This user has blocked you from viewing their profile page.");
 	}
 	
 	// HACK Page title

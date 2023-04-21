@@ -21,8 +21,8 @@ class UserBlock {
 		}
 		else {
 			$this->node = $node;
-			$this->from = $from;
-			$this->to = $to;
+			$this->from = array();
+			$this->to = array();
 		}
 	}
 	
@@ -32,7 +32,7 @@ class UserBlock {
 	}
 	
 	function has_from(string $name) : bool {
-		return (array_search($name, $this->from, true) >= 0);
+		return in_array($name, $this->from, true);
 	}
 	
 	function add_from(string $name) : void {
@@ -50,7 +50,7 @@ class UserBlock {
 	}
 	
 	function has_to(string $name) : bool {
-		return (array_search($name, $this->to, true) >= 0);
+		return in_array($name, $this->to, true);
 	}
 	
 	function add_to(string $name) : void {
@@ -97,8 +97,8 @@ function user_block_add(string $blocker, string $blockee) : void {
 	$blocker = new UserBlock($blocker);
 	$blockee = new UserBlock($blockee);
 	
-	$blocker->add_to($blockee);
-	$blockee->add_from($blocker);
+	$blocker->add_to($blockee->node);
+	$blockee->add_from($blocker->node);
 	
 	$blocker->save();
 	$blockee->save();
@@ -112,8 +112,8 @@ function user_block_remove(string $blocker, string $blockee) : void {
 	$blocker = new UserBlock($blocker);
 	$blockee = new UserBlock($blockee);
 	
-	$blocker->remove_to($blockee);
-	$blockee->remove_from($blocker);
+	$blocker->remove_to($blockee->node);
+	$blockee->remove_from($blocker->node);
 	
 	$blocker->save();
 	$blockee->save();
