@@ -1180,7 +1180,7 @@ function display_user(string $user) {
 	$user = new User($user);
 	
 	// Handle user blocks at this point
-	if ($stalker && user_block_has($stalker, $user->name, true, false)) {
+	if ($stalker && user_block_has($stalker->name, $user->name, true, false)) {
 		notify("Blocked user", "This user has blocked you from viewing their profile page.");
 	}
 	
@@ -1259,6 +1259,12 @@ function display_user(string $user) {
 		
 		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "<a href=\"./?a=user_verify&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">verified</span> Toggle verified status</button></a>");
 	}
+	
+	// Block user
+	if ($stalker && $stalker->name != $user->name) {
+		mod_property("Block user", "Blocking this user will prevent you from seeing some of the things this user does and prevent this user from seeing things you do. You might still see some things as blocking is still in a testing state.", "<a href=\"./?a=account-toggle-block&handle=$user->name&key=" . $stalker->get_sak() . "\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">block</span> Block user</button></a>");
+	}
+	
 	echo "</div>";
 	
 	// Finally the message wall for this user
