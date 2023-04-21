@@ -134,10 +134,12 @@ $gEndMan->add("account-toggle-block", function(Page $page) {
 		// If the block exists
 		if (user_block_has($user->name, $blockee, false)) {
 			user_block_remove($user->name, $blockee);
+			$page->info("Block removed", "Your block on this user has been removed.");
 		}
 		// If the block does not exist
 		else {
 			user_block_add($user->name, $blockee);
+			$page->info("Block added", "You have blocked this user.");
 		}
 	}
 	else {

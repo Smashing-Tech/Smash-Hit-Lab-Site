@@ -327,21 +327,22 @@ class Discussion {
 				$comments[$i]->display = $user->get_display();
 				$comments[$i]->image = $user->get_image();
 				$comments[$i]->body = $comments[$i]->render_body();
+				$comments[$i]->actions = array("reply");
+				$comments[$i]->badge = get_user_badge($user);
 			}
 			// If blocked, give a fake comment.
 			else {
+				$comments[$i]->author = "???";
 				$comments[$i]->display = "Blocked user";
 				$comments[$i]->image = "./?a=generate-logo-coloured&seed=$i";
 				$comments[$i]->body = "<i>[You blocked the user who wrote this comment or the user who wrote this comment blocked you, so it can't be displayed.]</i>";
+				$comments[$i]->actions = array();
+				$comments[$i]->badge = "";
 			}
-			
-			$comments[$i]->actions = array("reply");
 			
 			if (get_name_if_admin_authed() || (get_name_if_authed() == $user->name)) {
 				$comments[$i]->actions[] = "hide";
 			}
-			
-			$comments[$i]->badge = get_user_badge($user);
 		}
 		
 		return $comments;
