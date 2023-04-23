@@ -71,7 +71,7 @@ function do_site_config() {
 			
 			set_config("discord_webhook", $_POST["discord_webhook"]);
 			
-			alert("Site config was updated by $user", "./?a=site_config");
+			alert("Site config was updated by @$user", "./?a=site_config");
 			redirect("./?a=site_config");
 		}
 	}
@@ -187,7 +187,7 @@ function do_user_ban() {
 			
 			// Unbanning
 			if ($duration === 0 || $duration === 1) {
-				alert("User $user->name unbanned by $banner: $reason", "./?u=$user->name");
+				alert("User $user->name unbanned by $banner\n\nReason: $reason", "./?u=$user->name");
 				
 				// Display success page
 				include_header();
@@ -196,7 +196,7 @@ function do_user_ban() {
 			}
 			// Banning
 			else {
-				alert("User $user->name banned by $banner: $reason", "./?u=$user->name");
+				alert("User $user->name banned by $banner\n\nReason: $reason", "./?u=$user->name");
 				
 				// Display success page
 				include_header();
@@ -243,18 +243,18 @@ function do_user_delete() {
 			}
 			
 			if ($user->is_admin()) {
-				alert("Admin $banner tried to delete staff member $user->name", "./?u=$banner");
+				alert("Admin @$banner tried to delete staff member @$user->name\n\nReason: $reason", "./?u=$banner");
 				sorry("You cannot delete a staff member. This action has been reported.");
 			}
 			
 			if ($user->is_verified()) {
-				alert("Admin $banner tried to delete verified user $user->name", "./?u=$banner");
+				alert("Admin @$banner tried to delete verified user @$user->name\n\nReason: $reason", "./?u=$banner");
 				sorry("You cannot delete a verified member. This action has been reported.");
 			}
 			
 			$user->delete();
 			
-			alert("Admin $banner deleted user $user->name: $reason", "./?u=$banner");
+			alert("Admin @$banner deleted user @$user->name\n\nReason: $reason", "./?u=$banner");
 			
 			include_header();
 			echo "<h1>Account deleted</h1><p>The account $handle was successfully deleted.</p>";
@@ -289,10 +289,13 @@ function do_send_notification() {
 			$db = new Database("user");
 			$users = $db->enumerate();
 			
-			notify_many($users, $_POST["title"], $_POST["url"]);
+			$title = $_POST["title"];
+			$link = $_POST["url"];
 			
-			alert("Global notification sent by $user", "./?u=$user");
-			redirect("./?a=send_notification");
+			notify_many($users, $title, $link);
+			
+			alert("Global notification sent by @$user\n\nTitle: $title\nLink: $link", "./?u=$user");
+			redirect("./?a=notifications");
 		}
 	}
 	else {
@@ -453,7 +456,7 @@ function do_user_roles() {
 				}
 			}
 			
-			alert("User $user->name has role set to $role by $actor->name: $reason");
+			alert("User @$user->name has role set to \"$role\" by @$actor->name\n\nReason: $reason");
 			
 			include_header();
 			echo "<h1>Roles updated</h1><p>The role for $handle was set to $role!</p>";

@@ -323,7 +323,7 @@ function save_mod() : void {
 	$mod->save_edit($user);
 	
 	// Admin alert!
-	alert("Mod page $mod_name updated by $user", "./?m=$mod_name");
+	alert("Mod page $mod_name updated by @$user", "./?m=$mod_name");
 	
 	redirect("./?m=$mod_name");
 }
@@ -359,7 +359,7 @@ function delete_mod() : void {
 			$mod = new ModPage($mod);
 			$mod->delete();
 			
-			alert("Mod page $mod->package deleted by $user: $reason");
+			alert("Mod page $mod->package deleted by @$user\n\nReason: $reason");
 			
 			include_header();
 			echo "<h1>Page was deleted!</h1><p>The mod page and assocaited discussion was deleted successfully.</p>";

@@ -211,7 +211,7 @@ class Discussion {
 		notify_scan($body, $url);
 		
 		// Admin alert!
-		alert("Discussion $this->id updated by $author", $url);
+		alert("Discussion $this->id has a new comment by @$author\nContent: " . substr($body, 0, 300) . ((strlen($body) > 300) ? "..." : ""), $url);
 	}
 	
 	function update_comment(int $index, string $author, string $body) {
@@ -678,40 +678,7 @@ function discussion_hide() {
 }
 
 function discussion_delete() {
-	$user = get_name_if_admin_authed();
-	
-	if (!$user) {
-		sorry("The action you have requested is not currently implemented.");
-	}
-	
-	$user = new User($user);
-	
-	if (get_config("enable_discussions", "enabled") === "disabled") {
-		sorry("Updating discussions has been disabled.");
-	}
-	
-	if (!array_key_exists("id", $_GET)) {
-		sorry("Need an id to update.");
-	}
-	
-	$discussion = $_GET["id"];
-	
-	if (!array_key_exists("index", $_GET)) {
-		sorry("Need an index to update.");
-	}
-	
-	$index = $_GET["index"]; // If it's -1 then it's a new comment
-	
-	$discussion = new Discussion($discussion);
-	
-	$discussion->delete_comment($index);
-	
-	if (array_key_exists("after", $_GET)) {
-		redirect($_GET["after"]);
-	}
-	else {
-		sorry("It's done but no clue what page you were on...");
-	}
+	sorry("This action was disabled on 2023-04-23 becuase it is not production ready");
 }
 
 function discussion_follow() {
@@ -775,10 +742,6 @@ function discussion_lock() {
 		sorry("The action you have requested is not currently implemented.");
 	}
 	
-	if (get_config("enable_discussions", "enabled") !== "enabled") {
-		sorry("There is no reason to lock a discussion when discussions are already unavailable.");
-	}
-	
 	$user = new User($user);
 	
 	if (!array_key_exists("id", $_GET)) {
@@ -788,6 +751,8 @@ function discussion_lock() {
 	$discussion = $_GET["id"];
 	$discussion = new Discussion($discussion);
 	$discussion->toggle_locked();
+	
+	alert("Discussion ID $discussion->id " . ($discussion->is_locked() ? "locked" : "unlocked") . " by @$user->name", $discussion->get_url());
 	
 	if (array_key_exists("after", $_GET)) {
 		redirect($_GET["after"]);
