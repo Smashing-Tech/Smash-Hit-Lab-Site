@@ -222,4 +222,6 @@ function alert(string $title, string $url = "") {
 		$un = new UserNotifications($users[$i], "alert");
 		$un->notify($title, $url);
 	}
+	
+	send_discord_message("Smash Hit Lab: " . date("Y-m-d H:i:s", time()) . " -- " . $title);
 }
