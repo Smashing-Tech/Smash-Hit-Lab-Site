@@ -115,6 +115,7 @@ function do_admin_dashboard() {
 		admin_action_item("./?a=user_delete", "person_off", "Delete user");
 		admin_action_item("./?a=user_roles", "security", "Edit roles");
 		admin_action_item("./?a=delete_mod", "delete", "Delete mod page");
+		admin_action_item("./?a=admin-impersonate&handle=smashhitlab", "business", "Brand account");
 		
 		include_footer();
 	}

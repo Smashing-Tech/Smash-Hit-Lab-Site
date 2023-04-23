@@ -151,9 +151,6 @@
 							}
 							nav_dropdown_item("manage_accounts", "Account", "./?a=edit_account");
 							nav_dropdown_item("notifications", "Notifications", "./?a=notifications");
-							if ($u->is_admin()) {
-								nav_dropdown_item("domain", "SHL Account", "./?a=admin-impersonate&handle=smashhitlab");
-							}
 							if (!$u->has_role("impersonateable")) {
 								nav_dropdown_item("logout", "Logout", "./?a=logout");
 							}
