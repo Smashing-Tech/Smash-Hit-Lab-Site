@@ -62,8 +62,6 @@ function handle_action(string $action, Page $page) {
 		case "discussion_lock": discussion_lock(); break;
 		case "discussion_view": discussion_view(); break;
 		case "discussion_poll": discussion_poll(); break;
-	// ---- MISC USER PAGES ---- //
-		case "notifications": check_notifications(); break;
 	// ---- ADMIN ACTION PAGES ---- //
 		case "site_config": do_site_config(); break;
 		case "backup_db": do_backup_db(); break;

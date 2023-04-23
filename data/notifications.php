@@ -96,8 +96,26 @@ class UserNotifications {
 		$this->save();
 	}
 	
-	function number() {
+	function count() {
 		return sizeof($this->notifications);
+	}
+	
+	function render() {
+		$content = "";
+		
+		if (sizeof($this->notifications) === 0) {
+			return "<p><i>No new notifications!</i></p>";
+		}
+		
+		$content .= "<ul>";
+		
+		for ($i = 0; $i < sizeof($this->notifications); $i++) {
+			$content .= $this->notifications[$i]->render();
+		}
+		
+		$content .= "</ul>";
+		
+		return $content;
 	}
 	
 	function display($title = "Notifications") {
@@ -174,25 +192,38 @@ function notify_scan(string $text, string $where) : void {
 	}
 }
 
-function check_notifications() {
-	/**
-	 * Notification checking action handler.
-	 */
-	
+$gEndMan->add("notifications", function(Page $page) {
 	$user = get_name_if_authed();
 	
 	if (!$user) {
-		sorry("To check your notifications, please log in first.");
+		$page->info("Sorry!", "Logged out users don't have notifications. Please log in or create an account to check your notifications!");
 	}
 	
 	$un = new UserNotifications($user);
+	$page->heading(1, "Notifications");
 	
-	include_header();
-	$un->display();
-	include_footer();
+	$page->add("<div style=\"text-align: center;\">");
+	$page->add("<a href=\"./?a=notifications-clear\"><button class=\"button\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">clear</span> Clear all</button></a>");
+	if (get_name_if_admin_authed()) {
+		$page->add(" <a href=\"./?a=send_notification\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">create</span> Create new</button></a>");
+	}
+	$page->add("</div>");
 	
+	$page->add($un->render());
+});
+
+$gEndMan->add("notifications-clear", function(Page $page) {
+	$user = get_name_if_authed();
+	
+	if (!$user) {
+		$page->info("Sorry!", "Logged out users don't have notifications. Please log in or create an account to check your notifications!");
+	}
+	
+	$un = new UserNotifications($user);
 	$un->clear();
-}
+	
+	$page->redirect("./?a=notifications");
+});
 
 function display_notification_charm(string $name) {
 	/**
@@ -200,7 +231,7 @@ function display_notification_charm(string $name) {
 	 */
 	
 	$un = new UserNotifications($name);
-	$count = $un->number();
+	$count = $un->count();
 	
 	if ($count) {
 		echo "<div class=\"cb-top-item\"><a href=\"./?a=notifications\">Notifications ($count)</a></div>";
