@@ -384,7 +384,7 @@ class Discussion {
 				
 				echo "<div id=\"discussion-$this->id-box\" class=\"comment-card comment-edit\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"$img\"/></div><div class=\"comment-card-inner-right\"><div><p>$name</p><p><textarea id=\"discussions-$this->id-entry\" style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none; display: inline-block;\" name=\"body\" placeholder=\"What would you like to say?\">$body</textarea></p><p><input type=\"hidden\" name=\"key\" value=\"$sak\">";
 				echo "<button class=\"button\" onclick=\"ds_update();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">send</span> Post comment</button>";
-				echo "<span id=\"discussions-$this->id-error\"></span></p></div></div></div></div>";
+				echo "<span id=\"discussions-$this->id-error\"></span></p></div></div></div></div><p class=\"small-text\">Please make sure to follow our <a href=\"./?n=community-guidelines\">Community Guidelines</a>.</p>";
 				break;
 			}
 			case "closed": {
