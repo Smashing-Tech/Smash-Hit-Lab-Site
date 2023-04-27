@@ -234,7 +234,7 @@ function display_notification_charm(string $name) {
 	$count = $un->count();
 	
 	if ($count) {
-		echo "<div class=\"cb-top-item\"><a href=\"./?a=notifications\">Notifications ($count)</a></div>";
+		echo "<div class=\"cb-top-item\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">notifications</span><a href=\"./?a=notifications\">Notifications ($count)</a></div>";
 	}
 }
 
