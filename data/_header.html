@@ -50,12 +50,19 @@
 			.shl-old-profile-dropdown-main {
 				display: none;
 				position: absolute;
-				right: 1px;
 				border-radius: 0.75em;
 				padding: 0.75em 0.75em;
 				background: var(--colour-background);
 				box-shadow: 0 0.4em 0.7em #0005;
 				transition: display 0.2s;
+			}
+			
+			.shl-old-profile-dropdown-main.right {
+				right: 1px;
+			}
+			
+			.shl-old-profile-dropdown-main.left {
+				left: 1px;
 			}
 			
 			.shl-old-profile-dropdown-button:hover .shl-old-profile-dropdown-main {
@@ -99,12 +106,40 @@
 						echo "<div class=\"cb-top-item\"><a href=\"$link\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">$icon</span> $title</a></div>";
 					}
 					
+					function nav_dropdown_item(string $icon, string $title, string $link) : void {
+						if ($link) {
+							echo "<a href=\"$link\">";
+						}
+						
+						echo "<div class=\"shl-old-profile-dropdown-item\">";
+						echo "<div class=\"shl-old-profile-dropdown-item-icon\">";
+						echo "<span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">$icon</span>";
+						echo "</div>";
+						echo "<div class=\"shl-old-profile-dropdown-item-text\">";
+						echo "<span>$title</span>";
+						echo "</div>";
+						echo "</div>";
+						
+						if ($link) {
+							echo "</a>";
+						}
+					}
+					
 					header_item("home", "Home", "./?p=home");
 					header_item("newspaper", "News", "./?n=home");
 					header_item("build", "Mods", "./?a=list_mods");
-					header_item("description", "Wiki", "https://smashhit.fandom.com/wiki/");
-					header_item("play_circle_filled", "YouTube", "https://youtube.com/@SmashHitLab");
-					header_item("forum", "Discord", "https://discord.gg/7kra7Z3UNn");
+					
+					echo "<div class=\"cb-top-item\">";
+					echo "<div class=\"shl-old-profile-dropdown-button\">";
+					echo "<a href=\"#\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">auto_awesome</span> More</a>";
+					echo "<div class=\"shl-old-profile-dropdown-main left\">";
+					nav_dropdown_item("description", "Wiki", "https://smashhit.fandom.com/wiki/");
+					nav_dropdown_item("play_circle_filled", "YouTube", "https://youtube.com/@SmashHitLab");
+					nav_dropdown_item("forum", "Discord", "https://discord.gg/7kra7Z3UNn");
+					echo "</div>";
+					echo "</div>";
+					echo "</div>";
+					
 					?>
 				</div>
 				<div class="header-container-right">
@@ -112,24 +147,7 @@
 					<?php
 						$user_name = get_name_if_authed();
 						
-						function nav_dropdown_item(string $icon, string $title, string $link) : void {
-							if ($link) {
-								echo "<a href=\"$link\">";
-							}
-							
-							echo "<div class=\"shl-old-profile-dropdown-item\">";
-							echo "<div class=\"shl-old-profile-dropdown-item-icon\">";
-							echo "<span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">$icon</span>";
-							echo "</div>";
-							echo "<div class=\"shl-old-profile-dropdown-item-text\">";
-							echo "<span>$title</span>";
-							echo "</div>";
-							echo "</div>";
-							
-							if ($link) {
-								echo "</a>";
-							}
-						}
+						
 						
 						if ($user_name) {
 							display_notification_charm($user_name);
@@ -140,7 +158,7 @@
 							echo "<div class=\"cb-top-item\">";
 							echo "<div class=\"shl-old-profile-dropdown-button\">";
 							echo "<img class=\"navbar-profile\" src=\"$image\"/>";
-							echo "<div class=\"shl-old-profile-dropdown-main\">";
+							echo "<div class=\"shl-old-profile-dropdown-main right\">";
 							
 							nav_dropdown_item("account_circle", "Profile", "./?u=$user_name");
 							if ($u->is_admin()) {
