@@ -1,14 +1,43 @@
 <script>
 	function openModPage() {
 		let e = document.getElementById("create-mod");
-		window.open("./?a=edit_mod&m=" + e.value);
+		//window.open("./?a=edit_mod&m=" + e.value);
+		window.location = "./?a=edit_mod&m=" + e.value;
+	}
+	
+	function show_dialogue() {
+		let e = document.getElementById("mod-page-new-dialogue-container");
+		e.style.display = "inherit";
+	}
+	
+	function hide_dialogue() {
+		let e = document.getElementById("mod-page-new-dialogue-container");
+		e.style.display = "none";
 	}
 </script>
-<div class="news-article-card comment-edit">
-	<details>
-		<summary style="font-size: 15pt; cursor: pointer;"><b>Add your mod</b></summary>
-		<p>Have a mod you want to share? Start by typing the package name, then click the button to get started adding your mod!</p>
-		<p><input id="create-mod" type="text" placeholder="Package name"/></p>
-		<p><button onclick="openModPage()">Create page</button></p>
-	</details>
+<p style="text-align: center;"><button onclick="show_dialogue()"><span class="material-icons" style="position: relative; top: 5px; margin-right: 3px;">edit</span> Create new mod page</button></p>
+<div id="mod-page-new-dialogue-container" class="dialogue-bg" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000c; z-index: 1000;">
+	<div class="dialogue-surface" style="position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%); width: max(50vw, 20em); height: 80vh; background: var(--colour-background); border-radius: 0.5em; box-shadow: 0 0.3em 0.4em var(--colour-background-dark-b); padding: 1.0em;">
+		<div class="dialogue-seperation" style="display: grid; grid-template-rows: 3em auto 3em; height: 100%;">
+			<div style="grid-row: 1; margin-bottom: 3em;">
+				<h4>Create a new mod</h4>
+			</div>
+			<div style="grid-row: 2;">
+				<p><b>What would you like the internal name of the page to be?</b></p>
+				<p>This is different from the mod's title, and should preferably contain only the characters A - Z (upper or lower case), the digits 0 - 9 and <code>_</code>, <code>-</code> and <code>.</code>.</p>
+				<p>We recommend using your mod's package name, if it's not already taken. For example: <code>org.knot126.randomhit</code>.</p>
+				<input id="create-mod" type="text" placeholder="Internal page name"/>
+			</div>
+			<div style="grid-row: 3;">
+				<div style="display: grid; grid-template-columns: auto auto;">
+					<div style="grid-column: 1;">
+						<button class="button secondary" onclick="hide_dialogue()">Go back</button>
+					</div>
+					<div style="grid-column: 2; text-align: right;">
+						<button onclick="openModPage()">Create page</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
