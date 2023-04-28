@@ -172,6 +172,18 @@ $gEndMan->add("site-css", function(Page $page) {
 	$page->send();
 });
 
+$gEndMan->add("site-js", function(Page $page) {
+	/**
+	 * Render and serve the js file
+	 */
+	
+	$page->type("text/javascript");
+	$page->allow_cache();
+	$page->set_mode(PAGE_MODE_RAW);
+	$page->add(file_get_contents("../data/_app.js"));
+	$page->send();
+});
+
 $gEndMan->add("generate-logo-coloured", function(Page $page) {
 	$cb = str_split(md5($page->get("seed")), 6);
 	

@@ -13,6 +13,7 @@ class ModPage {
 	public $updated;
 	public $created;
 	public $author;
+	public $reason;
 	public $security;
 	public $reviews;
 	
@@ -34,6 +35,7 @@ class ModPage {
 			$this->updated = $mod->updated;
 			$this->created = property_exists($mod, "created") ? $mod->created : time();
 			$this->author = property_exists($mod, "author") ? $mod->author : "";
+			$this->reason = property_exists($mod, "reason") ? $mod->reason : "";
 			$this->security = $mod->security;
 			$this->status = $mod->status;
 			$this->reviews = property_exists($mod, "reviews") ? $mod->reviews : random_discussion_name();
@@ -61,6 +63,7 @@ class ModPage {
 			$this->updated = time();
 			$this->created = time();
 			$this->author = "";
+			$this->reason = "";
 			$this->security = "";
 			$this->status = "Released";
 			$this->reviews = random_discussion_name();
@@ -115,6 +118,7 @@ class ModPage {
 		if (get_name_if_authed()) {
 			echo "<p class=\"centred\">";
 			echo "<a href=\"./?a=edit_mod&m=$this->package\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit this mod</button></a> ";
+			echo "<button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Magic editor (beta)</button> ";
 			echo "<a href=\"./?a=mod_history&m=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">history</span> History</button></a> ";
 			echo "<a href=\"./?a=mod-rename&oldslug=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit_location</span> Rename</button></a> ";
 			
@@ -149,7 +153,6 @@ class ModPage {
 		mod_property("Wiki article", "A relevant wiki article about the mod.", $this->wiki, true);
 		mod_property("Source code", "A link to where the source code for a mod can be found.", $this->code, true);
 		mod_property("Status", "A short description of the mod's development status.", $this->status, true);
-		mod_property("Package", "The name of the mod's APK or IPA file.", $this->package, true);
 		
 		echo "<p class=\"small-text\">This page was last updated at " . date("Y-m-d H:i", $this->updated) . " by " . get_nice_display_name($this->author) . "</p>";
 		
@@ -202,6 +205,10 @@ class ModPage {
 			"Incomplete" => "Incomplete",
 			"Planning" => "Planning"
 		]);
+		
+		echo "<h3>Edit info</h3>";
+		edit_feild("reason", "text", "Edit reason", "Optional description of why this mod was edited.", "");
+		
 		form_end("Save edits");
 	}
 	
@@ -217,6 +224,7 @@ class ModPage {
 		validate_length("version", $_POST["version"], 100);
 		validate_length("security", $_POST["security"], 200);
 		validate_length("status", $_POST["status"], 50);
+		validate_length("reason", $_POST["reason"], 400);
 		
 		$this->name = htmlspecialchars($_POST["name"]);
 		$this->creators = parse_comma_array(htmlspecialchars($_POST["creators"]));
@@ -231,6 +239,7 @@ class ModPage {
 		$this->author = $whom;
 		$this->security = htmlspecialchars($_POST["security"]);
 		$this->status = htmlspecialchars($_POST["status"]);
+		$this->reason = htmlspecialchars($_POST["reason"]);
 		
 		$this->save();
 	}

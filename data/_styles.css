@@ -226,7 +226,7 @@ input[type=submit]:hover, button:hover, .button:hover {
 
 /* Navbar */
 .navbar-section {
-	background: var(--colour-background-dark);
+	background: var(--colour-background-dark-c);
 	border: none;
 	padding: 1em;
 	position: fixed;
@@ -234,6 +234,8 @@ input[type=submit]:hover, button:hover, .button:hover {
 	width: calc(100vw - 32px);
 	z-index: 100;
 	border-radius: 0 0 !(NavBar.Radius) !(NavBar.Radius);
+	backdrop-filter: blur(5em);
+	box-shadow: 0 0.2em 0.4em #0004;
 }
 
 .navbar-section a {
