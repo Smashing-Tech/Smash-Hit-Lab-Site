@@ -254,5 +254,5 @@ function alert(string $title, string $url = "") {
 		$un->notify($title, $url);
 	}
 	
-	send_discord_message(date("Y-m-d H:i:s", time()) . " — " . $title);
+	send_discord_message(date("Y-m-d H:i:s", time()) . " — " . $title . ($url ? "\n[Relevant link](https://smashhitlab.000webhostapp.com/$url)" : ""));
 }
