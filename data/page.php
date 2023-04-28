@@ -12,6 +12,7 @@ class Page {
 	public $title;
 	public $body;
 	public $mode;
+	public $request;
 	
 	function __construct() {
 		$this->title = null;
@@ -21,6 +22,12 @@ class Page {
 	
 	function set_mode(int $mode) : void {
 		$this->mode = $mode;
+		
+		if ($mode == PAGE_MODE_API) {
+			$this->body = [];
+			$this->type("application/json");
+			$this->request = $this->get_json();
+		}
 	}
 	
 	function http_header(string $key, string $value) : void {
@@ -55,16 +62,25 @@ class Page {
 	}
 	
 	function info($title = "Done", $desc = "The action completed successfully.") : void {
-		include_header();
-		echo "<h1>$title</h1><p>$desc</p>";
-		include_footer();
+		if ($this->mode != PAGE_MODE_API) {
+			include_header();
+			echo "<h1>$title</h1><p>$desc</p>";
+			include_footer();
+		}
+		else {
+			$this->set("status", $title);
+			$this->set("message", $desc);
+		}
 		die();
 	}
 	
 	function get(string $key, bool $require = true, ?int $length = null, int $sanitise = SANITISE_HTML, $require_post = false) : ?string {
 		$value = null;
 		
-		if (array_key_exists($key, $_POST)) {
+		if ($this->mode == PAGE_MODE_API && array_key_exists($key, $this->request)) {
+			$value = $this->request[$key];
+		}
+		else if (array_key_exists($key, $_POST)) {
 			$value = $_POST[$key];
 		}
 		
@@ -111,6 +127,19 @@ class Page {
 		}
 		
 		return $value;
+	}
+	
+	function get_json() {
+		/**
+		 * If in API mode, get the body of the request as JSON.
+		 */
+		
+		try {
+			return json_decode(file_get_contents("php://input"), true);
+		}
+		catch (Exception $e) {
+			return [];
+		}
 	}
 	
 	function set(string $key, mixed $value) {
@@ -168,7 +197,7 @@ class Page {
 	private function render_json() : string {
 		assert($this->mode === PAGE_MODE_API);
 		
-		return json_encode($body);
+		return json_encode($this->body);
 	}
 	
 	function render() : string {

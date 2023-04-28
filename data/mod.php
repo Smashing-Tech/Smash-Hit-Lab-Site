@@ -118,7 +118,7 @@ class ModPage {
 		if (get_name_if_authed()) {
 			echo "<p class=\"centred\">";
 			echo "<a href=\"./?a=edit_mod&m=$this->package\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit this mod</button></a> ";
-			echo "<button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Magic editor (beta)</button> ";
+			echo "<button id=\"shl-magic-editor-main-button\" class=\"button secondary\" onclick=\"shl_magic_editor_begin();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Magic editor (beta)</button> ";
 			echo "<a href=\"./?a=mod_history&m=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">history</span> History</button></a> ";
 			echo "<a href=\"./?a=mod-rename&oldslug=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit_location</span> Rename</button></a> ";
 			
@@ -134,7 +134,9 @@ class ModPage {
 			
 			$pd = new Parsedown();
 			$pd->setSafeMode(true);
+			echo "<div id=\"mod-about\" class=\"shl-magic-editor-feild\">";
 			echo $pd->text($this->description);
+			echo "</div>";
 		}
 		
 		if ($this->download || $this->version || $this->creators || $this->security) {
@@ -155,6 +157,8 @@ class ModPage {
 		mod_property("Status", "A short description of the mod's development status.", $this->status, true);
 		
 		echo "<p class=\"small-text\">This page was last updated at " . date("Y-m-d H:i", $this->updated) . " by " . get_nice_display_name($this->author) . "</p>";
+		
+		echo "<script>shl_magic_editor_init();</script>";
 		
 		$disc = new Discussion($this->reviews);
 		$disc->display_reverse("Reviews", "./?m=" . $this->package);
@@ -240,6 +244,18 @@ class ModPage {
 		$this->security = htmlspecialchars($_POST["security"]);
 		$this->status = htmlspecialchars($_POST["status"]);
 		$this->reason = htmlspecialchars($_POST["reason"]);
+		
+		$this->save();
+	}
+	
+	function save_edit_api(Page $page, string $whom, $data) {
+		if (strlen($data["about"]) > 4000) {
+			$page->info("too_long", "The about section for this mod is too long. Please limit the about section to 4000 characters.");
+		}
+		
+		$this->updated = time();
+		$this->author = $whom;
+		$this->description = $data["about"];
 		
 		$this->save();
 	}
@@ -336,6 +352,25 @@ function save_mod() : void {
 	
 	redirect("./?m=$mod_name");
 }
+
+$gEndMan->add("mod-save", function (Page $page) {
+	$user = get_name_if_authed();
+	
+	$page->set_mode(PAGE_MODE_API);
+	
+	if (!$user) {
+		$page->set("status", "not_authed");
+		$page->set("message", "You need to log in first!");
+	}
+	
+	$data = $page->get_json();
+	
+	$mod = new ModPage($data["page"]);
+	$mod->save_edit_api($page, $user, $data);
+	
+	$page->set("status", "done");
+	$page->set("message", "The changes were saved successfully!");
+});
 
 function delete_mod() : void {
 	$user = get_name_if_admin_authed();
