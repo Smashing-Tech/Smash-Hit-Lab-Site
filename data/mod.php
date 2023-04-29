@@ -1,5 +1,23 @@
 <?php
 
+function validate_modpage_name(string $name) : bool {
+	$chars = str_split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.");
+	
+	// Charset limit
+	for ($i = 0; $i < strlen($name); $i++) {
+		if (array_search($name[$i], $chars, true) === false) {
+			return false;
+		}
+	}
+	
+	// Size limit
+	if (strlen($name) > 36) {
+		return false;
+	}
+	
+	return true;
+}
+
 class ModPage {
 	public $package;
 	public $name;
@@ -72,8 +90,10 @@ class ModPage {
 	}
 	
 	function save() {
-		$db = new RevisionDB("mod");
-		$db->save($this->package, $this);
+		if (validate_modpage_name($this->package)) {
+			$db = new RevisionDB("mod");
+			$db->save($this->package, $this);
+		}
 	}
 	
 	function rename(string $new_slug) : bool {
@@ -273,6 +293,14 @@ function display_mod() {
 	 */
 	
 	$revision = array_key_exists("index", $_GET) ? $_GET["index"] : -1;
+	
+	if (!((new RevisionDB("mod"))->has($_GET["m"]))) {
+		include_header();
+		echo "<h1>We don't have that!</h1><p>This mod page does not exist.</p>";
+		include_footer();
+		return;
+	}
+	
 	$mod = new ModPage($_GET["m"], $revision);
 	
 	global $gTitle; $gTitle = $mod->name;
@@ -296,6 +324,12 @@ function edit_mod() : void {
 	}
 	
 	$mod_name = $_GET["m"];
+	
+	if (!validate_modpage_name($mod_name)) {
+		echo "<h1>Invalid page name</h1><p>The mod page slug is not a valid slug. They should only include lowercase and uppercase basic latin letters, abraic numerals and the underscore, dot and dash.</p>";
+		include_footer();
+		return;
+	}
 	
 	if (!get_name_if_authed()) {
 		echo "<h1>Sorry</h1><p>You need to <a href=\"./?p=login\">log in</a> or <a href=\"./?p=register\">create an account</a> to edit pages.</p>";
@@ -348,7 +382,7 @@ function save_mod() : void {
 	$mod->save_edit($user);
 	
 	// Admin alert!
-	alert("Mod page $mod_name updated by @$user", "./?m=$mod_name");
+	alert("Mod page $mod_name updated by @$user\nUsed legacy editor\nReason: $mod->reason", "./?m=$mod_name");
 	
 	redirect("./?m=$mod_name");
 }
@@ -367,6 +401,8 @@ $gEndMan->add("mod-save", function (Page $page) {
 	
 	$mod = new ModPage($data["page"]);
 	$mod->save_edit_api($page, $user, $data);
+	
+	alert("Mod page #$mod->package updated by @$user\nUsed magic editor", "./?m=$mod->package");
 	
 	$page->set("status", "done");
 	$page->set("message", "The changes were saved successfully!");

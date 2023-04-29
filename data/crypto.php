@@ -1,7 +1,7 @@
 <?php
 
 function random_base32(int $nchar) : string {
-	$alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUV";
+	$alphabet = "0123456789abcdefghijklmnopqrstuv";
 	
 	$base = random_bytes($nchar);
 	$name = "";

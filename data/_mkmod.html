@@ -1,7 +1,6 @@
 <script>
 	function openModPage() {
 		let e = document.getElementById("create-mod");
-		//window.open("./?a=edit_mod&m=" + e.value);
 		window.location = "./?a=edit_mod&m=" + e.value;
 	}
 	
@@ -23,9 +22,9 @@
 				<h4>Create a new mod</h4>
 			</div>
 			<div style="grid-row: 2;">
-				<p><b>What would you like the internal name of the page to be?</b></p>
-				<p>This is different from the mod's title, and should preferably contain only the characters A - Z (upper or lower case), the digits 0 - 9 and <code>_</code>, <code>-</code> and <code>.</code>.</p>
-				<p>We recommend using your mod's package name, if it's not already taken. For example: <code>org.knot126.randomhit</code>.</p>
+				<p><b>What would you like the internal name (slug) of your mod's page to be?</b></p>
+				<p>This is different from the mod's title, and should preferably contain only lowercase and uppercase latin characters, numbers and dots, dashes and underscores.</p>
+				<p>If you have changed your mod's package name to something unique, we recommend using that as the slug.</p>
 				<input id="create-mod" type="text" placeholder="Internal page name"/>
 			</div>
 			<div style="grid-row: 3;">
