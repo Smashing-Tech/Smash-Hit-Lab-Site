@@ -134,6 +134,7 @@ function do_admin_alerts() {
 	if ($user->is_mod()) {
 		include_header();
 		echo "<h1>Alerts</h1>";
+		echo "<div class=\"comment-card\"><p>Alerts will be removed on 7 May 2023 in favour of the Discord webhook.</p></div>";
 		
 		$un = new UserNotifications($user->name, "alert");
 		$un->display("");

@@ -1235,12 +1235,8 @@ function display_user(string $user) {
 	
 	echo "<h3>Actions</h3>";
 	
-	// Show the email action if the user allows it
-	if ($stalker && $user->allow_messages) {
-		mod_property("Email", "You can send a private message to this user via email.", "<a href=\"./?a=user_email&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">email</span> Send email</button></a>");
-	}
-	// We can offer the user to use the message wall
-	else {
+	// Show the send message action
+	if ($stalker) {
 		mod_property("Send message", "You can send this user a message publicly via their wall.", "<button class=\"button secondary\" onclick=\"user_tabs_select('wall')\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">forum</span> Message wall</button>");
 	}
 	
@@ -1380,6 +1376,7 @@ function user_email() {
 		if (!array_key_exists("submit", $_GET)) {
 			include_header();
 			echo "<h1>Send email</h1>";
+			echo "<div class=\"comment-card\"><p>To help simplify future development and prevent spam, user email functions will be removed on 7 May 2023.</p></div>";
 			form_start("./?a=user_email&submit=1");
 			
 			$know_handle = array_key_exists("handle", $_GET);
