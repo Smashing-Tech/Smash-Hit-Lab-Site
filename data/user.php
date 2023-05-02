@@ -1,50 +1,11 @@
 <?php
 
-require_once "database.php";
-require_once "templates.php";
-
 function random_hex() : string {
 	/**
 	 * Cryptographically secure random hex values.
 	 */
 	
 	return bin2hex(random_bytes(32));
-}
-
-function random_password() : string {
-	/**
-	 * Randomly generates a new password.
-	 */
-	
-	$alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*-_+=[]{}<>()";
-	
-	$pw = random_bytes(25);
-	
-	for ($i = 0; $i < strlen($pw); $i++) {
-		$pw[$i] = $alphabet[floor((ord($pw[$i]) / 255) * strlen($alphabet))];
-	}
-	
-	return $pw;
-}
-
-function crush_ip(?string $ip = null) : string {
-	/**
-	 * Crush an IP address into a partial hash.
-	 * 
-	 * Normally IP addresses are used to deny access, so it's okay if there are
-	 * collisions (and in fact this should help with privacy).
-	 * 
-	 * TODO IPv6 address might not be handled as well
-	 * 
-	 * TODO This is also used for denying tokens from the wrong IP, so it's worth
-	 * considering if this mitigates that.
-	 */
-	
-	if ($ip === null) {
-		$ip = $_SERVER["REMOTE_ADDR"];
-	}
-	
-	return substr(md5($ip), 0, 6);
 }
 
 class Token {
@@ -258,18 +219,12 @@ function find_pfp($user) : string | null {
 		case "youtube": {
 			return get_yt_image($user->youtube);
 		}
+		case "url": {
+			return $user->image;
+		}
 		default: {
 			return "./?a=generate-logo-coloured&seed=$user->name";
 		}
-	}
-}
-
-function dechexa(int $num) {
-	if ($num < 16) {
-		return "0" . dechex($num);
-	}
-	else {
-		return dechex($num);
 	}
 }
 
@@ -908,7 +863,7 @@ function user_exists(string $username) : bool {
 	return $db->has($username);
 }
 
-function check_token(string $name, string $lockbox) {
+function check_token__(string $name, string $lockbox) {
 	/**
 	 * Given the name of the token, get the user's assocaited name, or NULL if
 	 * the token is not valid.
@@ -932,7 +887,7 @@ function get_name_if_authed() {
 		return null;
 	}
 	
-	return check_token($_COOKIE["tk"], $_COOKIE["lb"]);
+	return check_token__($_COOKIE["tk"], $_COOKIE["lb"]);
 }
 
 function get_display_name_if_authed() {
@@ -1084,11 +1039,23 @@ function edit_account() {
 	
 	edit_feild("display", "text", "Display name", "This is the name that will be displayed instead of your handle. It can be any name you prefer to be called.", $user->display);
 	edit_feild("about", "textarea", "About", "You can write a piece of text detailing whatever you like on your userpage. Please don't include personal information!", $user->about);
-	edit_feild("image_type", "select", "Profile image source", "Please chose what service your profile image should be derived from.", $user->image_type, true, [
+	
+	$available_types = [
 		"gravatar" => "Gravatar",
 		"youtube" => "YouTube",
 		"generated" => "Lab Logo",
-	]);
+	];
+	
+	if ($user->is_verified()) {
+		$available_types["url"] = "Image URL";
+	}
+	
+	edit_feild("image_type", "select", "Profile image source", "Please chose what service your profile image should be derived from.", $user->image_type, true, $available_types);
+	
+	if ($user->is_verified()) {
+		edit_feild("imageurl", "text", "Image URL", "The location of your user image, if set to \"Image URL\".", $user->image);
+	}
+	
 	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, not including the at sign (@). We will use this account to give you a profile picture.", $user->youtube);
 	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email, !$user->is_admin());
 	edit_feild("colour", "text", "Page colour", "The base colour that the colour of your userpage is derived from. Represented as hex #RRGGBB.", $user->manual_colour);
@@ -1123,6 +1090,10 @@ function save_account() {
 	validate_length("About", $_POST["about"], 2000);
 	validate_length("Image type", $_POST["image_type"], 15);
 	
+	if (array_key_exists("imageurl", $_POST)) {
+		validate_length("Image url", $_POST["imageurl"], 1000);
+	}
+	
 	$user = new User($user);
 	$user->display = htmlspecialchars($_POST["display"]);
 	
@@ -1152,6 +1123,12 @@ function save_account() {
 	}
 	
 	$user->image_type = $_POST["image_type"];
+	
+	// HACK This is a quick hack for custom image urls.
+	if ($user->image_type == "url" && $user->is_verified()) {
+		$user->image = htmlspecialchars($_POST["imageurl"]);
+	}
+	
 	$user->update_image();
 	
 	// Finally the about section

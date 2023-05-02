@@ -12,3 +12,19 @@ function random_base32(int $nchar) : string {
 	
 	return $name;
 }
+
+function random_password() : string {
+	/**
+	 * Randomly generates a new password.
+	 */
+	
+	$alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*-_+=[]{}<>()";
+	
+	$pw = random_bytes(25);
+	
+	for ($i = 0; $i < strlen($pw); $i++) {
+		$pw[$i] = $alphabet[floor((ord($pw[$i]) / 255) * strlen($alphabet))];
+	}
+	
+	return $pw;
+}
