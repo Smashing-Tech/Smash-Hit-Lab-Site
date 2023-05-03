@@ -47,8 +47,8 @@
 		return string + "</p>";
 	}
 	
-	function ds_render_comment(image, author, display, time, body, actions, index, badge, pronouns) {
-		return "<div class=\"comment-card\"><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"" + image + "\"/></div><div class=\"comment-card-inner-right\"><div class=\"comment-info-block\"><p><a href=\"./?u=" + author + "\">" + display + "</a> " + badge + "</p></div><div class=\"comment-info-block comment-side-info\"><p>@" + author + (pronouns ? (" · " + pronouns) : "") + " · " + time + "</p></div>" + body + ds_render_actions(actions, index, author) + "</div></div></div>";
+	function ds_render_comment(hidden, image, author, display, time, body, actions, index, badge, pronouns) {
+		return "<div class=\"comment-card\" " + (hidden ? "style=\"opacity: 0.6;\"" : "") + "><div class=\"comment-card-inner\"><div class=\"comment-card-inner-left\"><img src=\"" + image + "\"/></div><div class=\"comment-card-inner-right\"><div class=\"comment-info-block\"><p><a href=\"./?u=" + author + "\">" + display + "</a> " + badge + "</p></div><div class=\"comment-info-block comment-side-info\"><p>@" + author + (pronouns ? (" · " + pronouns) : "") + " · " + time + "</p></div>" + body + ds_render_actions(actions, index, author) + "</div></div></div>";
 	}
 	
 	function ds_load_handle() {
@@ -72,7 +72,7 @@
 					let body = comment["body"]; // Will already be escaped
 					let date = format_time(comment["updated"]);
 					
-					discussion.innerHTML += ds_render_comment(image, author, display, date, body, comment["actions"], comment["index"], comment["badge"], comment["pronouns"]);
+					discussion.innerHTML += ds_render_comment(comment["hidden"], image, author, display, date, body, comment["actions"], comment["index"], comment["badge"], comment["pronouns"]);
 				}
 				
 				UserSAK = data["next_sak"];
