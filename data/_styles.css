@@ -482,6 +482,17 @@ input[type=submit]:hover, button:hover, .button:hover {
 	margin-left: 1em;
 }
 
+.comment-side-info {
+	display: inline-block;
+	opacity: 0.6;
+	margin-left: 0.5em;
+}
+
+.comment-info-block {
+	display: inline-block;
+	width: fit-content;
+}
+
 .profile-header-image-wrapper {
 	text-align: center;
 }
