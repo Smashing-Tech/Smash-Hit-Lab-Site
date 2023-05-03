@@ -414,9 +414,9 @@ class User {
 			$info = $db->load($name);
 			
 			$this->schema = (property_exists($info, "schema") ? $info->schema : 0);
-			$this->id = 
 			$this->name = $info->name;
 			$this->display = (property_exists($info, "display") ? $info->display : $info->name);
+			$this->pronouns = (property_exists($info, "pronouns") ? $info->pronouns : "");
 			$this->password = $info->password;
 			$this->tokens = $info->tokens;
 			$this->email = $info->email ? $info->email : "";
@@ -458,6 +458,7 @@ class User {
 		else {
 			$this->name = $name;
 			$this->display = $name;
+			$this->pronouns = "";
 			$this->password = null;
 			$this->tokens = array();
 			$this->email = "";
@@ -1038,6 +1039,7 @@ function edit_account() {
 	form_start("./?a=save_account");
 	
 	edit_feild("display", "text", "Display name", "This is the name that will be displayed instead of your handle. It can be any name you prefer to be called.", $user->display);
+	edit_feild("pronouns", "text", "Pronouns", "These are your perferred pronouns; for example, he/him, she/her or they/them. They will be displayed by your name in some contexts.", $user->pronouns);
 	edit_feild("about", "textarea", "About", "You can write a piece of text detailing whatever you like on your userpage. Please don't include personal information!", $user->about);
 	
 	$available_types = [
@@ -1065,6 +1067,7 @@ function edit_account() {
 	
 	echo "<h2>Other actions</h2>";
 	
+	edit_feild("download", "label", "Download data", "You can download any data that we are keeping about you and take it to another service.", "<i>Please let a staff member know that you would like data. We should respond within a few days.</i>");
 	edit_feild("delete", "label", "Delete account", "If you would like to delete your account, you can start by clicking the button.", "<a href=\"./?a=account_delete\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">person_off</span> Delete my account</button></a>");
 	
 	display_user_accent_script($user);
@@ -1084,6 +1087,7 @@ function save_account() {
 	}
 	
 	validate_length("Display name", $_POST["display"], 30);
+	validate_length("Pronouns", $_POST["pronouns"], 30);
 	validate_length("Email", $_POST["email"], 300);
 	validate_length("YouTube", $_POST["youtube"], 30);
 	validate_length("Colour", $_POST["colour"], 7);
@@ -1091,11 +1095,12 @@ function save_account() {
 	validate_length("Image type", $_POST["image_type"], 15);
 	
 	if (array_key_exists("imageurl", $_POST)) {
-		validate_length("Image url", $_POST["imageurl"], 1000);
+		validate_length("Image URL", $_POST["imageurl"], 1000);
 	}
 	
 	$user = new User($user);
 	$user->display = htmlspecialchars($_POST["display"]);
+	$user->pronouns = htmlspecialchars($_POST["pronouns"]);
 	
 	if (($user->display != $user->name) && user_exists($user->display)) {
 		sorry("You cannot set your display name to that of another user's handle.");
@@ -1191,6 +1196,11 @@ function display_user(string $user) {
 	echo "<div class=\"user-tab-data details\">";
 	echo "<h3>Details</h3>";
 	mod_property("Join date", "The date that the user joined the Smash Hit Lab.", Date("Y-m-d", $user->created));
+	
+	// Maybe show pronouns?
+	if ($user->pronouns) {
+		mod_property("Pronouns", "When referring to this person using pronouns, please use their preferred pronouns. Intentionally or repeatedly using the wrong pronouns will lead to a ban.", "$user->pronouns");
+	}
 	
 	// Show roles
 	if ($user->count_roles()) {

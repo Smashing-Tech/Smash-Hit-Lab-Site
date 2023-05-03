@@ -618,10 +618,12 @@ blockquote {
 
 .user-tabs-ent {
 	cursor: pointer;
+	padding: 0.75em;
+	border-radius: 0.5em;
 }
 
 .user-tabs-ent:hover {
-	border-bottom: 0.25em solid var(--colour-primary-a);
+	background: var(--colour-primary-a);
 }
 
 .user-tabs-ent.about {
@@ -641,11 +643,14 @@ blockquote {
 }
 
 .user-tabs-ent.selected {
-	border-bottom: 0.25em solid var(--colour-primary);
+	background: var(--colour-primary);
+	color: var(--colour-primary-text);
 }
 
 .user-tabs-tab {
 	text-align: center;
+	margin: 0;
+	padding: 0;
 }
 
 .mod-banner {
