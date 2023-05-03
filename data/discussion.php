@@ -285,7 +285,7 @@ class Discussion {
 		return sizeof($this->comments) - $this->enumerate_hidden();
 	}
 	
-	function list_since(int $index) {
+	function list_since(int $index, bool $hidden = false) {
 		/**
 		 * Return a list of comments since (and including) a given comment, also
 		 * including some extra data
@@ -305,14 +305,16 @@ class Discussion {
 		}
 		
 		// Remove hidden comments
-		for ($i = 0; $i < sizeof($comments);) {
-			if ($comments[$i]->is_hidden()) {
-				array_splice($comments, $i, 1);
-			}
-			// We can only increment if it doesn't exist since everything
-			// will shift down when things are removed!
-			else {
-				$i++;
+		if (!$hidden) {
+			for ($i = 0; $i < sizeof($comments);) {
+				if ($comments[$i]->is_hidden()) {
+					array_splice($comments, $i, 1);
+				}
+				// We can only increment if it doesn't exist since everything
+				// will shift down when things are removed!
+				else {
+					$i++;
+				}
 			}
 		}
 		
@@ -409,6 +411,10 @@ class Discussion {
 	
 	function display_reload() {
 		echo "<button class=\"button secondary\" onclick=\"ds_clear(); ds_load();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">refresh</span> Reload</button>";
+		
+		if (get_name_if_admin_authed()) {
+			echo " <button class=\"button secondary\" onclick=\"ds_toggle_hidden();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">visibility_off</span> Toggle hidden</button>";
+		}
 	}
 	
 	function display_follow() {
@@ -479,7 +485,7 @@ class Discussion {
 	
 	function comments_load_script(bool $backwards = false) {
 		$sak = user_get_sak();
-		echo "<script>var DiscussionID = \"$this->id\"; var UserSAK = \"$sak\"; var DiscussionBackwards = " . ($backwards ? "true" : "false") . ";</script>";
+		echo "<script>var DiscussionID = \"$this->id\"; var UserSAK = \"$sak\"; var DiscussionBackwards = " . ($backwards ? "true" : "false") . "; var ShowHidden = false;</script>";
 		readfile("../data/_discussionload.html");
 	}
 	
@@ -721,7 +727,7 @@ function discussion_poll() {
 	
 	// List the comments
 	$disc = new Discussion($_GET["id"]);
-	$comments = $disc->list_since($_GET["index"]);
+	$comments = $disc->list_since($_GET["index"], get_name_if_admin_authed() && array_key_exists("hidden", $_GET));
 	
 	// Create the result data
 	$result = new stdClass;

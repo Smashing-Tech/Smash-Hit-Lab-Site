@@ -86,7 +86,7 @@
 	}
 	
 	function ds_load() {
-		ds_request("GET", "./?a=discussion_poll&id=" + DiscussionID + "&index=0", ds_load_handle);
+		ds_request("GET", "./?a=discussion_poll&id=" + DiscussionID + "&index=0" + (window.ShowHidden ? "&hidden=1" : ""), ds_load_handle);
 	}
 	
 	function ds_clear() {
@@ -132,5 +132,11 @@
 	function ds_update() {
 		let body = document.getElementById("discussions-" + DiscussionID + "-entry").value;
 		ds_request("POST", "./?a=discussion_update&id=" + DiscussionID + "&index=-1&key=" + UserSAK + "&api=1", ds_update_handle, body);
+	}
+	
+	function ds_toggle_hidden() {
+		window.ShowHidden = !window.ShowHidden;
+		ds_clear();
+		ds_load();
 	}
 </script>
