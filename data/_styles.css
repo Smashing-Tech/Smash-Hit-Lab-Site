@@ -493,6 +493,30 @@ input[type=submit]:hover, button:hover, .button:hover {
 	width: fit-content;
 }
 
+@media (min-width: calc(75em + 50px)) {
+	.profile-header {
+		display: grid;
+		grid-template-columns: 400px auto;
+		margin-bottom: 2em;
+	}
+	
+	.profile-header-image-section {
+		grid-column: 1;
+	}
+	
+	.profile-header-userinfo {
+		grid-column: 2;
+	}
+}
+
+@media (max-width: calc(75em + 49px)) {
+	.profile-header-userinfo * {
+		text-align: center;
+		margin: 0;
+		margin-bottom: 0.75em;
+	}
+}
+
 .profile-header-image-wrapper {
 	text-align: center;
 }

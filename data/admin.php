@@ -81,7 +81,7 @@ function do_site_config() {
 }
 
 function admin_action_item(string $url, string $icon, string $title) {
-	echo "<div style=\"display: inline-block; width: 150px; text-align: center; padding: 0.75em; margin: 0.5em; background: var(--colour-background-light); border-radius: 0.5em;\">";
+	echo "<div style=\"display: inline-block; width: 150px; height: 125px; text-align: center; padding: 0.75em; margin: 0.5em; background: var(--colour-background-light); border-radius: 0.5em;\">";
 		echo "<a href=\"$url\">";
 			echo "<p style=\"font-size: 24pt;\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px; font-size: 32pt;\">$icon</span></p>";
 			echo "<p>$title</p>";

@@ -1275,13 +1275,13 @@ function display_user(string $user) {
 function display_user_banner(User $user) {
 	$display_name = $user->display ? $user->display : $user->name;
 	
-	echo "<div class=\"mod-edit-property\">";
-		echo "<div class=\"mod-edit-property-label\">";
+	echo "<div class=\"profile-header\">";
+		echo "<div class=\"profile-header-image-section\">";
 			if ($user->image) {
 				echo "<div class=\"profile-header-image-wrapper\"><img class=\"profile-header-image\" src=\"$user->image\"/></div>";
 			}
 		echo "</div>";
-		echo "<div class=\"mod-edit-property-data\">";
+		echo "<div class=\"profile-header-userinfo\">";
 			echo "<h1 class=\"left-align\">$display_name</h1>";
 			echo "<h2 class=\"left-align\">@$user->name</h2>";
 		echo "</div>";

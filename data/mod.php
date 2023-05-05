@@ -90,10 +90,8 @@ class ModPage {
 	}
 	
 	function save() {
-		if (validate_modpage_name($this->package)) {
-			$db = new RevisionDB("mod");
-			$db->save($this->package, $this);
-		}
+		$db = new RevisionDB("mod");
+		$db->save($this->package, $this);
 	}
 	
 	function rename(string $new_slug) : bool {
@@ -106,7 +104,7 @@ class ModPage {
 		$db = new RevisionDB("mod");
 		
 		// Check if page already exists
-		if ($db->has($new_slug)) {
+		if ($db->has($new_slug) || !validate_modpage_name($new_slug)) {
 			return false;
 		}
 		

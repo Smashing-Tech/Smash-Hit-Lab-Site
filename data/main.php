@@ -13,6 +13,7 @@ require_once "Parsedown.php";
 require_once "action.php";
 require_once "admin.php";
 require_once "auth.php";
+require_once "chat.php";
 require_once "config.php";
 require_once "crypto.php";
 require_once "database.php";
