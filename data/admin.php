@@ -28,20 +28,9 @@ function do_site_config() {
 			echo "<h3>Connections</h3>";
 			edit_feild("discord_webhook", "text", "Discord webhook", "The discord webhook that will be used for alerts.", get_config("discord_webhook", ""));
 			
-			echo "<h3>Security</h3>";
-			edit_feild("register", "select", "Auth type", "Which auth backend to use.", get_config("auth_backend", "labbyware"), true, [
-				"labbyware" => "Labbyware Native Auth",
-				"knotauth" => "Knot Auth Service"
-			]);
-			
 			echo "<h4>Labbyware Native Auth</h4>";
 			edit_feild("register", "select", "Enable registering", "Weather registering of new accounts should be limited or not.", get_config("register", "anyone"), true, array("anyone" => "Anyone can register", "users" => "Only users can register", "admins" => "Only admins can register", "closed" => "Registering is disabled"));
 			edit_feild("enable_login", "select", "Enable logins", "Allow users to log in to the stie.</p><p><b>Warning:</b> If you set this to completely disabled and all admins are logged out, then you need to wait for Knot126 to fix the site.", get_config("enable_login", "users"), true, array("users" => "All users can log in", "verified" => "Verified users and admins can log in", "admins" => "Only admins can log in", "closed" => "Logging in is disabled"));
-			
-			// echo "<h4>Knot Auth/Auth7 Backend</h4>";
-			// edit_feild("ka_api_path", "text", "KnotAuth Server", "The http url of the KnotAuth server to use. The server used must support and enable passive mode.", get_config("ka_api_path", "https://example.com/api/"));
-			// edit_feild("ka_app_id", "text", "KnotAuth App ID", "The ID of the app you registered with the KnotAuth instance.", get_config("ka_app_id", ""));
-			// edit_feild("ka_app_key", "text", "KnotAuth App Key", "The secret key you registered for this app. Note: This is not displayed in the form, but providing a value will update it.", "");
 			
 			echo "<input type=\"submit\" value=\"Save settings\"/>";
 			echo "</form>";
@@ -60,14 +49,6 @@ function do_site_config() {
 			// Security
 			set_config("register", $_POST["register"], array("anyone", "users", "admins", "closed"));
 			set_config("enable_login", $_POST["enable_login"], array("users", "verified", "admins", "closed"));
-			
-			// KA
-			// set_config("ka_api_path", $_POST["ka_api_path"]);
-			// set_config("ka_app_id", $_POST["ka_app_id"]);
-			
-			// if ($_POST["ka_app_key"]) {
-				// set_config("ka_app_key", $_POST["ka_app_key"]);
-			// }
 			
 			set_config("discord_webhook", $_POST["discord_webhook"]);
 			
@@ -305,6 +286,37 @@ function do_send_notification() {
 	}
 }
 
+$gEndMan->add("notifications-send-multicast", function(Page $page) {
+	$handle = get_name_if_authed();
+	$user = $handle ? (new User($handle)) : null;
+	
+	if ($user && ($user->has_role('multicast') || $user->is_admin())) {
+		if (!$page->has("submit")) {
+			$form = new Form("./?a=notifications-send-multicast&submit=1");
+			$form->textbox("title", "Title", "Title of the notifiaction");
+			$form->textbox("link", "Link", "The link the notifiaction leads to");
+			$form->textbox("users", "Users", "A comma seperated list of users' handles this notification will be sent to.");
+			$form->submit("Send notifiaction");
+			
+			$page->heading(1, "Send multicast notifiaction");
+			$page->add($form);
+		}
+		else {
+			$title = $page->get("title");
+			$link = $page->get("link");
+			$handles = $page->get("users");
+			
+			notify_many(parse_comma_array($handles), $title, $link);
+			alert("Multicast notifiaction sent by $handle to " . htmlspecialchars($handles), "./?u=$handle");
+			
+			$page->redirect("./?n=home");
+		}
+	}
+	else {
+		$page->info("Sorry!", "You cannot send multicast notifications: not authed as a admin or missing 'multicast' privleges.");
+	}
+});
+
 function do_backup_db() {
 	/**
 	 * Back up the site database.
@@ -398,8 +410,13 @@ function do_user_roles() {
 			
 			form_start("./?a=user_roles&submit=1");
 			edit_feild("handle", "text", "Handle", "Handle or username of the user to update.", $have_handle ? $_GET["handle"] : "", !$have_handle);
-			edit_feild("role", "select", "Role", "Which role to set this user to.", "1w", true, array("headmaster" => "Headmaster", "admin" => "Administrator", "mod" => "Moderator", "none" => "None"));
-			edit_feild("reason", "text", "Reason", "Type a short reason why you want to change this user's role (required).", "");
+			edit_feild("role", "select", "Role", "Which role to set this user to.", "1w", true, [
+				"headmaster" => "Headmaster",
+				"admin" => "Administrator",
+				"mod" => "Moderator",
+				"none" => "None"
+			]);
+			edit_feild("reason", "text", "Reason", "Type a short reason why you want to change this user's role. (required)", "");
 			form_end("Set role");
 			
 			include_footer();

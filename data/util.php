@@ -62,3 +62,7 @@ function dechexa(int $num) {
 		return dechex($num);
 	}
 }
+
+function frand() : float {
+	return mt_rand() / mt_getrandmax();
+}

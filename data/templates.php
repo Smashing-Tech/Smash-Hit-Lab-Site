@@ -370,7 +370,7 @@ function rich_format(string $base, bool $trusted = false) : string {
 }
 
 function parse_comma_array(string $s) : array {
-	return explode(",", $s);
+	return explode(",", str_replace(" ", "", $s));
 }
 
 function create_comma_array(array $s) : string {

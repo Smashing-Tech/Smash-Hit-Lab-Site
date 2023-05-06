@@ -153,7 +153,9 @@ function notify_many(array $users, string $title, string $url) {
 	 */
 	
 	for ($i = 0; $i < sizeof($users); $i++) {
-		notify($users[$i], $title, $url);
+		if (user_exists($users[$i])) {
+			notify($users[$i], $title, $url);
+		}
 	}
 }
 
@@ -205,7 +207,8 @@ $gEndMan->add("notifications", function(Page $page) {
 	$page->add("<div style=\"text-align: center;\">");
 	$page->add("<a href=\"./?a=notifications-clear\"><button class=\"button\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">clear</span> Clear all</button></a>");
 	if (get_name_if_admin_authed()) {
-		$page->add(" <a href=\"./?a=send_notification\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">create</span> Create new</button></a>");
+		$page->add(" <a href=\"./?a=send_notification\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">add</span> Create</button></a>");
+		$page->add(" <a href=\"./?a=notifications-send-multicast\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">add</span> Multicast</button></a>");
 	}
 	$page->add("</div>");
 	

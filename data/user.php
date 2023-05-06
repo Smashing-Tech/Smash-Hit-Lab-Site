@@ -265,10 +265,6 @@ function colour_saturation($colour) {
 	return 1.0 - (min($R, $G, $B) / $M);
 }
 
-function frand() : float {
-	return mt_rand() / mt_getrandmax();
-}
-
 function special_function($n) {
 	return max(1.0 - 4.0 * pow($n - 0.65, 2), -0.1);
 }
