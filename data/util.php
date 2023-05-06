@@ -34,6 +34,14 @@ function send_discord_message(string $message) {
 	post($webhook_url, json_encode($body));
 }
 
+function alert(string $title, string $url = "") {
+	/**
+	 * Add a notification to a user's inbox.
+	 */
+	
+	send_discord_message(date("Y-m-d H:i:s", time()) . " — " . $title . ($url ? "\n[Relevant link](https://smashhitlab.000webhostapp.com/$url)" : ""));
+}
+
 function crush_ip(?string $ip = null) : string {
 	/**
 	 * Crush an IP address into a partial hash.

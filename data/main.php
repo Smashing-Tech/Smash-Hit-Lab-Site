@@ -71,7 +71,6 @@ function handle_action(string $action, Page $page) {
 		case "user_delete": do_user_delete(); break;
 		case "user_verify": user_verify(); break;
 		case "admin_dashboard": do_admin_dashboard(); break;
-		case "alerts": do_admin_alerts(); break;
 		case "send_notification": do_send_notification(); break;
 		// Transitioning to using Endpoint Manager
 		default: {

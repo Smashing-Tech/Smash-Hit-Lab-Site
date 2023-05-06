@@ -89,7 +89,6 @@ function do_admin_dashboard() {
 		admin_action_item("./?a=send_notification", "notifications_active", "Send notification");
 		admin_action_item("./?a=backup_db", "backup", "Create backup");
 		admin_action_item("./?a=storage_list", "inventory", "Site storage");
-		admin_action_item("./?a=alerts", "new_releases", "Alerts");
 		
 		echo "<h4>Users and contributed content</h4>";
 		admin_action_item("./?a=user_ban", "gavel", "Ban user");
@@ -97,29 +96,6 @@ function do_admin_dashboard() {
 		admin_action_item("./?a=user_roles", "security", "Edit roles");
 		admin_action_item("./?a=delete_mod", "delete", "Delete mod page");
 		admin_action_item("./?a=admin-impersonate&handle=smashhitlab", "business", "Brand account");
-		
-		include_footer();
-	}
-	else {
-		sorry("The action you have requested is not currently implemented.");
-	}
-}
-
-function do_admin_alerts() {
-	/**
-	 * ADMINNNNNNNNNNNNNNNNNNNNNNNN!!!!!!!!!
-	 */
-	
-	$user = new User(get_name_if_authed());
-	
-	if ($user->is_mod()) {
-		include_header();
-		echo "<h1>Alerts</h1>";
-		echo "<div class=\"comment-card\"><p>Alerts will be removed on 7 May 2023 in favour of the Discord webhook.</p></div>";
-		
-		$un = new UserNotifications($user->name, "alert");
-		$un->display("");
-		$un->clear();
 		
 		include_footer();
 	}

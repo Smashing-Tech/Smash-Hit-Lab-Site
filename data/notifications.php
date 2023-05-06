@@ -3,10 +3,6 @@
  * User notifications
  */
 
-require_once "user.php";
-require_once "templates.php";
-require_once "config.php"; // For admin alerts
-
 class Notification {
 	/**
 	 * A single notification.
@@ -239,23 +235,4 @@ function display_notification_charm(string $name) {
 	if ($count) {
 		echo "<div class=\"cb-top-item\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">notifications</span><a href=\"./?a=notifications\">Notifications ($count)</a></div>";
 	}
-}
-
-/**
- * ADMIN ALERTS
- */
-
-function alert(string $title, string $url = "") {
-	/**
-	 * Add a notification to a user's inbox.
-	 */
-	
-	$users = get_config("admins", array());
-	
-	for ($i = 0; $i < sizeof($users); $i++) {
-		$un = new UserNotifications($users[$i], "alert");
-		$un->notify($title, $url);
-	}
-	
-	send_discord_message(date("Y-m-d H:i:s", time()) . " — " . $title . ($url ? "\n[Relevant link](https://smashhitlab.000webhostapp.com/$url)" : ""));
 }

@@ -171,9 +171,6 @@
 							if ($u->is_admin()) {
 								nav_dropdown_item("apps", "Dashboard", "./?a=admin_dashboard");
 							}
-							if ($u->is_mod()) {
-								nav_dropdown_item("new_releases", "Alerts", "./?a=alerts");
-							}
 							nav_dropdown_item("manage_accounts", "Account", "./?a=edit_account");
 							nav_dropdown_item("notifications", "Notifications", "./?a=notifications");
 							if (!$u->has_role("impersonateable")) {
