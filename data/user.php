@@ -416,7 +416,6 @@ class User {
 			$this->password = $info->password;
 			$this->tokens = $info->tokens;
 			$this->email = $info->email ? $info->email : "";
-			$this->allow_messages = (property_exists($info, "allow_messages") ? $info->allow_messages : false);
 			$this->created = (property_exists($info, "created") ? $info->created : time());
 			$this->login_wait = (property_exists($info, "login_wait") ? $info->login_wait : 0);
 			$this->verified = property_exists($info, "verified") ? $info->verified : null;
@@ -1057,7 +1056,6 @@ function edit_account() {
 	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, not including the at sign (@). We will use this account to give you a profile picture.", $user->youtube);
 	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email, !$user->is_admin());
 	edit_feild("colour", "text", "Page colour", "The base colour that the colour of your userpage is derived from. Represented as hex #RRGGBB.", $user->manual_colour);
-	edit_feild("messages", "select", "Allow emails", "Choose if you want other users to be able to send you emails without revealing your email address.", $user->allow_messages ? "1" : "0", true, array("0" => "Disallow messages", "1" => "Allow messages"));
 	
 	form_end("Save account details");
 	
@@ -1113,9 +1111,6 @@ function save_account() {
 	
 	$user->youtube = htmlspecialchars($_POST["youtube"]);
 	$user->manual_colour = htmlspecialchars($_POST["colour"]);
-	
-	// User messages
-	$user->allow_messages = ($_POST["messages"] === "1") ? true : false;
 	
 	// If the user started it with an @ then we will try to make it okay for
 	// them.
@@ -1220,10 +1215,9 @@ function display_user(string $user) {
 	
 	// Show the send message action
 	if ($stalker) {
-		mod_property("Send message", "You can send this user a message publicly via their wall.", "<button class=\"button secondary\" onclick=\"user_tabs_select('wall')\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">forum</span> Message wall</button>");
+		mod_property("Send message", "You can send this user a message publicly via their message wall.", "<button class=\"button secondary\" onclick=\"user_tabs_select('wall')\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">forum</span> Message wall</button>");
 	}
 	
-	// Admins can view some extra data like emails
 	if ($stalker && $stalker->is_admin()) {
 		if ($user->is_banned()) {
 			mod_property("Unban time", "The time at which this user will be allowed to log in again.", $user->unban_date());
@@ -1346,61 +1340,6 @@ function user_verify() {
 		alert("User $user->name was marked verified", "./?u=$user->name");
 		
 		redirect("./?u=$user->name");
-	}
-	else {
-		sorry("The action you have requested is not currently implemented.");
-	}
-}
-
-function user_email() {
-	$actor = get_name_if_authed();
-	
-	if ($actor) {
-		if (!array_key_exists("submit", $_GET)) {
-			include_header();
-			echo "<h1>Send email</h1>";
-			echo "<div class=\"comment-card\"><p>To help simplify future development and prevent spam, user email functions will be removed on 7 May 2023.</p></div>";
-			form_start("./?a=user_email&submit=1");
-			
-			$know_handle = array_key_exists("handle", $_GET);
-			edit_feild("handle", "text", "Handle", "The handle of the user to send mail.", $know_handle ? $_GET["handle"] : "", !$know_handle);
-			form_textarea("message", "Message", "The message you want to send this user.");
-			
-			form_end("Send email");
-			include_footer();
-		}
-		else {
-			$handle = htmlspecialchars($_POST["handle"]);
-			$message = htmlspecialchars($_POST["message"]);
-			
-			// Validate message length before adding our own header
-			validate_length("Message", $message, 2000);
-			
-			// Open user info of the actor
-			$actor = new User($actor);
-			
-			// Prepend message header
-			$message = "This is a message from $actor->name ($actor->email) at the Smash Hit Lab. It is NOT an official email, and you don't have to reply or acknowledge it.\n\n=============================================\n\n" . $message;
-			
-			// Open the user info
-			$user = new User($handle);
-			
-			// Disallow sending if the user doesn't want it
-			if (!$user->allow_messages) {
-				sorry("This user does not want to be sent emails.");
-			}
-			
-			// Send email, making sure we try to reply to the actor.
-			mail(
-				$user->email,
-				"Message from $actor->name",
-				$message,
-				array("Reply-To" => "$actor->name <$actor->email>")
-			);
-			
-			// Inform the user of success
-			inform("Message sent", "The following message was sent to $user->name:</p><p><pre>$message</pre>");
-		}
 	}
 	else {
 		sorry("The action you have requested is not currently implemented.");
