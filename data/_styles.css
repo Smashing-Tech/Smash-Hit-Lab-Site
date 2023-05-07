@@ -105,6 +105,11 @@ body {
 	color: var(--colour-background-text);
 }
 
+.pronouns-span {
+	opacity: 0.6;
+	font-weight: 400;
+}
+
 .main-section {
 	border: none;
 	color: var(--colour-background-text);

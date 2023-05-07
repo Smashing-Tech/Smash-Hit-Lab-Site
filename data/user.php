@@ -1272,7 +1272,9 @@ function display_user_banner(User $user) {
 			}
 		echo "</div>";
 		echo "<div class=\"profile-header-userinfo\">";
-			echo "<h1 class=\"left-align\">$display_name</h1>";
+			echo "<h1 class=\"left-align\">$display_name";
+			if ($user->pronouns) { echo "<span class=\"pronouns-span\"> ($user->pronouns)</span>"; }
+			echo "</h1>";
 			echo "<h2 class=\"left-align\">@$user->name</h2>";
 		echo "</div>";
 	echo "</div>";
