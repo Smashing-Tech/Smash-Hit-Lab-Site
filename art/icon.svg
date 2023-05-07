@@ -29,8 +29,8 @@
      units="px"
      width="256px"
      inkscape:zoom="3.0585938"
-     inkscape:cx="128"
-     inkscape:cy="128"
+     inkscape:cx="128.32695"
+     inkscape:cy="128.32695"
      inkscape:window-width="1920"
      inkscape:window-height="995"
      inkscape:window-x="-9"
@@ -56,14 +56,6 @@
     <path
        id="path1506"
        style="fill:#0afdea;stroke:none;stroke-width:0.112875px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 33.866665,4.9708017 4.970501,33.866965 33.866665,62.762531 62.762829,33.866965 Z" />
-    <path
-       id="path226"
-       style="fill:#002624;stroke:none;stroke-width:0.0798143px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 48.314708,19.418624 H 19.418622 l 2.99e-4,28.895785 28.895787,3e-4 z" />
-    <path
-       id="path232"
-       style="fill:#0afdea;stroke:none;stroke-width:0.0564364px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 33.866665,19.418971 19.41882,33.866816 33.866665,48.314362 48.31451,33.866816 Z" />
+       d="M 33.866667 4.970756 L 19.41897 19.418453 L 48.314364 19.418453 L 33.866667 4.970756 z M 19.418453 19.41897 L 4.970756 33.867183 L 33.866667 62.762577 L 48.31488 48.31488 L 33.866667 48.314364 L 19.41897 48.314364 L 19.41897 33.866667 L 19.418453 19.41897 z M 19.41897 33.866667 L 33.866667 48.314364 L 48.314364 33.866667 L 33.866667 19.41897 L 19.41897 33.866667 z M 48.31488 48.31488 L 62.762577 33.867183 L 48.31488 19.419486 L 48.31488 48.31488 z " />
   </g>
 </svg>

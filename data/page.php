@@ -230,6 +230,26 @@ class Page {
 	}
 }
 
+class Piece {
+	/**
+	 * A page piece
+	 */
+	
+	public $data;
+	
+	function __construct() {
+		$this->data = "";
+	}
+	
+	function add(string $s) {
+		$this->data .= $s;
+	}
+	
+	function render() {
+		return $this->data;
+	}
+}
+
 function get_page_name() {
 	return str_replace("/", ",", str_replace(".", ",", $_GET["p"]));
 }

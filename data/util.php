@@ -74,3 +74,50 @@ function dechexa(int $num) {
 function frand() : float {
 	return mt_rand() / mt_getrandmax();
 }
+
+function __js_style_var__(string $var, string $val) {
+	echo "qs.style.setProperty('$var', '$val');";
+}
+
+function render_accent_script(string $colour) {
+	$p = new Piece();
+	
+	$swatch = derive_pallete_from_colour(colour_from_hex($colour));
+	$darkest = $swatch[0];
+	$dark = $swatch[1];
+	$darkish = $swatch[2];
+	$bright = $swatch[3];
+	
+	$p->add("<script>var qs = document.querySelector(':root');");
+	
+	$p->add(__js_style_var__("--colour-primary", $bright));
+	$p->add(__js_style_var__("--colour-primary-darker", "#ffffff"));
+	$p->add(__js_style_var__("--colour-primary-hover", "#ffffff"));
+	$p->add(__js_style_var__("--colour-primary-a", $bright . "40"));
+	$p->add(__js_style_var__("--colour-primary-b", $bright . "80"));
+	$p->add(__js_style_var__("--colour-primary-c", $bright . "c0"));
+	$p->add(__js_style_var__("--colour-primary-text", "#000000"));
+	
+	$p->add(__js_style_var__("--colour-background-light", $darkish));
+	$p->add(__js_style_var__("--colour-background-light-a", $darkish . "40"));
+	$p->add(__js_style_var__("--colour-background-light-b", $darkish . "80"));
+	$p->add(__js_style_var__("--colour-background-light-c", $darkish . "c0"));
+	$p->add(__js_style_var__("--colour-background-light-text", $bright));
+	
+	$p->add(__js_style_var__("--colour-background", $dark));
+	$p->add(__js_style_var__("--colour-background-a", $dark . "40"));
+	$p->add(__js_style_var__("--colour-background-b", $dark . "80"));
+	$p->add(__js_style_var__("--colour-background-c", $dark . "c0"));
+	$p->add(__js_style_var__("--colour-background-text", $bright));
+	
+	$p->add(__js_style_var__("--colour-background-dark", $darkest));
+	$p->add(__js_style_var__("--colour-background-dark-a", $darkest . "40"));
+	$p->add(__js_style_var__("--colour-background-dark-b", $darkest . "80"));
+	$p->add(__js_style_var__("--colour-background-dark-c", $darkest . "c0"));
+	$p->add(__js_style_var__("--colour-background-dark-text", $bright));
+	$p->add(__js_style_var__("--colour-background-dark-text-hover", $bright));
+	
+	$p->add("</script>");
+	
+	return $p->render();
+}
