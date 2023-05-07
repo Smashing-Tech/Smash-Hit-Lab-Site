@@ -163,8 +163,7 @@ input[type=submit]:hover, button:hover, .button:hover {
 }
 
 .button.secondary {
-	background: transparent;
-	border: 1px solid var(--colour-primary-a);
+	background: var(--colour-background-light-c);
 	color: var(--colour-primary);
 }
 
