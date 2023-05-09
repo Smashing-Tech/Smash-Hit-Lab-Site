@@ -685,10 +685,6 @@ function discussion_hide() {
 	}
 }
 
-function discussion_delete() {
-	sorry("This action was disabled on 2023-04-23 becuase it is not production ready");
-}
-
 function discussion_follow() {
 	$user = get_name_if_authed();
 	
