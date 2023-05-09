@@ -90,3 +90,22 @@ class ChatConversation {
 		$db->delete($this->id);
 	}
 }
+
+/**
+ * TEMP CHAT INTERFACE
+ * 
+ * This is a version of chat that adds some extras. It's not e2ee!
+ */
+$gEndMan->add("bogo-chat", function(Page $page) {
+	$sak = user_get_sak();
+	
+	$page->add("<div class=\"bogo-chat\">");
+	$page->add("<div id=\"discussion-000000000000000000000000\"></div>");
+	$page->add("<script>var DiscussionID = \"000000000000000000000000\"; var UserSAK = \"$sak\"; var DiscussionBackwards = false; var ShowHidden = false;</script>");
+	$page->add(file_get_contents("../data/_discussionload.html"));
+	$page->add("<script>DiscussionChatStyle = true; setInterval(ds_load, 3000);</script>");
+	$page->add("</div>");
+	
+	$page->add("<input type=\"text\" id=\"discussions-000000000000000000000000-entry\" style=\"width: calc(100% - 1em); background: transparent; padding: 0; resize: none; display: inline-block;\" name=\"body\" placeholder=\"Type your message here...\"></input><input type=\"hidden\" name=\"key\" value=\"$sak\">");
+	$page->add("<button class=\"button\" onclick=\"ds_update();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">send</span></button>");
+});

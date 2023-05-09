@@ -1,4 +1,6 @@
 <script>
+	var DiscussionChatStyle = false;
+	
 	function ds_request(verb, url, func, body) {
 		/**
 		 * Make an xhr request using the given verb, url and function
@@ -25,6 +27,8 @@
 	}
 	
 	function ds_render_actions(actions, index, author) {
+		if (DiscussionChatStyle) { return ""; }
+		
 		let string = "<p>";
 		
 		// Render each action

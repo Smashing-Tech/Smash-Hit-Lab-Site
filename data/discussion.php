@@ -196,7 +196,11 @@ class Discussion {
 		}
 	}
 	
-	function add_comment(string $author, string $body) {
+	function add_comment(string $author, string $body) : bool {
+		if (!$this->has_access($author)) {
+			return false;
+		}
+		
 		$this->comments[] = (new Comment())->create($author, $body);
 		$this->save();
 		
@@ -212,6 +216,8 @@ class Discussion {
 		
 		// Admin alert!
 		alert("Discussion $this->id has a new comment by @$author\nContent: " . substr($body, 0, 300) . ((strlen($body) > 300) ? "..." : ""), $url);
+		
+		return true;
 	}
 	
 	function update_comment(int $index, string $author, string $body) {
@@ -459,15 +465,6 @@ class Discussion {
 		echo "</div>";
 	}
 	
-	function display_hidden() {
-		$hidden = $this->enumerate_hidden();
-		
-		if ($hidden > 0 && get_name_if_admin_authed()) {
-			$s = ($hidden == 1) ? " was" : "s were";
-			echo "<p><i>Please note that $hidden other comment$s hidden.</i></p>";
-		}
-	}
-	
 	function display_comments(bool $reverse = false) {
 		echo "<div id=\"discussion-$this->id\"></div>";
 		echo "<script>ds_clear(); ds_load();</script>";
@@ -493,7 +490,6 @@ class Discussion {
 		$this->comments_load_script();
 		$this->display_bar($title);
 		if ($this->display_disabled()) { return; }
-		$this->display_hidden();
 		$this->display_comments();
 		$this->display_edit(-1, $url);
 	}
@@ -502,7 +498,6 @@ class Discussion {
 		$this->comments_load_script(true);
 		$this->display_bar($title);
 		if ($this->display_disabled()) { return; }
-		$this->display_hidden();
 		$this->display_edit(-1, $url);
 		$this->display_comments(true);
 	}
@@ -536,53 +531,8 @@ function discussion_update() {
 	if (array_key_exists("api", $_GET)) {
 		return discussion_update_new();
 	}
-	
-	$user = get_name_if_authed();
-	
-	if (!$user || !array_key_exists("key", $_POST) || !user_verify_sak($_POST["key"])) {
-		sorry("You need to be logged in to post comments.");
-	}
-	
-	if (get_config("enable_discussions", "enabled") !== "enabled") {
-		sorry("Updating discussions has been disabled.");
-	}
-	
-	$user = new User($user);
-	
-	if (!array_key_exists("id", $_GET)) {
-		sorry("Need an id to update.");
-	}
-	
-	$discussion = $_GET["id"];
-	
-	if (!array_key_exists("index", $_GET)) {
-		sorry("Need an index to update.");
-	}
-	
-	$index = $_GET["index"]; // If it's -1 then it's a new comment
-	
-	if (!array_key_exists("body", $_POST)) {
-		sorry("Need a body for content.");
-	}
-	
-	$body = (array_key_exists("raw", $_GET) ? file_get_contents("php://input") : $_POST["body"]);
-	
-	validate_length("Body of message", $body, 4000);
-	
-	$discussion = new Discussion($discussion);
-	
-	if ($index == "-1") {
-		$discussion->add_comment($user->name, $body);
-		
-		if (array_key_exists("after", $_GET)) {
-			redirect($_GET["after"]);
-		}
-		else {
-			sorry("It's done but no clue what page you were on...");
-		}
-	}
 	else {
-		sorry("Editing comments is not yet a feature.");
+		sorry("Using this endpoint in a non-api mode has been removed.");
 	}
 }
 
@@ -627,12 +577,17 @@ function discussion_update_new() {
 	$discussion = new Discussion($discussion);
 	
 	if ($index == "-1") {
-		$discussion->add_comment($user->name, $body);
+		$status = $discussion->add_comment($user->name, $body);
 		
-		echo "{\"error\": \"done\", \"message\": \"Your comment was posted successfully!\"}"; return;
+		if ($status) {
+			echo "{\"error\": \"done\", \"message\": \"Your comment was posted successfully!\"}";
+		}
+		else {
+			echo "{\"error\": \"not_posted\", \"message\": \"This comment could not be posted. This might happen if you don't have access to the discussion.\"}";
+		}
 	}
 	else {
-		echo "{\"error\": \"not_supported\", \"message\": \"Updating existing comments is not supported.\"}"; return;
+		echo "{\"error\": \"not_supported\", \"message\": \"Updating existing comments is not supported.\"}";
 	}
 }
 
@@ -727,6 +682,8 @@ function discussion_poll() {
 	
 	// Create the result data
 	$result = new stdClass;
+	$result->status = "done";
+	$result->message = "Loaded discussions successfully!";
 	$result->anything = (sizeof($comments) !== 0);
 	$result->comments = $comments;
 	$result->actor = $user;
