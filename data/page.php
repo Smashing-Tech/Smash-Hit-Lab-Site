@@ -194,6 +194,29 @@ class Page {
 		$this->add("<p>$text</p>");
 	}
 	
+	function section_start(string $title, string $desc) : void {
+		$a = "";
+		$a .= "<div class=\"mod-edit-property\">";
+			$a .= "<div class=\"mod-edit-property-label\">";
+				// If there is no title there is little reason for a desc. as well.
+				if ($title) {
+					$a .= "<h4>$title</h4>";
+					$a .= "<p>$desc</p>";
+				}
+			$a .= "</div>";
+			$a .= "<div class=\"mod-edit-property-data\">";
+		
+		$this->add($a);
+	}
+	
+	function section_end() {
+		$a = "";
+			$a .= "</div>";
+		$a .= "</div>";
+		
+		$this->add($a);
+	}
+	
 	function link_button(string $icon, string $title, string $url, bool $primary = false) : void {
 		$this->add("<a href=\"$url\"><button class=\"button" . ($primary ? "" : " secondary") . "\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">$icon</span> $title</button></a>");
 	}

@@ -17,7 +17,7 @@ class Form {
 	function __construct(string $url, string $method = "post") {
 		$method = htmlspecialchars($method);
 		$url = htmlspecialchars($url);
-		$this->body = "<form action=\"$url\" method=\"$method\">";
+		$this->body = "<form action=\"$url\" method=\"$method\" enctype=\"multipart/form-data\">";
 		$this->container_type = FORM_CONTAINER_NORMAL;
 	}
 	
@@ -144,6 +144,12 @@ class Form {
 		
 		$this->container("", "", $data);
 		$this->body .= "</form>";
+	}
+	
+	function upload(string $name, string $title, string $desc) {
+		$data = "<input type=\"file\" name=\"$name\" />";
+		
+		$this->container($title, $desc, $data);
 	}
 	
 	function render() {

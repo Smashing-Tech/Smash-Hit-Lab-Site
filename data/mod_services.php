@@ -49,6 +49,12 @@ class ServiceMod {
 		
 		$user->add_mod($this->id);
 	}
+	
+	function set_ads(string $ad_png, string $ad_xml) {
+		$this->ad_png = base64_encode($ad_png);
+		$this->ad_xml = base64_encode($ad_xml);
+		$this->save();
+	}
 }
 
 $gEndMan->add("services-home", function (Page $page) {
@@ -78,7 +84,7 @@ $gEndMan->add("services-home", function (Page $page) {
 $gEndMan->add("services-create", function (Page $page) {
 	$user = user_get_current();
 	
-	if ($user) {
+	if ($user && $user->is_verified()) {
 		if ($page->has("submit")) {
 			$sv = new ServiceMod(null);
 			$sv->create($user, $page->get("title"));
@@ -95,6 +101,9 @@ $gEndMan->add("services-create", function (Page $page) {
 			$page->add($form);
 		}
 	}
+	else if ($user && !$user->is_verified()) {
+		$page->info("We're sorry, but ...", "... you need to be verified to use this service, as it could be abused if we allow unverified users to use it.");
+	}
 	else {
 		$page->info();
 	}
@@ -104,13 +113,116 @@ $gEndMan->add("services-info", function (Page $page) {
 	$user = user_get_current();
 	$id = $page->get("id");
 	
-	if ($user && $user->has_mod($id)) {
+	if ($user && $user->has_mod($id) && $user->is_verified()) {
 		$sv = new ServiceMod($id);
 		
-		$page->heading(1, "$sv->title");
-		$page->para("Mod ID: $sv->id");
+		$page->heading(1, $sv->title);
+		
+		$page->section_start("Advertisements", "You can create and update the ad channel for your mod.");
+		$page->link_button("new_releases", "Update adverts", "./?a=services-adverts&id=$id");
+		$page->section_end();
+		
+		$page->section_start("Preview ads", "Preview what your ad looks like.");
+		$page->link_button("image", "Preview adverts", "./?a=services-adverts-preview&id=$id");
+		$page->section_end();
+		
+		$page->section_start("Patches", "Patches that you can apply to libsmashhit.so.");
+		$page->link_button("layers", "How to patch", "./?a=services-patch&id=$id");
+		$page->section_end();
+		
+		$page->section_start("Mod ID", "The identifier for your mod.");
+		$page->para("<code>$sv->id</code>");
+		$page->section_end();
 	}
 	else {
 		$page->info("Sorry!", "You do not have access to this mod!");
+	}
+});
+
+$gEndMan->add("services-adverts", function (Page $page) {
+	$user = user_get_current();
+	$id = $page->get("id");
+	
+	if ($user && $user->has_mod($id) && $user->is_verified()) {
+		if (!$page->has("submit")) {
+			$page->heading(1, "Update advertisements");
+			
+			$form = new Form("./?a=services-adverts&id=$id&submit=1");
+			$form->upload("file_xml", "XML file", "The UI XML file for your advert.");
+			$form->upload("file_png", "PNG file", "The PNG image for your advert.");
+			$form->submit("Save adverts");
+			
+			$page->add($form);
+		}
+		else {
+			$sv = new ServiceMod($id);
+			$sv->set_ads(
+				$page->get_file("file_png", "image/png"),
+				$page->get_file("file_xml", "text/xml"));
+			
+			$page->redirect("./?a=services-info&id=$id");
+		}
+	}
+	else {
+		$page->info("Sorry!", "You do not have access to this mod!");
+	}
+});
+
+$gEndMan->add("services-adverts-preview", function (Page $page) {
+	$user = user_get_current();
+	$id = $page->get("id");
+	
+	if ($user && $user->has_mod($id) && $user->is_verified()) {
+		$sv = new ServiceMod($id);
+		
+		$page->heading(1, "Preview advertisement");
+		$page->add("<img src=\"data:image/png;base64," . $sv->ad_png . "\"/>");
+		$page->add("<pre>" . htmlspecialchars(base64_decode($sv->ad_xml)) . "</pre>");
+	}
+	else {
+		$page->info("Sorry!", "You do not have access to this mod!");
+	}
+});
+
+$gEndMan->add("services-patch", function (Page $page) {
+	$user = user_get_current();
+	$id = $page->get("id");
+	
+	if ($user && $user->has_mod($id) && $user->is_verified()) {
+		$page->heading("Patching libsmashhit binary");
+	}
+	else {
+		$page->info("Sorry!", "You do not have access to this mod!");
+	}
+});
+
+$gEndMan->add("get-ads-info", function (Page $page) {
+	$platform = $page->get("platform"); // Platform is where the ID goes
+	$version = $page->get("version");
+	$rev = $page->get("rev");
+	$date = $page->get("date");
+	
+	$rev += 1;
+	
+	$page->set_mode(PAGE_MODE_RAW);
+	$page->type("text/xml");
+	$page->add("<ads revision=\"$rev\" showfront=\"1\" onlyfree=\"0\" sale=\"0\" folder=\"?a=get-ads-data&amp;id=$platform&amp;name=\"/>");
+});
+
+$gEndMan->add("get-ads-data", function (Page $page) {
+	$id = $page->get("id");
+	$name = $page->get("name");
+	
+	$sv = new ServiceMod($id);
+	
+	$page->set_mode(PAGE_MODE_RAW);
+	
+	if (str_ends_with($name, "png")) {
+		$page->type("image/png");
+		$page->add(base64_decode($sv->ad_png));
+	}
+	else if (str_ends_with($name, "xml")) {
+		$page->type("text/xml");
+		$page->add(base64_decode($sv->ad_xml));
 	}
 });
