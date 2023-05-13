@@ -5,6 +5,7 @@ class ServiceMod {
 	public $title;
 	public $ad_png;
 	public $ad_xml;
+	public $imperssions;
 	
 	function __construct(?string $id) {
 		$db = new Database("services");
@@ -16,12 +17,14 @@ class ServiceMod {
 			$this->title = $info->title;
 			$this->ad_png = $info->ad_png;
 			$this->ad_xml = $info->ad_xml;
+			$this->imperssions = (property_exists($info, "imperssions")) ? $info->imperssions : 0;
 		}
 		else {
 			$this->id = $id;
 			$this->title = "New untitled mod";
 			$this->ad_png = "";
 			$this->ad_xml = "";
+			$this->imperssions = 0;
 		}
 	}
 	
@@ -51,8 +54,14 @@ class ServiceMod {
 	}
 	
 	function set_ads(string $ad_png, string $ad_xml) {
+		$this->imperssions = 0;
 		$this->ad_png = base64_encode($ad_png);
 		$this->ad_xml = base64_encode($ad_xml);
+		$this->save();
+	}
+	
+	function incr_imperssions() {
+		$this->imperssions += 1;
 		$this->save();
 	}
 }
@@ -175,6 +184,10 @@ $gEndMan->add("services-adverts-preview", function (Page $page) {
 	if ($user && $user->has_mod($id) && $user->is_verified()) {
 		$sv = new ServiceMod($id);
 		
+		$page->section_start("Impressions", "The number of times this ad has been viewed.");
+		$page->para("$sv->imperssions");
+		$page->section_end();
+		
 		$page->heading(1, "Preview advertisement");
 		$page->add("<img src=\"data:image/png;base64," . $sv->ad_png . "\"/>");
 		$page->add("<pre>" . htmlspecialchars(base64_decode($sv->ad_xml)) . "</pre>");
@@ -197,12 +210,16 @@ $gEndMan->add("services-patch", function (Page $page) {
 });
 
 $gEndMan->add("get-ads-info", function (Page $page) {
-	$platform = $page->get("platform"); // Platform is where the ID goes
-	$version = $page->get("version");
+	// Platform is where the ID goes unless we really have the id
+	$platform = $page->has("id") ? $page->get("id") : $page->get("platform");
+	//$version = $page->get("version");
 	$rev = $page->get("rev");
 	$date = $page->get("date");
 	
 	$rev += 1;
+	
+	// temp
+	(new ServiceMod($platform))->incr_imperssions();
 	
 	$page->set_mode(PAGE_MODE_RAW);
 	$page->type("text/xml");
