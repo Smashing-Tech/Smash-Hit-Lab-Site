@@ -21,7 +21,7 @@ class ServiceMod {
 		}
 		else {
 			$this->id = $id;
-			$this->title = "New untitled mod";
+			$this->title = "New untitled instance";
 			$this->ad_png = "";
 			$this->ad_xml = "";
 			$this->imperssions = 0;
@@ -78,7 +78,7 @@ $gEndMan->add("services-home", function (Page $page) {
 		$page->heading(1, "Mod Services");
 		$page->add("<div class=\"comment-card\"><p>Mod Services are in a prerelease state and currently only support adverts.</p></div>");
 		$page->add("<p style=\"text-align: center;\">");
-		$page->link_button("add", "Create new mod", "./?a=services-create", true);
+		$page->link_button("add", "Create instance", "./?a=services-create", true);
 		
 		$page->add("<ul>");
 		for ($i = 0; $i < sizeof($user->mods); $i++) {
@@ -99,22 +99,22 @@ $gEndMan->add("services-create", function (Page $page) {
 	$user = user_get_current();
 	
 	if ($user && $user->is_verified()) {
-		if ($page->has("submit")) {
+		if (!$page->has("submit")) {
+			$page->heading(1, "Create instance");
+			
+			$form = new Form("./?a=services-create&submit=1");
+			$form->textbox("title", "Title", "The title of mod services instance.");
+			$form->submit("Create instance");
+			
+			$page->add($form);
+		}
+		else {
 			$sv = new ServiceMod(null);
 			$sv->create($user, $page->get("title"));
 			
 			alert("@$user->name created a mod service with id $sv->id (Title: $sv->title)", "./?a=services-info&id=$sv->id");
 			
 			$page->redirect("./?a=services-info&id=$sv->id");
-		}
-		else {
-			$page->heading(1, "Create mod");
-			
-			$form = new Form("./?a=services-create&submit=1");
-			$form->textbox("title", "Title", "The title of your mod.");
-			$form->submit("Create mod");
-			
-			$page->add($form);
 		}
 	}
 	else if ($user && !$user->is_verified()) {
