@@ -98,6 +98,8 @@ $gEndMan->add("services-create", function (Page $page) {
 			$sv = new ServiceMod(null);
 			$sv->create($user, $page->get("title"));
 			
+			alert("@$user->name created a mod service with id $sv->id (Title: $sv->title)", "./?a=services-info&id=$sv->id");
+			
 			$page->redirect("./?a=services-info&id=$sv->id");
 		}
 		else {
@@ -122,22 +124,28 @@ $gEndMan->add("services-info", function (Page $page) {
 	$user = user_get_current();
 	$id = $page->get("id");
 	
-	if ($user && $user->has_mod($id) && $user->is_verified()) {
+	if ($user && (($user->has_mod($id) && $user->is_verified()) || $user->is_admin())) {
+		$really_owns_mod = $user->has_mod($id);
+		
 		$sv = new ServiceMod($id);
 		
 		$page->heading(1, $sv->title);
 		
-		$page->section_start("Advertisements", "You can create and update the ad channel for your mod.");
-		$page->link_button("new_releases", "Update adverts", "./?a=services-adverts&id=$id");
-		$page->section_end();
+		if ($really_owns_mod) {
+			$page->section_start("Advertisements", "You can create and update the ad channel for your mod.");
+			$page->link_button("new_releases", "Update adverts", "./?a=services-adverts&id=$id");
+			$page->section_end();
+		}
 		
 		$page->section_start("Preview ads", "Preview what your ad looks like.");
 		$page->link_button("image", "Preview adverts", "./?a=services-adverts-preview&id=$id");
 		$page->section_end();
 		
-		$page->section_start("Patches", "Patches that you can apply to libsmashhit.so.");
-		$page->link_button("layers", "How to patch", "./?a=services-patch&id=$id");
-		$page->section_end();
+		if ($really_owns_mod) {
+			$page->section_start("Patches", "Patches that you can apply to libsmashhit.so.");
+			$page->link_button("layers", "How to patch", "./?a=services-patch&id=$id");
+			$page->section_end();
+		}
 		
 		$page->section_start("Mod ID", "The identifier for your mod.");
 		$page->para("<code>$sv->id</code>");
@@ -169,6 +177,8 @@ $gEndMan->add("services-adverts", function (Page $page) {
 				$page->get_file("file_png", "image/png"),
 				$page->get_file("file_xml", "text/xml"));
 			
+			alert("@$user->name pushed new ads revision for mod service $id (\"$sv->title\")", "./?a=services-adverts-preview&id=$id");
+			
 			$page->redirect("./?a=services-info&id=$id");
 		}
 	}
@@ -181,7 +191,7 @@ $gEndMan->add("services-adverts-preview", function (Page $page) {
 	$user = user_get_current();
 	$id = $page->get("id");
 	
-	if ($user && $user->has_mod($id) && $user->is_verified()) {
+	if ($user && (($user->has_mod($id) && $user->is_verified()) || $user->is_admin())) {
 		$sv = new ServiceMod($id);
 		
 		// $page->section_start("Impressions", "The number of times this ad has been viewed.");
