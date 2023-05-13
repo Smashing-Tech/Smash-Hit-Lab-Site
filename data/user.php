@@ -414,6 +414,7 @@ class User {
 			$this->display = (property_exists($info, "display") ? $info->display : $info->name);
 			$this->pronouns = (property_exists($info, "pronouns") ? $info->pronouns : "");
 			$this->password = $info->password;
+			$this->pw_reset = (property_exists($info, "pw_reset") ? $info->pw_reset : "");
 			$this->tokens = $info->tokens;
 			$this->email = $info->email ? $info->email : "";
 			$this->created = (property_exists($info, "created") ? $info->created : time());
@@ -456,6 +457,7 @@ class User {
 			$this->display = $name;
 			$this->pronouns = "";
 			$this->password = null;
+			$this->pw_reset = "";
 			$this->tokens = array();
 			$this->email = "";
 			$this->created = time();
@@ -645,6 +647,36 @@ class User {
 		$this->set_password($password);
 		
 		return $password;
+	}
+	
+	function authorise_reset(string $actor) : void {
+		/**
+		 * Authorise a password reset for this user
+		 */
+		
+		$this->pw_reset = random_base64(100);
+		
+		mail($this->email, "Password reset for the Smash Hit Lab", "<html><body><p>Hello $this->name,</p><p>A password reset was initialised by $actor, a member of the staff team.</p><p>Please go to this link to reset your password: <a href=\"https://smashhitlab.000webhostapp.com/?a=auth-reset-password\">https://smashhitlab.000webhostapp.com/?a=auth-reset-password</a></p><p>You will also need this code: $this->pw_reset</p><p>If you did not ask for a password reset, report this to staff immediately.</p></body></html>", array("MIME-Version" => "1.0", "Content-Type" => "text/html; charset=utf-8"));
+		
+		$this->pw_reset = hash("sha256", $this->pw_reset);
+		
+		$this->save();
+	}
+	
+	function do_reset(string $code) : bool {
+		$reset_ok = ($this->pw_reset && ($this->pw_reset === hash("sha256", $code)));
+		
+		if ($reset_ok) {
+			$pw = $this->new_password();
+			
+			mail($this->email, "Your account has a new password!", "<html><body><p>Hello $this->name,</p><p>Your password reset at the Smash Hit Lab has succeded!</p><p>Your new password is: " . htmlspecialchars($pw) . "</p><p>If you did not ask for a password reset, report this to staff immediately.</p></body></html>", array("MIME-Version" => "1.0", "Content-Type" => "text/html; charset=utf-8"));
+		}
+		
+		// we always clear the reset even if it failed
+		$this->pw_reset = "";
+		$this->save();
+		
+		return $reset_ok;
 	}
 	
 	function set_email(string $email) : void {
@@ -1449,4 +1481,8 @@ $gEvents->add("user.register.after", function(Page $page) {
 	$wall = new Discussion($user->wall);
 	
 	$wall->add_comment("smashhitlab", "Welcome to the Smash Hit Lab!\n\nIf you ever have any issues, please let one of our staff know — they will have a badge that says \"moderator\" or \"admin\" next to their name.\n\nIf you find any bugs or glitches, please report them to [knot126](./?u=knot126).\n\nDon't be afraid to say hello, and we hope you enjoy your stay!");
+});
+
+$gEndMan->add("user-authorise-reset", function(Page $page) {
+	
 });

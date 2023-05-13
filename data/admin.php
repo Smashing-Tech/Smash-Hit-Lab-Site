@@ -512,11 +512,30 @@ $gEndMan->add("admin-return", function(Page $page) {
 	$page->redirect("./?n=home");
 });
 
-$gEndMan->add("admin-migrate-users", function(Page $page) {
+$gEndMan->add("user-init-reset", function(Page $page) {
 	$user = get_name_if_admin_authed();
 	
 	if ($user) {
-		
+		if (!$page->has("submit")) {
+			$page->heading(1, "Begin password reset");
+			$form = new Form("./?a=user-init-reset&submit=1");
+			$form->textbox("handle", "Handle", "Handle of the user to reset the password for.");
+			$form->textbox("email", "Email", "Email of the user to reset the passwrod for.");
+			$form->submit("Begin reset");
+			
+			$page->add($form);
+		}
+		else {
+			$need = new User($page->get("handle"));
+			
+			if ($need->email !== $page->get("email")) {
+				$page->info("Wait a minute!", "This is not the email of the user requesting the password reset. If it does not match the email used to send the support request, you are likely being tricked into hacking an account.");
+			}
+			
+			$need->authorise_reset($user);
+			
+			$page->info("Done", "The reset for the user has been authorised. They should now check their email to get the code to reset their password.");
+		}
 	}
 	else {
 		$page->info("You can't fucking do that !!!!");

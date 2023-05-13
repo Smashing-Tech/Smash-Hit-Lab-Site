@@ -342,3 +342,35 @@ $gEndMan->add("auth-register", function(Page $page) {
 		auth_register_form($page);
 	}
 });
+
+$gEndMan->add("auth-reset-password", function(Page $page) {
+	if (!$page->has("submit")) {
+		$page->heading(1, "Reset password");
+		
+		$form = new Form("./?a=auth-reset-password&submit=1");
+		$form->textbox("handle", "Handle", "What was your username that you signed up for?");
+		$form->textbox("code", "Code", "What was the reset code that was sent to your email?");
+		$form->submit("Reset password");
+		
+		$page->add($form);
+	}
+	else {
+		$handle = $page->get("handle");
+		$code = $page->get("code");
+		
+		if (!user_exists($handle)) {
+			$page->info("Problem", "You don't exist.");
+		}
+		
+		$user = new User($handle);
+		
+		$result = $user->do_reset($code);
+		
+		if ($result) {
+			$page->info("Yay!", "Your password was reset! It will be sent to your email.");
+		}
+		else {
+			$page->info("Oh no!", "The password weset didnt wowrk.");
+		}
+	}
+});
