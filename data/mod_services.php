@@ -121,7 +121,12 @@ $gEndMan->add("services-create", function (Page $page) {
 			
 			alert("@$user->name created a mod service with id $sv->id (Title: $sv->title)", "./?a=services-info&id=$sv->id");
 			
-			$page->redirect("./?a=services-info&id=$sv->id");
+			if (strtolower($sv->title) === "owo") {
+				$page->info("OwO what's this?", "<a href=\"./?a=services-info&id=$sv->id\">Are wou twying to cewatwe a mawd swewcie? Amawswing! UwU</a>");
+			}
+			else {
+				$page->redirect("./?a=services-info&id=$sv->id");
+			}
 		}
 	}
 	else if ($user && !$user->is_verified()) {
