@@ -184,9 +184,9 @@ $gEndMan->add("services-adverts-preview", function (Page $page) {
 	if ($user && $user->has_mod($id) && $user->is_verified()) {
 		$sv = new ServiceMod($id);
 		
-		$page->section_start("Impressions", "The number of times this ad has been viewed.");
-		$page->para("$sv->imperssions");
-		$page->section_end();
+		// $page->section_start("Impressions", "The number of times this ad has been viewed.");
+		// $page->para("$sv->imperssions");
+		// $page->section_end();
 		
 		$page->heading(1, "Preview advertisement");
 		$page->add("<img src=\"data:image/png;base64," . $sv->ad_png . "\"/>");
@@ -233,7 +233,7 @@ $gEndMan->add("get-ads-info", function (Page $page) {
 	$rev += 1;
 	
 	// temp
-	(new ServiceMod($platform))->incr_imperssions();
+	//(new ServiceMod($platform))->incr_imperssions();
 	
 	$page->set_mode(PAGE_MODE_RAW);
 	$page->type("text/xml");
