@@ -3,6 +3,8 @@
 class ServiceMod {
 	public $id;
 	public $title;
+	public $persistent;
+	public $revision;
 	public $ad_png;
 	public $ad_xml;
 	public $imperssions;
@@ -15,6 +17,8 @@ class ServiceMod {
 			
 			$this->id = $info->id;
 			$this->title = $info->title;
+			$this->persistent = (property_exists($info, "persistent")) ? $info->persistent : true;
+			$this->revision = (property_exists($info, "revision")) ? $info->revision : 0;
 			$this->ad_png = $info->ad_png;
 			$this->ad_xml = $info->ad_xml;
 			$this->imperssions = (property_exists($info, "imperssions")) ? $info->imperssions : 0;
@@ -22,6 +26,8 @@ class ServiceMod {
 		else {
 			$this->id = $id;
 			$this->title = "New untitled instance";
+			$this->persistent = true;
+			$this->revision = 0;
 			$this->ad_png = "";
 			$this->ad_xml = "";
 			$this->imperssions = 0;
@@ -60,6 +66,7 @@ class ServiceMod {
 	
 	function set_ads(string $ad_png, string $ad_xml) {
 		$this->imperssions = 0;
+		$this->revision += 1;
 		$this->ad_png = base64_encode($ad_png);
 		$this->ad_xml = base64_encode($ad_xml);
 		$this->save();
@@ -158,6 +165,12 @@ $gEndMan->add("services-info", function (Page $page) {
 		
 		$page->heading(3, "Other things");
 		
+		if ($really_owns_mod) {
+			$page->section_start("Edit properties", "Update information about this mod services instance.");
+			$page->link_button("edit", "Edit properties", "./?a=services-update&id=$id");
+			$page->section_end();
+		}
+		
 		$page->section_start("Delete services", "Delete this mod service.");
 		$page->link_button("delete", "Delete service", "./?a=services-delete&id=$id");
 		$page->section_end();
@@ -165,6 +178,42 @@ $gEndMan->add("services-info", function (Page $page) {
 		$page->section_start("Mod ID", "The identifier for your mod.");
 		$page->para("<code>$sv->id</code>");
 		$page->section_end();
+	}
+	else {
+		$page->info("Sorry!", "You do not have access to this mod!");
+	}
+});
+
+$gEndMan->add("services-update", function (Page $page) {
+	$user = user_get_current();
+	$id = $page->get("id");
+	
+	if ($user && $user->has_mod($id) && $user->is_verified()) {
+		if (!$page->has("submit")) {
+			$sv = new ServiceMod($id);
+			
+			$page->heading(1, "Editing \"$sv->title\"");
+			
+			$form = new Form("./?a=services-update&id=$id&submit=1");
+			$form->textbox("title", "Title", "The title of your services instance.", $sv->title);
+			$form->select("persist", "Agerssion", "Agression controls how often your ad will be shown to players.", [
+				"0" => "Show only once per revision",
+				 "1" => "Show ads every time",
+			], $sv->persistent ? "1" : "0");
+			$form->submit("Update instance");
+			
+			$page->add($form);
+		}
+		else {
+			$sv = new ServiceMod($id);
+			$sv->title = $page->get("title");
+			$sv->persistent = ($page->get("persist") === "1");
+			$sv->save();
+			
+			alert("@$user->name updated mod service with id $id (\"$sv->title\")", "./?a=services-info&id=$id");
+			
+			$page->redirect("./?a=services-info&id=$id");
+		}
 	}
 	else {
 		$page->info("Sorry!", "You do not have access to this mod!");
@@ -284,10 +333,18 @@ $gEndMan->add("get-ads-info", function (Page $page) {
 	// due to the way I implement the patch (the EZ way) that means i cannot
 	// require the version of the game
 	//$version = $page->get("version");
-	$rev = $page->get("rev");
+	$rev = (int) $page->get("rev");
 	$date = $page->get("date");
 	
-	$rev += 1;
+	// Determine what the revision to push to user is
+	$sv = new ServiceMod($platform);
+	
+	if ($sv->persistent) {
+		$rev += 1;
+	}
+	else {
+		$rev = $sv->revision;
+	}
 	
 	// temp
 	//(new ServiceMod($platform))->incr_imperssions();

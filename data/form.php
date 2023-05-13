@@ -77,7 +77,7 @@ class Form {
 		$this->container($title, $desc, $data);
 	}
 	
-	function select(string $name, string $title, string $desc, array $options, bool $enabled = true) {
+	function select(string $name, string $title, string $desc, array $options, ?string $value = null, bool $enabled = true) {
 		$data = "<select name=\"$name\">";
 		$k = array_keys($options);
 		
