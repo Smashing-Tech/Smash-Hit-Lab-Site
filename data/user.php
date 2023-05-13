@@ -429,6 +429,7 @@ class User {
 			$this->sak = property_exists($info, "sak") ? $info->sak : random_hex();
 			$this->manual_colour = property_exists($info, "manual_colour") ? $info->manual_colour : "";
 			$this->roles = property_exists($info, "roles") ? $info->roles : array();
+			$this->mods = property_exists($info, "mods") ? $info->mods : array();
 			
 			// If there weren't discussions before, save them now.
 			if (!property_exists($info, "wall")) {
@@ -470,6 +471,7 @@ class User {
 			$this->sak = random_hex();
 			$this->manual_colour = "";
 			$this->roles = array();
+			$this->mods = array();
 			
 			// Make sure the new user is following their wall by default.
 			$d = new Discussion($this->wall);
@@ -848,6 +850,30 @@ class User {
 		
 		return $n;
 	}
+	
+	function add_mod(string $mod) : void {
+		if (array_search($mod, $this->mods) === false) {
+			$this->mods[] = $mod;
+		}
+		
+		$this->save();
+	}
+	
+	function remove_mod(string $mod) : void {
+		if (array_search($mod, $this->mods) !== false) {
+			$this->mods = array_diff($this->mods, array($mod));
+		}
+		
+		$this->save();
+	}
+	
+	function has_mod(string $mod) : bool {
+		/**
+		 * Check if the user has a certian mod
+		 */
+		
+		return (array_search($mod, $this->mods) !== false);
+	}
 }
 
 function user_exists(string $username) : bool {
@@ -884,6 +910,16 @@ function get_name_if_authed() {
 	}
 	
 	return check_token__($_COOKIE["tk"], $_COOKIE["lb"]);
+}
+
+function user_get_current() {
+	/**
+	 * Get the current user
+	 */
+	
+	$name = get_name_if_authed();
+	
+	return ($name) ? (new User($name)) : null;
 }
 
 function get_display_name_if_authed() {

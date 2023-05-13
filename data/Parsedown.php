@@ -1989,6 +1989,6 @@ class Parsedown
         'u', 'xm', 'sub', 'nobr',
                    'sup', 'ruby',
                    'var', 'span',
-                   'wbr', 'time',
+                   'wbr', 'time', 'p',
     );
 }

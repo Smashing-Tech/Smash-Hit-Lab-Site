@@ -135,6 +135,9 @@
 					header_item("home", "Home", "./?p=home");
 					header_item("newspaper", "News", "./?n=home");
 					header_item("science", "Mods", "./?a=list_mods");
+					if (get_name_if_authed()) {
+						header_item("handyman", "Mod Services", "./?a=services-home");
+					}
 					
 					echo "<div class=\"cb-top-item\">";
 					echo "<div class=\"shl-old-profile-dropdown-button\">";

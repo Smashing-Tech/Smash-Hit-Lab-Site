@@ -129,6 +129,33 @@ class Page {
 		return $value;
 	}
 	
+	function get_file(string $key, string $require_format = null, int $max_size = 400000) {
+		if (!array_key_exists($key, $_FILES)) {
+			$this->info("Whoops!", "You didn't put the file by id '$key'.");
+		}
+		
+		$file = $_FILES[$key];
+		
+		$name = $file["name"];
+		$size = $file["size"];
+		$format = $file["type"];
+		
+		// Checks
+		if ($require_format && $require_format !== $format) {
+			$this->info("Whoops!", "That's not a $require_format file!");
+		}
+		
+		if ($size > $max_size) {
+			$this->info("Whoops!", "The file " . htmlspecialchars($name) . " is too large!");
+		}
+		
+		// Get contents
+		$contents = file_get_contents($file["tmp_name"]);
+		
+		// Return contents
+		return $contents;
+	}
+	
 	function get_json() {
 		/**
 		 * If in API mode, get the body of the request as JSON.
@@ -165,6 +192,10 @@ class Page {
 	
 	function para(string $text) : void {
 		$this->add("<p>$text</p>");
+	}
+	
+	function link_button(string $icon, string $title, string $url, bool $primary = false) : void {
+		$this->add("<a href=\"$url\"><button class=\"button" . ($primary ? "" : " secondary") . "\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">$icon</span> $title</button></a>");
 	}
 	
 	function global_header() : void {

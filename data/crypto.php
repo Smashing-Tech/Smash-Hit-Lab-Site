@@ -13,6 +13,19 @@ function random_base32(int $nchar) : string {
 	return $name;
 }
 
+function random_base64(int $nchar) : string {
+	$alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+	
+	$base = random_bytes($nchar);
+	$name = "";
+	
+	for ($i = 0; $i < strlen($base); $i++) {
+		$name .= $alphabet[ord($base[$i]) & 0b111111];
+	}
+	
+	return $name;
+}
+
 function random_password() : string {
 	/**
 	 * Randomly generates a new password.
