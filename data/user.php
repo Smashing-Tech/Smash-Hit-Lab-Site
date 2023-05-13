@@ -841,8 +841,10 @@ class User {
 	}
 	
 	function remove_role(string $role) : void {
-		if (array_search($role, $this->roles) !== false) {
-			$this->roles = array_diff($this->roles, array($role));
+		$index = array_search($role, $this->roles);
+		
+		if ($index !== false) {
+			array_splice($this->roles, $index, 1);
 		}
 		
 		$this->save();
@@ -892,8 +894,10 @@ class User {
 	}
 	
 	function remove_mod(string $mod) : void {
-		if (array_search($mod, $this->mods) !== false) {
-			$this->mods = array_diff($this->mods, array($mod));
+		$index = array_search($mod, $this->mods);
+		
+		if ($index !== false) {
+			array_splice($this->mods, $index, 1);
 		}
 		
 		$this->save();

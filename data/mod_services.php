@@ -38,6 +38,11 @@ class ServiceMod {
 		return $db->has($this->id);
 	}
 	
+	function delete() : void {
+		$db = new Database("services");
+		$db->delete($this->id);
+	}
+	
 	function create(User $user, string $title) {
 		// Generate ID
 		$db = new Database("services");
@@ -131,6 +136,8 @@ $gEndMan->add("services-info", function (Page $page) {
 		
 		$page->heading(1, $sv->title);
 		
+		$page->heading(3, "Advertisements");
+		
 		if ($really_owns_mod) {
 			$page->section_start("Advertisements", "You can create and update the ad channel for your mod.");
 			$page->link_button("new_releases", "Update adverts", "./?a=services-adverts&id=$id");
@@ -142,14 +149,58 @@ $gEndMan->add("services-info", function (Page $page) {
 		$page->section_end();
 		
 		if ($really_owns_mod) {
+			$page->heading(3, "Tools");
+			
 			$page->section_start("Patches", "Patches that you can apply to libsmashhit.so.");
 			$page->link_button("layers", "How to patch", "./?a=services-patch&id=$id");
 			$page->section_end();
 		}
 		
+		$page->heading(3, "Other things");
+		
+		$page->section_start("Delete services", "Delete this mod service.");
+		$page->link_button("delete", "Delete service", "./?a=services-delete&id=$id");
+		$page->section_end();
+		
 		$page->section_start("Mod ID", "The identifier for your mod.");
 		$page->para("<code>$sv->id</code>");
 		$page->section_end();
+	}
+	else {
+		$page->info("Sorry!", "You do not have access to this mod!");
+	}
+});
+
+$gEndMan->add("services-delete", function (Page $page) {
+	$user = user_get_current();
+	$id = $page->get("id");
+	
+	if ($user && (($user->has_mod($id) && $user->is_verified()) || $user->is_admin())) {
+		if (!$page->has("submit")) {
+			$page->heading(1, "Delete services");
+			
+			$sv = new ServiceMod($id);
+			
+			$form = new Form("./?a=services-delete&id=$id&key=" . $user->get_sak() . "&submit=1");
+			$form->container("Warning", "", "Preforming this action will <b>delete the mod service \"$sv->title\" ($id) forever and break any mods using it</b>. Please consider this carefully.");
+			$form->submit("Delete service");
+			
+			$page->add($form);
+		}
+		else {
+			if (!$user->verify_sak($page->get("key"))) {
+				$page->info("Error", "Key not accepted.");
+			}
+			
+			$sv = new ServiceMod($id);
+			$sv->delete();
+			
+			$user->remove_mod($id);
+			
+			alert("@$user->name deleted mod service with id $id (\"$sv->title\")");
+			
+			$page->redirect("./?a=services-home");
+		}
 	}
 	else {
 		$page->info("Sorry!", "You do not have access to this mod!");
@@ -193,10 +244,6 @@ $gEndMan->add("services-adverts-preview", function (Page $page) {
 	
 	if ($user && (($user->has_mod($id) && $user->is_verified()) || $user->is_admin())) {
 		$sv = new ServiceMod($id);
-		
-		// $page->section_start("Impressions", "The number of times this ad has been viewed.");
-		// $page->para("$sv->imperssions");
-		// $page->section_end();
 		
 		$page->heading(1, "Preview advertisement");
 		$page->add("<img src=\"data:image/png;base64," . $sv->ad_png . "\"/>");
