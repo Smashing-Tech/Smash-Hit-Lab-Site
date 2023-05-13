@@ -202,7 +202,19 @@ $gEndMan->add("services-patch", function (Page $page) {
 	$id = $page->get("id");
 	
 	if ($user && $user->has_mod($id) && $user->is_verified()) {
-		$page->heading("Patching libsmashhit binary");
+		$page->heading(1, "Patching libsmashhit binary");
+		$page->para("This is how to download the Patch Tool to patch your <code>libsmashhit.so</code> for the ad service.");
+		$page->add("<ol>
+			<li>To start, <a href=\"https://github.com/Smashing-Tech/Libsmashhit-Tools/releases/download/v0.3.2/patch.py\">download this script</a> and open it.</li>
+			<ol>
+				<li>TL;DR of how to do this: download <a herf=\"https://python.org/\">Python</a> and then run <code>py ./patch.py</code> in a command prompt (exact command depending on platform).</li>
+			</ol>
+			<li>Open your libsmashhit in the patch tool. Please note that it only supports ARM64 1.4.2 and 1.4.3 binaries and ARM32 binaries cannot be patched.</li>
+			<li>Find the option that mentions ads and the mod ID.</li>
+			<li>Check the box to the left of the option to enable the ads, then paste the string <code>$id</code> in the text box.</li>
+			<li>Click the button at the bottom that says \"Patch libsmashhit.so\" to patch your binary.</li>
+			<li>You are done and can now close the patch tool.</li>
+		</ol>");
 	}
 	else {
 		$page->info("Sorry!", "You do not have access to this mod!");
@@ -212,6 +224,8 @@ $gEndMan->add("services-patch", function (Page $page) {
 $gEndMan->add("get-ads-info", function (Page $page) {
 	// Platform is where the ID goes unless we really have the id
 	$platform = $page->has("id") ? $page->get("id") : $page->get("platform");
+	// due to the way I implement the patch (the EZ way) that means i cannot
+	// require the version of the game
 	//$version = $page->get("version");
 	$rev = $page->get("rev");
 	$date = $page->get("date");
