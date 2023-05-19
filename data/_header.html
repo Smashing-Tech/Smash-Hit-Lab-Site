@@ -6,13 +6,13 @@
 		<meta name="keywords" content="smash hit, smash, hit, mobile, game, mobile game, glass, glass game, break glass, break glass game, break, destruction, destruction game, modding, mods, mod, modification, smash hit lab, lab">
 		<meta name="author" content="Smash Hit Lab">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="shortcut icon" type="image/png" href="./icon.png"/>
-		<link rel="stylesheet" href="./?a=site-css"/>
+		<link rel="shortcut icon" type="image/png" href="/icon.png"/>
+		<link rel="stylesheet" href="/?a=site-css"/>
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
 		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
 		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
-		<script src="./?a=site-js" onload="shl_main();"></script>
+		<script src="/?a=site-js" onload="shl_main();"></script>
 		<?php
 		global $gTitle;
 		
@@ -132,11 +132,11 @@
 						}
 					}
 					
-					header_item("home", "Home", "./?p=home");
-					header_item("newspaper", "News", "./?n=home");
-					header_item("science", "Mods", "./?a=list_mods");
+					header_item("home", "Home", "/?p=home");
+					header_item("newspaper", "News", "/?n=home");
+					header_item("science", "Mods", "/?a=list_mods");
 					if (get_name_if_authed()) {
-						header_item("handyman", "Services", "./?a=services-home");
+						header_item("handyman", "Services", "/?a=services-home");
 					}
 					
 					echo "<div class=\"cb-top-item\">";
@@ -170,25 +170,25 @@
 							echo "<img class=\"navbar-profile\" src=\"$image\"/>";
 							echo "<div class=\"shl-old-profile-dropdown-main right\">";
 							
-							nav_dropdown_item("account_circle", "Profile", "./?u=$user_name");
+							nav_dropdown_item("account_circle", "Profile", "/?u=$user_name");
 							if ($u->is_admin()) {
-								nav_dropdown_item("apps", "Dashboard", "./?a=admin_dashboard");
+								nav_dropdown_item("apps", "Dashboard", "/?a=admin_dashboard");
 							}
-							nav_dropdown_item("manage_accounts", "Account", "./?a=edit_account");
-							nav_dropdown_item("notifications", "Notifications", "./?a=notifications");
+							nav_dropdown_item("manage_accounts", "Account", "/?a=edit_account");
+							nav_dropdown_item("notifications", "Notifications", "/?a=notifications");
 							if (!$u->has_role("impersonateable")) {
-								nav_dropdown_item("logout", "Logout", "./?a=logout");
+								nav_dropdown_item("logout", "Logout", "/?a=logout");
 							}
 							else {
-								nav_dropdown_item("logout", "Switch back", "./?a=admin-return");
+								nav_dropdown_item("logout", "Switch back", "/?a=admin-return");
 							}
 							
 							echo "</div>";
 							echo "</div>";
 							echo "</div>";
 						} else {
-							header_item("login", "Login", "./?a=auth-login");
-							header_item("person_add", "Register", "./?a=auth-register");
+							header_item("login", "Login", "/?a=auth-login");
+							header_item("person_add", "Register", "/?a=auth-register");
 						}
 					?>
 				</div>

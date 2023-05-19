@@ -202,6 +202,69 @@ class Article {
 			echo "</div>";
 		}
 	}
+	
+	function render() {
+		/**
+		 * Renders a news article's HTML.
+		 */
+		
+		$base = "";
+		$has_sidebar = ($this->name != "sidebar" && $this->name != "home");
+		
+		if ($has_sidebar) {
+			$base .= "<div class=\"article-page-body\">";
+			$base .= "<div class=\"article-page-body-main\">";
+		}
+		
+		$base .= "<h1>$this->title</h1>";
+		
+		// Make icons
+		$icon_date = "<span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">today</span>";
+		$icon_people = "<span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">supervisor_account</span>";
+		
+		// Make editor list
+		$editors = "";
+		
+		for ($i = 0; $i < sizeof($this->authors); $i++) {
+			$editors .= get_nice_display_name($this->authors[$i]);
+			
+			// Nice ands and commas
+			if (($i + 2) == sizeof($this->authors)) {
+				$editors .= " and ";
+			}
+			else if (($i + 1) != sizeof($this->authors)) {
+				$editors .= ", ";
+			}
+		}
+		
+		// Display article creation date
+		$base .= "<p style=\"text-align: center; opacity: 0.7;\">$icon_date Created " . date("Y-m-d", $this->created) . (($this->created != $this->updated) ? (" (edited " . date("Y-m-d", $this->updated) . ")") : ("")) . "<span style=\"padding-left: 1em\"/>$icon_people Edited by $editors</p>";
+		
+		// Edit button for article
+		//show_news_edit_button($this->name);
+		
+		$base .= "<div class=\"article-body\">";
+		$base .= $this->get_html();
+		$base .= "</div>";
+		
+		// Divider for comments
+		$base .= "<div style=\"border-bottom: 1px solid var(--colour-primary-b); margin-bottom: 1em;\"></div>";
+		
+		// Display comments
+		//$disc = new Discussion($this->comments);
+		//$disc->display("Comments", "./?n=" . $this->name);
+		
+		// Has sidebar ?
+		if ($has_sidebar) {
+			$base .= "</div>";
+			$base .= "<div class=\"article-page-body-sidebar\">";
+			$base .= (new Article("sidebar"))->get_html();
+			$base .= "</div>";
+			$base .= "</div>";
+		}
+		
+		return $base;
+	}
 }
 
 function article_exists(string $name) : bool {
@@ -238,6 +301,23 @@ function display_news(string $name) : void {
 	
 	include_footer();
 }
+
+$gEndMan->add("news-view", function (Page $page) {
+	$id = $page->get("id");
+	
+	if (!article_exists($id)) {
+		$page->info("Whoops!", "It seems like we don't have a news article by that name. Maybe check to make sure you've spelled everything alright?");
+	}
+	
+	$article = new Article($id);
+	
+	// HACK for article titles
+	global $gTitle; $gTitle = $article->title;
+	
+	if (($article->permissions == "public") || (get_name_if_admin_authed() != null)) {
+		$page->add($article->render());
+	}
+});
 
 function pretend_error() : void {
 	include_header();
