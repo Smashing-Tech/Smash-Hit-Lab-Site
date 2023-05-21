@@ -1262,7 +1262,7 @@ function display_user(string $user) {
 	
 	// Maybe show pronouns?
 	if ($user->pronouns) {
-		mod_property("Pronouns", "When referring to this person using pronouns, please use their preferred pronouns. Intentionally or repeatedly using the wrong pronouns will lead to a ban.", "$user->pronouns");
+		mod_property("Pronouns", "When referring to this person using pronouns, please use their preferred pronouns.", "$user->pronouns");
 	}
 	
 	// Show roles

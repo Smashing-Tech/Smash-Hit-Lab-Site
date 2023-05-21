@@ -419,7 +419,7 @@ class Discussion {
 		echo "<button class=\"button secondary\" onclick=\"ds_clear(); ds_load();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">refresh</span> Reload</button>";
 		
 		if (get_name_if_admin_authed()) {
-			echo " <button class=\"button secondary\" onclick=\"ds_toggle_hidden();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">visibility_off</span> Toggle hidden</button>";
+			echo " <button class=\"button secondary\" onclick=\"ds_toggle_hidden();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">visibility_off</span> Hidden</button>";
 		}
 	}
 	
@@ -745,3 +745,29 @@ function discussion_view() {
 	
 	include_footer();
 }
+
+$gEndMan->add("discussion-hide", function (Page $page) {
+	$page->set_mode(PAGE_MODE_API);
+	
+	$user = user_get_current();
+	
+	if (!$user) {
+		$page->info("not_authed", "Please log in first!");
+	}
+	
+	$id = $page->get("id");
+	$index = $page->get("index");
+	$sak = $page->get("sak");
+	
+	$d = new Discussion($id);
+	
+	if (($d->get_author($index) !== $user->name && !$user->is_admin()) || (!$user->verify_sak($sak))) {
+		$page->info("not_permitted", "You cannot hide a comment which you have not written.");
+	}
+	
+	$d->hide_comment($index);
+	
+	$page->set("status", "done");
+	$page->set("message", "The comment has been hidden.");
+	$page->set("next_sak", $user->get_sak());
+});

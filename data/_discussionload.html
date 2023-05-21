@@ -34,8 +34,12 @@
 		// Render each action
 		for (let i = 0; i < actions.length; i++) {
 			switch (actions[i]) {
+				case "like": {
+					string += "";
+					break;
+				}
 				case "hide": {
-					string += "<a href=\"./?a=discussion_hide&id=" + DiscussionID + "&index=" + index + "&after=" + window.location + "&key=" + UserSAK + "\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">block</span> Hide</button></a> ";
+					string += "<button class=\"button secondary\" onclick=\"ds_hide(" + index + ");\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">block</span> Hide</button> ";
 					break;
 				}
 				case "reply": {
@@ -90,7 +94,7 @@
 	}
 	
 	function ds_load() {
-		ds_request("GET", "./?a=discussion_poll&id=" + DiscussionID + "&index=0" + (window.ShowHidden ? "&hidden=1" : ""), ds_load_handle);
+		ds_request("GET", "/?a=discussion_poll&id=" + DiscussionID + "&index=0" + (window.ShowHidden ? "&hidden=1" : ""), ds_load_handle);
 	}
 	
 	function ds_clear() {
@@ -135,7 +139,22 @@
 	
 	function ds_update() {
 		let body = document.getElementById("discussions-" + DiscussionID + "-entry").value;
-		ds_request("POST", "./?a=discussion_update&id=" + DiscussionID + "&index=-1&key=" + UserSAK + "&api=1", ds_update_handle, body);
+		ds_request("POST", "/?a=discussion_update&id=" + DiscussionID + "&index=-1&key=" + UserSAK + "&api=1", ds_update_handle, body);
+	}
+	
+	function ds_hide_handle() {
+		console.log(this.responseText);
+		setTimeout(ds_load, 1);
+	}
+	
+	function ds_hide(index) {
+		let data = {
+			id: DiscussionID,
+			index: index,
+			sak: UserSAK
+		};
+		
+		ds_request("POST", "/?a=discussion-hide", ds_hide_handle, JSON.stringify(data));
 	}
 	
 	function ds_toggle_hidden() {

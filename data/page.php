@@ -70,6 +70,7 @@ class Page {
 		else {
 			$this->set("status", $title);
 			$this->set("message", $desc);
+			$this->send();
 		}
 		die();
 	}
@@ -162,7 +163,13 @@ class Page {
 		 */
 		
 		try {
-			return json_decode(file_get_contents("php://input"), true);
+			$result = json_decode(file_get_contents("php://input"), true);
+			
+			if (!$result) {
+				return [];
+			}
+			
+			return $result;
 		}
 		catch (Exception $e) {
 			return [];

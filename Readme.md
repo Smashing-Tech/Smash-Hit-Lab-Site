@@ -8,7 +8,7 @@ Unfortunately I was too stupid to realise that planning things out was probably 
 
 ### Database
 
-The database is essentially just flat file object oriented database organised into:
+The database is essentially just flat file document database organised into:
 
 ```
 data
