@@ -451,6 +451,8 @@ class User {
 				$this->schema = 2;
 				$this->save();
 			}
+			
+			// Schema R3: Account database
 		}
 		else {
 			$this->name = $name;
