@@ -344,6 +344,24 @@ $gEndMan->add("auth-register", function(Page $page) {
 	}
 });
 
+$gEndMan->add("auth-logout", function(Page $page) {
+	$token = $page->get_cookie("tk");
+	$lockbox = $page->get_cookie("lb");
+	
+	// Delete the token on the server
+	$db = new Database("token");
+	$db->delete($token);
+	
+	// TODO Remove the token from the user
+	
+	// Unset cookie
+	$page->cookie("tk", "", 0);
+	$page->cookie("lb", "", 0);
+	
+	// Redirect to homepage
+	$page->info("Logged out", "You have been logged out of the Smash Hit Lab.");
+});
+
 $gEndMan->add("auth-reset-password", function(Page $page) {
 	if (!$page->has("submit")) {
 		$page->heading(1, "Reset password");
@@ -374,4 +392,19 @@ $gEndMan->add("auth-reset-password", function(Page $page) {
 			$page->info("Oh no!", "The password weset didnt wowrk.");
 		}
 	}
+});
+
+/**
+ * Redirects for legacy pages which are still linked sometimes
+ */
+$gEndMan->add("login", function (Page $page) {
+	$page->redirect("./?a=auth-login");
+});
+
+$gEndMan->add("register", function (Page $page) {
+	$page->redirect("./?a=auth-register");
+});
+
+$gEndMan->add("logout", function (Page $page) {
+	$page->redirect("./?a=auth-logout");
 });

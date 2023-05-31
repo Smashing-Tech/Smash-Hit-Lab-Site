@@ -10,16 +10,13 @@ require_once "event.php";
 require_once "Parsedown.php";
 
 // Everying Everywhere All At Once
-require_once "action.php";
 require_once "admin.php";
 require_once "auth.php";
-require_once "chat.php";
 require_once "config.php";
 require_once "crypto.php";
 require_once "database.php";
 require_once "discussion.php";
 require_once "form.php";
-require_once "forum.php";
 require_once "ipblock.php";
 require_once "mod.php";
 require_once "mod_services.php";
@@ -35,10 +32,6 @@ require_once "util.php";
 
 function handle_action(string $action, Page $page) {
 	switch ($action) {
-	// ---- USER ACCOUNTS ---- //
-		case "register": do_register(); break; // DEPRECATED
-		case "login": do_login(); break; // DEPRECATED
-		case "logout": do_logout(); break; // DEPRECATED
 	// ---- MOD PAGES ---- //
 		case "mod_update":
 		/*DEPRECATED*/ case "edit_mod": edit_mod(); break;
