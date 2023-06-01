@@ -1082,7 +1082,7 @@ function get_profile_image(string $user) {
 	
 	$pfpi = (ord($user->name[0]) % 6) + 1;;
 	
-	return $user->image ? $user->image : "./img/defaultuser$pfpi.png";
+	return $user->image;
 }
 
 function edit_account() {
@@ -1127,7 +1127,7 @@ function edit_account() {
 		edit_feild("imageurl", "text", "Image URL", "The location of your user image, if set to \"Image URL\".", $user->image);
 	}
 	
-	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, not including the at sign (@). We will use this account to give you a profile picture.", $user->youtube);
+	edit_feild("youtube", "text", "YouTube", "The handle for your YouTube account, if you have one.", $user->youtube);
 	edit_feild("email", "text", "Email", "The email address that you prefer to be contacted about for account related issues.", $user->email, !$user->is_admin());
 	edit_feild("colour", "text", "Page colour", "The base colour that the colour of your userpage is derived from. Represented as hex #RRGGBB.", $user->manual_colour);
 	

@@ -360,7 +360,7 @@ function do_storage_list() {
 			$name = $files[$i];
 			$name_url = urlencode($name);
 			
-			echo "<p><a href=\"./?a=storage_download&file=$name_url\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">description</span> $name</a></p>";
+			echo "<p><a href=\"./?a=storage_download&file=$name_url\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">description</span> $name</a> [<a href=\"./?a=storage-delete&index=$i\">Delete</a>]</p>";
 		}
 		
 		include_footer();
@@ -369,6 +369,30 @@ function do_storage_list() {
 		sorry("The action you have requested is not currently implemented.");
 	}
 }
+
+$gEndMan->add("storage-delete", function (Page $page) {
+	/**
+	 * Note: I'm doing things by file index since I don't really feel like trying
+	 * to sanitise paths properly.
+	 */
+	
+	$index = (int) $page->get("index");
+	$user = get_name_if_admin_authed();
+	$storage_dir = "../data/store/";
+	
+	if ($user) {
+		$files = list_folder($storage_dir);
+		
+		if ($index < sizeof($files)) {
+			unlink($storage_dir . $files[$index]);
+		}
+		
+		$page->redirect("./?a=storage_list");
+	}
+	else {
+		$page->info("Log in first", "Please log in first.");
+	}
+});
 
 function do_user_roles() {
 	$actor = get_name_if_admin_authed();

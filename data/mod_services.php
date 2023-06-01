@@ -83,7 +83,7 @@ $gEndMan->add("services-home", function (Page $page) {
 	
 	if ($user) {
 		$page->heading(1, "Mod Services");
-		$page->add("<div class=\"comment-card\"><p>Mod Services are in a prerelease state and currently only support adverts.</p></div>");
+		//$page->add("<div class=\"comment-card\"><p>Mod Services are in a prerelease state and currently only support adverts.</p></div>");
 		$page->add("<p style=\"text-align: center;\">");
 		$page->link_button("add", "Create instance", "./?a=services-create", true);
 		
