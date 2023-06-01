@@ -20,9 +20,6 @@ function do_site_config() {
 			edit_feild("sitename", "text", "Site name", "The name of your community.", get_config("sitename", "My New Community"));
 			
 			echo "<h3>Features</h3>";
-			edit_feild("enable_news", "select", "News", "Enable or disabled the news articles feature.", get_config("enable_news", "enabled"), true, ["enabled" => "Enabled", "disabled" => "Disabled"]);
-			edit_feild("enable_wiki", "select", "Wiki", "Enable or disabled the wiki features.", get_config("enable_wiki", "enabled"), true, ["enabled" => "Enabled", "disabled" => "Disabled"]);
-			edit_feild("enable_forum", "select", "Forums", "Enable or disabled the forum feature.", get_config("enable_forum", "disabled"), true, ["disabled" => "Disabled"]);
 			edit_feild("enable_discussions", "select", "Discussions", "If discussions should be enabled, disabled or closed sitewide. Closed will disable new comments but still show old ones, while disabled will stop showing them entirely. Comments can still be marked as hidden when closed, but cannot when disabled.", get_config("enable_discussions", "enabled"), true, array("enabled" => "Enabled", "disabled" => "Disabled", "closed" => "Closed"));
 			
 			echo "<h3>Connections</h3>";
@@ -41,9 +38,6 @@ function do_site_config() {
 			set_config("sitename", htmlspecialchars($_POST["sitename"]));
 			
 			// Features
-			set_config("enable_news", $_POST["enable_news"], array("enabled", "disabled"));
-			set_config("enable_wiki", $_POST["enable_wiki"], array("enabled", "disabled"));
-			set_config("enable_forum", $_POST["enable_forum"], array("enabled", "disabled"));
 			set_config("enable_discussions", $_POST["enable_discussions"], array("enabled", "disabled", "closed"));
 			
 			// Security
