@@ -193,7 +193,7 @@ class ModPage {
 		for ($i = (sizeof($history) - 1); $i >= 0; $i--) {
 			$rev = $history[$i];
 			
-			echo "<li><a href=\"./?m=$this->package&index=$i\">Edit at " . date("Y-m-d H:i:s", $rev->updated) . "</a> (Index $i) by <a href=\"./?u=$rev->author\">$rev->author</a> &mdash; $rev->reason</li>";
+			echo "<li><a href=\"./?m=$this->package&index=$i\">Edit at " . date("Y-m-d H:i:s", $rev->updated) . "</a> by <a href=\"./?u=$rev->author\">$rev->author</a> &mdash; $rev->reason</li>";
 		}
 		
 		echo "</ul>";

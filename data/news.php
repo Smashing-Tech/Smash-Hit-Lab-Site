@@ -44,7 +44,7 @@ function get_news_edit_button(string $name) : string {
 		$user = new User($user);
 		
 		if ($user->is_admin()) {
-			return "<p class=\"centred\"><a href=\"./?a=update_news&n=$name\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit this article</button></a></p>";
+			return "<p class=\"centred\"><a href=\"./?a=update_news&n=$name\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit article</button></a> <a href=\"./?a=news-history&n=$name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">history</span> History</button></a></p>";
 		}
 	}
 	
@@ -61,15 +61,16 @@ class Article {
 	public $body;
 	public $created;
 	public $updated;
+	public $author;
 	public $authors;
 	public $permissions;
 	public $comments;
 	
-	function __construct(string $name) {
+	function __construct(string $name, int $revision = -1) {
 		$db = new RevisionDB("article");
 		
 		if ($db->has($name)) {
-			$info = $db->load($name);
+			$info = $db->load($name, $revision);
 			
 			$this->name = $info->name;
 			$this->title = $info->title;
@@ -129,6 +130,9 @@ class Article {
 			$this->authors[] = $whom;
 		}
 		
+		// Set author for revision
+		$this->author = $whom;
+		
 		push_recent($this->name);
 		
 		$this->save();
@@ -137,6 +141,23 @@ class Article {
 	function set_permissions(string $name) {
 		$this->permissions = $name;
 		$this->save();
+	}
+	
+	function display_history() {
+		echo "<h1>History of " . ($this->title ? $this->title : $this->name) . "</h1>";
+		
+		$db = new RevisionDB("article");
+		$history = $db->history($this->name);
+		
+		echo "<ul>";
+		
+		for ($i = (sizeof($history) - 1); $i >= 0; $i--) {
+			$rev = $history[$i];
+			
+			echo "<li><a href=\"./?n=$this->name&index=$i\">Edit at " . date("Y-m-d H:i:s", $rev->updated) . "</a> by <a href=\"./?u=$rev->author\">$rev->author</a> &mdash; $rev->reason</li>";
+		}
+		
+		echo "</ul>";
 	}
 	
 	function display_update() {
@@ -285,7 +306,13 @@ function display_news(string $name) : void {
 		sorry("It seems like we don't have a news article by that name.", get_news_edit_button($name));
 	}
 	
-	$article = new Article($name);
+	$index = -1;
+	
+	if (get_name_if_admin_authed() && array_key_exists("index", $_GET)) {
+		$index = (int) $_GET["index"];
+	}
+	
+	$article = new Article($name, $index);
 	
 	// HACK for article titles
 	global $gTitle; $gTitle = $article->title;
@@ -301,6 +328,20 @@ function display_news(string $name) : void {
 	
 	include_footer();
 }
+
+$gEndMan->add("news-history", function (Page $page) {
+	if (get_name_if_admin_authed()) {
+		$page->set_mode(PAGE_MODE_RAW);
+		
+		include_header();
+		$article = new Article($_GET["n"]);
+		$article->display_history();
+		include_footer();
+	}
+	else {
+		$page->info("Sorry", "You cannot preform this action.");
+	}
+});
 
 $gEndMan->add("news-view", function (Page $page) {
 	$id = $page->get("id");
