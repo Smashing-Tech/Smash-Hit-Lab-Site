@@ -20,9 +20,7 @@ function post(string $url, string $body) {
 	return $result;
 }
 
-function send_discord_message(string $message) {
-	$webhook_url = get_config("discord_webhook", "");
-	
+function send_discord_message(string $message, string $webhook_url = "") {
 	if (!$webhook_url) {
 		return;
 	}
@@ -39,7 +37,19 @@ function alert(string $title, string $url = "") {
 	 * Add a notification to a user's inbox.
 	 */
 	
-	send_discord_message(date("Y-m-d H:i:s", time()) . " — " . $title . ($url ? "\n[Relevant link](https://smashhitlab.000webhostapp.com/$url)" : ""));
+	// Create the message
+	$webhook_url = get_config("discord_webhook", "");
+	$message = date("Y-m-d H:i:s", time()) . " — " . $title . ($url ? "\n[Relevant link](https://smashhitlab.000webhostapp.com/$url)" : "");
+	
+	// Send via primary webhook
+	send_discord_message($message, $webhook_url);
+	
+	// Send to secondary webhook
+	$webhook_url = get_config("secondary_discord_webhook", "");
+	
+	if ($webhook_url) {
+		send_discord_message($message, $webhook_url);
+	}
 }
 
 function crush_ip(?string $ip = null) : string {

@@ -29,6 +29,9 @@ function do_site_config() {
 			edit_feild("register", "select", "Enable registering", "Weather registering of new accounts should be limited or not.", get_config("register", "anyone"), true, array("anyone" => "Anyone can register", "users" => "Only users can register", "admins" => "Only admins can register", "closed" => "Registering is disabled"));
 			edit_feild("enable_login", "select", "Enable logins", "Allow users to log in to the stie.</p><p><b>Warning:</b> If you set this to completely disabled and all admins are logged out, then you need to wait for Knot126 to fix the site.", get_config("enable_login", "users"), true, array("users" => "All users can log in", "verified" => "Verified users and admins can log in", "admins" => "Only admins can log in", "closed" => "Logging in is disabled"));
 			
+			echo "<h4>Audit notes</h4>";
+			edit_feild("reason", "text", "Reason", "Reason for updating the site config, if any.", "");
+			
 			echo "<input type=\"submit\" value=\"Save settings\"/>";
 			echo "</form>";
 			include_footer();
@@ -46,7 +49,10 @@ function do_site_config() {
 			
 			set_config("discord_webhook", $_POST["discord_webhook"]);
 			
-			alert("Site config was updated by @$user", "./?a=site_config");
+			$reason = htmlspecialchars($_POST["reason"]);
+			$reason = $reason ? $reason : "*(none)*";
+			
+			alert("Site config was updated by @$user\n\nReason: $reason", "./?a=site_config");
 			redirect("./?a=site_config");
 		}
 	}
