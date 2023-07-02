@@ -90,6 +90,16 @@ function main() {
 	
 	$page = new Page();
 	
+	// Mastodon are fucks
+	// See https://jort.link/
+	$agent = $_SERVER['HTTP_USER_AGENT'];
+	
+	if (str_contains(strtolower($agent), "mastodon") || !$agent) {
+		http_response_code(203);
+		echo "<html><head><title>Go away</title></head><body>Go away</body></html>";
+		die();
+	}
+	
 	if (array_key_exists("a", $_GET)) {
 		handle_action($_GET["a"], $page);
 	}
