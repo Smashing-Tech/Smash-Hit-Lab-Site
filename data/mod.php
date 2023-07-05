@@ -140,7 +140,7 @@ class ModPage {
 			echo "<a href=\"./?a=mod_history&m=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">history</span> History</button></a> ";
 			echo "<a href=\"./?a=mod-rename&oldslug=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit_location</span> Rename</button></a> ";
 			
-			if (get_name_if_admin_authed()) {
+			if (get_name_if_mod_authed()) {
 				echo "<a href=\"./?a=mod_delete&package=$this->package\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">delete</span> Delete</button></a> ";
 			}
 			
@@ -407,7 +407,7 @@ $gEndMan->add("mod-save", function (Page $page) {
 });
 
 function delete_mod() : void {
-	$user = get_name_if_admin_authed();
+	$user = get_name_if_mod_authed();
 	
 	if ($user) {
 		if (!array_key_exists("page", $_POST)) {

@@ -325,6 +325,7 @@ class Discussion {
 		}
 		
 		$stalker = get_name_if_authed();
+		$stalker_user = new User($stalker);
 		
 		// Add extra metadata and format them
 		for ($i = 0; $i < sizeof($comments); $i++) {
@@ -350,7 +351,7 @@ class Discussion {
 				$comments[$i]->pronouns = "";
 			}
 			
-			if (get_name_if_admin_authed() || (get_name_if_authed() == $user->name)) {
+			if ($stalker_user->is_mod() || (get_name_if_authed() == $user->name)) {
 				$comments[$i]->actions[] = "hide";
 			}
 		}
@@ -418,7 +419,7 @@ class Discussion {
 	function display_reload() {
 		echo "<button class=\"button secondary\" onclick=\"ds_clear(); ds_load();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">refresh</span> Reload</button>";
 		
-		if (get_name_if_admin_authed()) {
+		if (get_name_if_mod_authed()) {
 			echo " <button class=\"button secondary\" onclick=\"ds_toggle_hidden();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">visibility_off</span> Hidden</button>";
 		}
 	}
@@ -438,7 +439,7 @@ class Discussion {
 	}
 	
 	function display_lock() {
-		$name = get_name_if_admin_authed();
+		$name = get_name_if_mod_authed();
 		
 		if ($name) {
 			$locked = $this->is_locked();
@@ -624,9 +625,9 @@ function discussion_hide() {
 	
 	$discussion = new Discussion($discussion);
 	
-	// If the user requesting is not the author and is not admin, we deny the
+	// If the user requesting is not the author and is not mod, we deny the
 	// request.
-	if (($discussion->get_author($index) !== $user->name && !$user->is_admin()) || (!$user->verify_sak($sak))) {
+	if (($discussion->get_author($index) !== $user->name && !$user->is_mod()) || (!$user->verify_sak($sak))) {
 		sorry("You cannot hide a comment which you have not written.");
 	}
 	
@@ -678,7 +679,7 @@ function discussion_poll() {
 	
 	// List the comments
 	$disc = new Discussion($_GET["id"]);
-	$comments = $disc->list_since($_GET["index"], get_name_if_admin_authed() && array_key_exists("hidden", $_GET));
+	$comments = $disc->list_since($_GET["index"], get_name_if_mod_authed() && array_key_exists("hidden", $_GET));
 	
 	// Create the result data
 	$result = new stdClass;
@@ -697,7 +698,7 @@ function discussion_poll() {
 }
 
 function discussion_lock() {
-	$user = get_name_if_admin_authed();
+	$user = get_name_if_mod_authed();
 	
 	if (!$user) {
 		sorry("The action you have requested is not currently implemented.");
@@ -761,7 +762,7 @@ $gEndMan->add("discussion-hide", function (Page $page) {
 	
 	$d = new Discussion($id);
 	
-	if (($d->get_author($index) !== $user->name && !$user->is_admin()) || (!$user->verify_sak($sak))) {
+	if (($d->get_author($index) !== $user->name && !$user->is_mod()) || (!$user->verify_sak($sak))) {
 		$page->info("not_permitted", "You cannot hide a comment which you have not written.");
 	}
 	

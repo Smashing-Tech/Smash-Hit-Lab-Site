@@ -997,6 +997,32 @@ function get_name_if_admin_authed() {
 	return $user->name;
 }
 
+function get_name_if_mod_authed() {
+	/**
+	 * Get the user's name if they are authed and they are a moderator.
+	 * 
+	 * Note: Technically this was made after moving away from get_name_if*
+	 * functions but there is some code in discussions that uses this and it's
+	 * just easier if we create this function.
+	 */
+	
+	$user = get_name_if_authed();
+	
+	// Check if authed
+	if (!$user) {
+		return null;
+	}
+	
+	$user = new User($user);
+	
+	// Check if admin
+	if (!$user->is_mod()) {
+		return null;
+	}
+	
+	return $user->name;
+}
+
 function user_get_sak() : string {
 	/**
 	 * Get the SAK of the current user.
@@ -1292,17 +1318,20 @@ function display_user(string $user) {
 		mod_property("Send message", "You can send this user a message publicly via their message wall.", "<button class=\"button secondary\" onclick=\"user_tabs_select('wall')\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">forum</span> Message wall</button>");
 	}
 	
-	if ($stalker && $stalker->is_admin()) {
+	if ($stalker && $stalker->is_mod()) {
 		if ($user->is_banned()) {
 			mod_property("Unban time", "The time at which this user will be allowed to log in again.", $user->unban_date());
 		}
 		
 		// If the wanted user isn't admin, we can ban them
-		if (!$user->is_admin()) {
-			mod_property("Ban user", "Banning this user will revoke access and prevent them from logging in until a set amount of time has passed.", "<a href=\"./?a=user_ban&handle=$user->name\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">gavel</span> Ban this user</button></a>");
+		if (!$user->is_admin() && $stalker->name != $user->name) {
+			mod_property("Ban user", "Banning this user will revoke access and prevent them from logging in until a set amount of time has passed.", "<a href=\"./?a=user_ban&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">gavel</span> Ban @$user->name</button></a>");
 		}
 		
-		mod_property("Change roles", "Roles set permissions for what users are allowed to do. They are often used for giving someone moderator or admin privleges.", "<a href=\"./?a=user_roles&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">security</span> Edit roles</button></a>");
+		// Only admins can change ranks
+		if ($stalker->is_admin()) {
+			mod_property("Change roles", "Roles set permissions for what users are allowed to do. They are often used for giving someone moderator or admin privleges.", "<a href=\"./?a=user_roles&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">security</span> Edit roles</button></a>");
+		}
 		
 		mod_property("Verified", "Verified members are checked by staff to be who they claim they are.", "<a href=\"./?a=user_verify&handle=$user->name\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">verified</span> Toggle verified status</button></a>");
 	}
@@ -1399,7 +1428,7 @@ function display_user_accent_script(User $user) {
 }
 
 function user_verify() {
-	$verifier = get_name_if_admin_authed();
+	$verifier = get_name_if_mod_authed();
 	
 	if ($verifier) {
 		$handle = htmlspecialchars($_GET["handle"]);

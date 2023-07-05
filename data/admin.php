@@ -105,7 +105,7 @@ function do_admin_dashboard() {
 }
 
 function do_user_ban() {
-	$banner = get_name_if_admin_authed();
+	$banner = get_name_if_mod_authed();
 	
 	if ($banner) {
 		if (!array_key_exists("handle", $_POST)) {
