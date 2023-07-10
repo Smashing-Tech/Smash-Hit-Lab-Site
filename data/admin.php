@@ -91,6 +91,7 @@ function do_admin_dashboard() {
 		admin_action_item("./?a=storage_list", "inventory", "Site storage");
 		
 		echo "<h4>Users and contributed content</h4>";
+		admin_action_item("./?a=user-list", "people", "List of users");
 		admin_action_item("./?a=user_ban", "gavel", "Ban user");
 		admin_action_item("./?a=user_delete", "person_off", "Delete user");
 		admin_action_item("./?a=user_roles", "security", "Edit roles");
@@ -563,5 +564,27 @@ $gEndMan->add("user-init-reset", function(Page $page) {
 	}
 	else {
 		$page->info("You can't fucking do that !!!!");
+	}
+});
+
+$gEndMan->add("user-list", function (Page $page) {
+	$user = user_get_current();
+	
+	if ($user && $user->is_mod()) {
+		$page->heading(1, "List of Users");
+		$page->add("<ul>");
+		
+		$users = (new Database("user"))->enumerate();
+		
+		for ($i = 0; $i < sizeof($users); $i++) {
+			$current = $users[$i];
+			
+			$page->add("<li><a href=\"./?u=$current\">@$current</li>");
+		}
+		
+		$page->add("</ul>");
+	}
+	else {
+		$page->info("Sorry", "This endpoint is not available for you.");
 	}
 });

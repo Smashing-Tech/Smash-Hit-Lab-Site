@@ -267,6 +267,14 @@ class Discussion {
 		}
 	}
 	
+	function count_all() {
+		/**
+		 * Count all shown and hidden comments.
+		 */
+		
+		return sizeof($this->comments);
+	}
+	
 	function enumerate_hidden() {
 		/**
 		 * Return the number of hidden comments.
@@ -325,7 +333,7 @@ class Discussion {
 		}
 		
 		$stalker = get_name_if_authed();
-		$stalker_user = new User($stalker);
+		$stalker_user = $stalker ? new User($stalker) : null;
 		
 		// Add extra metadata and format them
 		for ($i = 0; $i < sizeof($comments); $i++) {
@@ -351,7 +359,7 @@ class Discussion {
 				$comments[$i]->pronouns = "";
 			}
 			
-			if ($stalker_user->is_mod() || (get_name_if_authed() == $user->name)) {
+			if ($stalker && $stalker_user->is_mod() || (get_name_if_authed() == $user->name)) {
 				$comments[$i]->actions[] = "hide";
 			}
 		}
@@ -577,11 +585,21 @@ function discussion_update_new() {
 	
 	$discussion = new Discussion($discussion);
 	
+	// Comment limit
+	if ($discussion->count_all() >= 800) {
+		echo "{\"error\": \"comment_limit_reached\", \"message\": \"This discussion has too many comments. You cannot post another one.\"}"; return;
+	}
+	
 	if ($index == "-1") {
 		$status = $discussion->add_comment($user->name, $body);
 		
 		if ($status) {
 			echo "{\"error\": \"done\", \"message\": \"Your comment was posted successfully!\"}";
+			
+			// If we reach the comment limit, automatically lock the discussion.
+			if ($discussion->count_all() >= 800 && !$discussion->is_locked()) {
+				$discussion->toggle_locked();
+			}
 		}
 		else {
 			echo "{\"error\": \"not_posted\", \"message\": \"This comment could not be posted. This might happen if you don't have access to the discussion.\"}";
