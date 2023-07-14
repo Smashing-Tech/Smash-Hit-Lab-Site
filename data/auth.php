@@ -251,7 +251,7 @@ function auth_register_form(Page $page) {
 function auth_register_action(Page $page) {
 	global $gEvents;
 	
-	$email_required = get_config("email_required", true);
+	$email_required = get_config("email_required", false);
 	
 	$handle = $page->get("handle", true, 24);
 	$email = $page->get("email", $email_required, 300);
