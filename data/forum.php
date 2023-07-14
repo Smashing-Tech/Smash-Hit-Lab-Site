@@ -78,7 +78,7 @@ $gEndMan->add("forum-create", function (Page $page) {
 	
 	if ($actor) {
 		if (!$page->has("submit")) {
-			$page->info("Problem", "You cannot do that.");
+			$page->info("Error", "There is no form for this action. Use the new thread dailogue on the main page.");
 		}
 		else {
 			// Forum threads use the same id's as their discussions
@@ -110,7 +110,7 @@ $gEndMan->add("forum-create", function (Page $page) {
 		}
 	}
 	else {
-		$page->info("Problem", "You cannot do that.");
+		$page->info("Not logged in", "Please log in or sign up to create a new thread.");
 	}
 });
 
@@ -136,7 +136,7 @@ $gEndMan->add("forum-view", function (Page $page) {
 	echo "<h1>$thread->title</h1>";
 	
 	// Moderation actions
-	if ($actor->is_mod()) {
+	if ($actor && $actor->is_mod()) {
 		echo "<p style=\"text-align: center;\"><a href=\"./?a=forum-delete&thread=$thread->id\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">delete</span> Delete</button></a></p>";
 	}
 	
@@ -154,6 +154,7 @@ $gEndMan->add("forum-delete", function (Page $page) {
 		if (!$page->has("submit")) {
 			$page->heading(1, "Delete thread");
 			
+			// Main deletion form
 			$form = new Form("./?a=forum-delete&submit=1");
 			$form->textbox("thread", "Thread ID", "The ID of the thread to delete.", $page->get("thread", false), !$page->has("thread"));
 			$form->textbox("reason", "Reason", "Reason for deletion of the thread.");
@@ -176,6 +177,6 @@ $gEndMan->add("forum-delete", function (Page $page) {
 		}
 	}
 	else {
-		$page->info("Problem", "You cannot do that.");
+		$page->info("Sorry", "You need to log in to preform this action.");
 	}
 });
