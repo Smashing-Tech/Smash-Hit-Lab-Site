@@ -743,3 +743,10 @@ blockquote {
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+
+.thread-card {
+	border-radius: 0.5em;
+	padding: 1em;
+	background: var(--colour-background-light);
+	margin-bottom: 0.5em;
+}

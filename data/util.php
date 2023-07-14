@@ -131,3 +131,30 @@ function render_accent_script(string $colour) {
 	
 	return $p->render();
 }
+
+function create_form_dialogue_code(string $id, string $url, string $title, string $body, string $button) {
+	return "<form action=\"$url\" method=\"post\">
+<div id=\"shl-dialogue-container-$id\" class=\"dialogue-bg\" style=\"display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000c; z-index: 1000;\">
+	<div class=\"dialogue-surface\" style=\"position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%); width: max(50vw, 20em); height: 80vh; background: var(--colour-background); border-radius: 0.5em; box-shadow: 0 0.3em 0.4em var(--colour-background-dark-b); padding: 1.0em;\">
+		<div class=\"dialogue-seperation\" style=\"display: grid; grid-template-rows: 3em auto 3em; height: 100%;\">
+			<div style=\"grid-row: 1; margin-bottom: 3em;\">
+				<h4>$title</h4>
+			</div>
+			<div style=\"grid-row: 2;\">
+				$body
+			</div>
+			<div style=\"grid-row: 3;\">
+				<div style=\"display: grid; grid-template-columns: auto auto;\">
+					<div style=\"grid-column: 1;\">
+						<button type=\"button\" class=\"button secondary\" onclick=\"shl_hide_dialogue('$id')\">Close</button>
+					</div>
+					<div style=\"grid-column: 2; text-align: right;\">
+						$button
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</form>";
+}

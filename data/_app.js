@@ -17,6 +17,9 @@ function shl_get_param(name) {
 	return (new URLSearchParams(document.location.search)).get(name);
 }
 
+/**
+ * Magic editor
+ */
 function shl_magic_editor_init() {
 	let elements = document.getElementsByClassName("shl-magic-editor-feild");
 	
@@ -69,6 +72,20 @@ function shl_magic_editor_end() {
 	
 	button.innerHTML = "<span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit page";
 	button.onclick = shl_magic_editor_begin;
+}
+
+/**
+ * Generic dialogues
+ */
+
+function shl_show_dialogue(name) {
+	let e = document.getElementById(`shl-dialogue-container-${name}`);
+	e.style.display = "inherit";
+}
+
+function shl_hide_dialogue(name) {
+	let e = document.getElementById(`shl-dialogue-container-${name}`);
+	e.style.display = "none";
 }
 
 function shl_main() {
