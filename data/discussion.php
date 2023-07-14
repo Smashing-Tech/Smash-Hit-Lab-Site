@@ -381,7 +381,10 @@ class Discussion {
 		switch ($enabled) {
 			case "enabled": {
 				if (!get_name_if_authed()) {
-					echo "<div id=\"discussion-$this->id-box\" class=\"comment-card comment-edit\"><p>Want to leave a comment? <a href=\"./?a=login\">Log in</a> or <a href=\"./?a=register\">create an account</a> to share your thoughts!</p></div>";
+					echo "<div class=\"comment-card comment-edit\">";
+					echo "<p style=\"text-align: center\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px; font-size: 128px;\">forum</span></p>";
+					echo "<p style=\"text-align: center\">Want to leave a comment? <a href=\"./?a=login\">Log in</a> or <a href=\"./?a=register\">create an account</a> to share your thoughts!</p>";
+					echo "</div>";
 					return;
 				}
 				
