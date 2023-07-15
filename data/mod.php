@@ -123,6 +123,8 @@ class ModPage {
 	}
 	
 	function display() {
+		$stalker = user_get_current();
+		
 		if ($this->image) {
 			echo "<div class=\"mod-banner\" style=\"background-image: linear-gradient(to top, #222c, #0008), url('$this->image');\">";
 			echo "<h1>" . $this->get_display_name() . "</h1>";
@@ -133,7 +135,7 @@ class ModPage {
 		}
 		
 		// Header
-		if (get_name_if_authed()) {
+		if ($stalker) {
 			echo "<p class=\"centred\">";
 			echo "<a href=\"./?a=edit_mod&m=$this->package\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Edit this mod</button></a> ";
 			echo "<button id=\"shl-magic-editor-main-button\" class=\"button secondary\" onclick=\"shl_magic_editor_begin();\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Magic editor (beta)</button> ";
@@ -157,14 +159,28 @@ class ModPage {
 			echo "</div>";
 		}
 		
-		if ($this->download || $this->version || $this->creators || $this->security) {
+		if ($this->download || $this->version || $this->creators) {
 			echo "<h3>Basic info</h3>";
 		}
 		
-		mod_property("Download", "A link to where the mod can be downloaded.", $this->download, true);
+		$download_content = "";
+		
+		if (!$stalker && (time() - $this->updated) < (60 * 60 * 24 * 28)) {
+			$download_content = "<div class=\"thread-card\">
+			<p>Please sign in to get links to this mod.</p>
+			<p><a href=\"./?a=auth-login\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">login</span> Login</button></a> <a href=\"./?a=auth-register\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">person_add</span> Register</button></a></p>
+		</div>";
+		}
+		else {
+			$download_content = "
+			<a href=\"$this->download\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">save_alt</span> Download</button></a>
+			<button class=\"button secondary\" onclick=\"navigator.clipboard.writeText('$this->download')\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">content_copy</span> Copy link</button>";
+		}
+		
+		mod_property("Download", "A link to where the mod can be downloaded.", $download_content, true);
 		mod_property("Version", "The latest version of this mod.", $this->version, true);
 		mod_property("Creators", "The people who created this mod.", create_comma_array_nice($this->creators), true);
-		mod_property("Security", "A short statement on this mod's security.", $this->security, true);
+		//mod_property("Security", "A short statement on this mod's security.", $this->security, true);
 		
 		if ($this->wiki || $this->code || $this->status || $this->package) {
 			echo "<h3>Other info</h3>";
