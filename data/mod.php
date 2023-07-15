@@ -163,9 +163,13 @@ class ModPage {
 			echo "<h3>Basic info</h3>";
 		}
 		
+		// Download area
 		$download_content = "";
 		
-		if (!$stalker && (time() - $this->updated) < (60 * 60 * 24 * 28)) {
+		if (!str_starts_with($this->download, "http")) {
+			$download_content = $this->download;
+		}
+		else if (!$stalker && (time() - $this->updated) < (60 * 60 * 24 * 28)) {
 			$download_content = "<div class=\"thread-card\">
 			<p>Please sign in to get links to this mod.</p>
 			<p><a href=\"./?a=auth-login\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">login</span> Login</button></a> <a href=\"./?a=auth-register\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">person_add</span> Register</button></a></p>
@@ -177,9 +181,30 @@ class ModPage {
 			<button class=\"button secondary\" onclick=\"navigator.clipboard.writeText('$this->download')\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">content_copy</span> Copy link</button>";
 		}
 		
+		// Creators list
+		// This code sucks
+		$creators_content = "<!-- Where the fuck does this p tag come from??? -->";
+		
+		for ($i = 0; $i < sizeof($this->creators); $i++) {
+			$user = $this->creators[$i];
+			
+			$on_site = user_exists($user);
+			$pfp = "./?a=generate-logo-coloured&seed=$user";
+			
+			if ($on_site) {
+				$user = new User($user);
+				$pfp = $user->image;
+			}
+			
+			$creators_content .= "<div style=\"display: grid; grid-template-columns: 32px auto;\">
+	<div style=\"grid-column: 1; align-items: center;\"><img src=\"$pfp\" style=\"width: 32px; height: 32px; border-radius: 16px;\"/></div>
+	<div style=\"grid-column: 2; margin-left: 0.5em; align-items: center;\"><p>" . ($on_site ? "<a href=\"./?u=$user->name\">$user->display</a> (@$user->name)" : $user) . "</p></div>
+</div>";
+		}
+		
 		mod_property("Download", "A link to where the mod can be downloaded.", $download_content, true);
 		mod_property("Version", "The latest version of this mod.", $this->version, true);
-		mod_property("Creators", "The people who created this mod.", create_comma_array_nice($this->creators), true);
+		mod_property("Creators", "The people who created this mod.", $creators_content, true);
 		//mod_property("Security", "A short statement on this mod's security.", $this->security, true);
 		
 		if ($this->wiki || $this->code || $this->status || $this->package) {
