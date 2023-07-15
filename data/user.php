@@ -425,6 +425,7 @@ class User {
 			$this->youtube = property_exists($info, "youtube") ? $info->youtube : "";
 			$this->image_type = property_exists($info, "image_type") ? $info->image_type : "gravatar";
 			$this->image = property_exists($info, "image") ? $info->image : "";
+			$this->image_age = property_exists($info, "image_age") ? $info->image_age : 0;
 			$this->accent = property_exists($info, "accent") ? $info->accent : null;
 			$this->about = property_exists($info, "about") ? $info->about : "";
 			$this->sak = property_exists($info, "sak") ? $info->sak : random_hex();
@@ -453,6 +454,12 @@ class User {
 			}
 			
 			// Schema R3: Account database
+			
+			// Refresh PFP if it's been more than a week
+			// if ($this->image_age < (time() - 60 * 60 * 24 * 7)) {
+			// 	$this->update_image();
+			// 	$this->save();
+			// }
 		}
 		else {
 			$this->name = $name;
@@ -470,6 +477,7 @@ class User {
 			$this->youtube = "";
 			$this->image_type = "gravatar";
 			$this->image = "";
+			$this->image_age = time();
 			$this->accent = null;
 			$this->about = "";
 			$this->sak = random_hex();
@@ -1083,20 +1091,23 @@ function get_user_badge(User $user) {
 	 * Get a user's badge.
 	 */
 	
+	$badge = "";
+	
 	if ($user->is_admin()) {
-		return "<span class=\"small-text staff-badge\">administrator</span>";
-	}
-	else if ($user->is_banned()) {
-		return "<span class=\"small-text banned-badge\">banned</span>";
+		$badge .= "<span class=\"small-text staff-badge\">Admin</span>";
 	}
 	else if ($user->is_mod()) {
-		return "<span class=\"small-text moderator-badge\">moderator</span>";
+		$badge .= "<span class=\"small-text moderator-badge\">Moderator</span>";
 	}
 	else if ($user->is_verified()) {
-		return "<span class=\"small-text verified-badge\">verified</span>";
+		$badge .= "<span class=\"small-text verified-badge\">Verified</span>";
 	}
 	
-	return "";
+	if ($user->is_banned()) {
+		$badge .= "<span class=\"small-text banned-badge\">Banned</span>";
+	}
+	
+	return $badge;
 }
 
 function get_profile_image(string $user) {

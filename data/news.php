@@ -135,12 +135,12 @@ class Article {
 		
 		push_recent($this->name);
 		
-		$this->save();
+		//$this->save();
 	}
 	
 	function set_permissions(string $name) {
 		$this->permissions = $name;
-		$this->save();
+		//$this->save();
 	}
 	
 	function display_history() {
@@ -394,6 +394,7 @@ function save_news() : void {
 	$article = new Article($_GET["n"]);
 	$article->update($_POST["title"], $_POST["body"], $user);
 	$article->set_permissions($_POST["permissions"]);
+	$article->save();
 	
 	redirect("./?n=$article->name");
 }

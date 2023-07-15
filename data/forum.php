@@ -1,11 +1,15 @@
 <?php
 
 class ForumThread {
+	/**
+	 * A bit of info about a forum thread. This is basically just the ID, date
+	 * and author.
+	 */
+	
 	public $id;
 	public $title;
 	public $created;
 	public $author;
-	public $replies;
 	
 	function __construct(string $id) {
 		$db = new Database("thread");
@@ -17,14 +21,12 @@ class ForumThread {
 			$this->title = $info->title;
 			$this->created = $info->created;
 			$this->author = $info->author;
-			$this->replies = $info->replies;
 		}
 		else {
 			$this->id = $id;
 			$this->title = "Untitled";
 			$this->created = time();
 			$this->author = "";
-			$this->replies = $id;
 		}
 	}
 	
@@ -55,8 +57,8 @@ $gEndMan->add("forum-home", function (Page $page) {
 	if ($actor) {
 		$page->add("<p style=\"text-align: center;\"><button onclick=\"shl_show_dialogue('new-thread')\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">edit</span> Create thread</button></p>");
 		
-		$page->add(create_form_dialogue_code('new-thread', "./?a=forum-create&submit=1", "Create a new thread", "<p><input type=\"text\" style=\"width: 96%;\" name=\"title\" placeholder=\"Title\"/></p>
-		<p><textarea name=\"content\" style=\"width: 96%;\" placeholder=\"Your message (supports markdown)\"></textarea></p>", "<button>Create thread</button>"));
+		$page->add(create_form_dialogue_code('new-thread', "./?a=forum-create&submit=1", "Create a new thread", "<p><input type=\"text\" style=\"width: calc(100% - 1em); background: none; border: none;\" name=\"title\" placeholder=\"Title\"/></p>
+		<p><textarea name=\"content\" style=\"width: calc(100% - 1em); background: none; border: none;\" placeholder=\"Type your message (supports markdown)...\"></textarea></p>", "<button>Create thread</button>", '25em'));
 	}
 	
 	$recent = get_config("forum_recent", []);
@@ -65,9 +67,18 @@ $gEndMan->add("forum-home", function (Page $page) {
 		$thread = new ForumThread($recent[$i]);
 		
 		if ($thread->exists()) {
+			$user = new User($thread->author);
+			
 			$page->add("<div class=\"thread-card\">
-	<h4><a href=\"./?a=forum-view&thread=$thread->id\">$thread->title</a></h4>
-	<p>At " . date("Y-m-d H:i:s", $thread->created) . " by @$thread->author</p>
+	<div style=\"display: grid; grid-template-columns: 80px auto;\">
+		<div style=\"grid-column: 1;\">
+			<img src=\"$user->image\" style=\"width: 80px; height: 80px; border-radius: 40px;\"/>
+		</div>
+		<div style=\"grid-column: 2; margin-left: 1em;\">
+			<h4><a href=\"./?a=forum-view&thread=$thread->id\">$thread->title</a></h4>
+			<p><a href=\"./?u=$user->name\">$user->display</a> (@$user->name) · " . date("Y-m-d H:i:s", $thread->created) . "</p>
+		</div>
+	</div>
 </div>");
 		}
 	}

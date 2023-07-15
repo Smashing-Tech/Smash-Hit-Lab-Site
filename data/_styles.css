@@ -46,7 +46,7 @@ h1, h2, h3, h4, p, li, summary {
 	margin-bottom: 0.5em;
 }
 
-h1 { font-size: 42pt; text-align: center; margin: 0.75em; margin-top: 0; text-shadow: 0 0 2em var(--colour-background-b); }
+h1 { font-size: 42pt; text-align: center; margin: 0.75em; margin-top: 0; text-shadow: 0 0 2em var(--colour-primary-b); }
 h2 { font-size: 28pt; text-align: center; }
 h3 { font-size: 22pt; font-weight: 400; padding-top: 0.8em; padding-bottom: 0.2em; }
 h4 { font-size: 18pt; }
@@ -142,7 +142,7 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus, select:focus
 
 textarea {
 	min-height: 10em;
-	font-family: var(--font-mono);
+	font-family: var(--font-main);
 }
 
 .comment-edit textarea {
@@ -454,6 +454,10 @@ input[type=submit]:hover, button:hover, .button:hover {
 .article-body p, .article-body li {
 	font-size: 16pt !important;
 	line-height: 1.5;
+}
+
+.article-body h1, .article-body h2 {
+	text-align: left;
 }
 
 .comment-card {
