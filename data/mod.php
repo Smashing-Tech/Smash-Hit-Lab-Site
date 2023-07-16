@@ -169,9 +169,10 @@ class ModPage {
 		if (!str_starts_with($this->download, "http")) {
 			$download_content = $this->download;
 		}
-		else if (!$stalker && (time() - $this->updated) < (60 * 60 * 24 * 28)) {
+		else if (!$stalker /*&& (time() - $this->updated) < (60 * 60 * 24 * 28)*/) {
 			$download_content = "<div class=\"thread-card\">
-			<p>Please sign in to get links to this mod.</p>
+			<p><b>You need an account to view this info.</b></p>
+			<p>Please log in or register to get links to this mod.</p>
 			<p><a href=\"./?a=auth-login\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">login</span> Login</button></a> <a href=\"./?a=auth-register\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">person_add</span> Register</button></a></p>
 		</div>";
 		}
@@ -491,6 +492,8 @@ function delete_mod() : void {
 }
 
 function list_mods() : void {
+	$actor = user_get_current();
+	
 	$db = new RevisionDB("mod");
 	
 	$list = $db->enumerate();
@@ -502,6 +505,7 @@ function list_mods() : void {
 		readfile("../data/_mkmod.html");
 	}
 	
+	// Grid of mods
 	echo "<div class=\"mod-listing\">";
 	
 	for ($i = 0; $i < sizeof($list); $i++) {
@@ -527,6 +531,16 @@ function list_mods() : void {
 	}
 	
 	echo "</div>";
+	
+	// Join message
+	if (!$actor) {
+		echo "<div class=\"thread-card\">
+			<p><b>Want to add your mod here?</b></p>
+			<p>Log in or create an account to add your mod to the database.</p>
+			<p><a href=\"./?a=auth-login\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">login</span> Login</button></a> <a href=\"./?a=auth-register\"><button class=\"button secondary\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">person_add</span> Register</button></a></p>
+		</div>";
+	}
+	
 	include_footer();
 }
 
