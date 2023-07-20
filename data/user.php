@@ -421,6 +421,7 @@ class User {
 			$this->login_wait = (property_exists($info, "login_wait") ? $info->login_wait : 0);
 			$this->verified = property_exists($info, "verified") ? $info->verified : null;
 			$this->ban = property_exists($info, "ban") ? $info->ban : null;
+			$this->edit_locked = property_exists($info, "edit_locked") ? $info->edit_locked : false;
 			$this->wall = property_exists($info, "wall") ? $info->wall : random_discussion_name();
 			$this->youtube = property_exists($info, "youtube") ? $info->youtube : "";
 			$this->image_type = property_exists($info, "image_type") ? $info->image_type : "gravatar";
@@ -473,6 +474,7 @@ class User {
 			$this->login_wait = 0;
 			$this->verified = null;
 			$this->ban = null;
+			$this->edit_locked = false;
 			$this->wall = random_discussion_name();
 			$this->youtube = "";
 			$this->image_type = "gravatar";
@@ -1138,6 +1140,10 @@ function edit_account() {
 		return;
 	}
 	
+	if (user_get_current()->edit_locked) {
+		inform("Edit locked by staff", "Your ability to edit account information has been locked. This could be due to a community guidelines violation relating to your account information.</p><p>If you need to delete your account, please contact staff.");
+	}
+	
 	$user = new User($user);
 	
 	display_user_banner($user);
@@ -1189,6 +1195,11 @@ function save_account() {
 	
 	if (!$user) {
 		sorry("Please log in to edit your user preferences.");
+	}
+	
+	// fuck u /j
+	if (user_get_current()->edit_locked) {
+		inform("Edit locked by staff", "Your ability to edit account information has been locked. This could be due to a community guidelines violation relating to your account information.</p><p>If you need to delete your account, please contact staff.");
 	}
 	
 	validate_length("Display name", $_POST["display"], 30);

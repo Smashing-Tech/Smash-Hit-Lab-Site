@@ -169,7 +169,7 @@ class ModPage {
 		if (!str_starts_with($this->download, "http")) {
 			$download_content = $this->download;
 		}
-		else if (!$stalker /*&& (time() - $this->updated) < (60 * 60 * 24 * 28)*/) {
+		else if (!$stalker && (time() - $this->updated) < (60 * 60 * 24 * 3)) {
 			$download_content = "<div class=\"thread-card\">
 			<p><b>You need an account to view this info.</b></p>
 			<p>Please log in or register to get links to this mod.</p>
@@ -242,6 +242,8 @@ class ModPage {
 	}
 	
 	function display_edit() {
+		$is_admin = get_name_if_admin_authed() !== null;
+		
 		echo "<h1>Editing " . ($this->name ? $this->name : $this->package) . "</h1>";
 		echo "<form action=\"./?a=save_mod&amp;m=$this->package\" method=\"post\">";
 		echo "<h3>Main</h3>";
@@ -249,15 +251,17 @@ class ModPage {
 		edit_feild("description", "textarea", "About", "One or two paragraphs that describe the mod.", htmlspecialchars($this->description));
 		
 		echo "<h3>Basic</h3>";
-		edit_feild("image", "text", "Banner image", "The URL of the banner image to use for this mod.", $this->image, get_name_if_admin_authed() !== null);
+		if ($is_admin) {
+			edit_feild("image", "text", "Banner image", "The URL of the banner image to use for this mod.", $this->image);
+		}
 		edit_feild("download", "text", "Download", "A link to where the mod can be downloaded.", $this->download);
 		edit_feild("version", "text", "Version", "The latest version of this mod.", $this->version);
 		edit_feild("creators", "text", "Creators", "The people who created this mod.", create_comma_array($this->creators));
-		edit_feild("security", "text", "Security", "A short statement on this mod's security.", $this->security);
+		//edit_feild("security", "text", "Security", "A short statement on this mod's security.", $this->security);
 		edit_feild("wiki", "text", "Wiki article", "A relevant wiki article about the mod.", $this->wiki);
 		
 		echo "<h3>Extra</h3>";
-		edit_feild("code", "text", "Source code", "A link to where the source code for a mod can be found.", $this->code);
+		//edit_feild("code", "text", "Source code", "A link to where the source code for a mod can be found.", $this->code);
 		edit_feild("tags", "text", "Tags", "Keywords and categorical description of this mod.", create_comma_array($this->tags));
 		
 		edit_feild("status", "select", "Status", "A short description of the mod's development status.", $this->status, true, [
@@ -277,16 +281,17 @@ class ModPage {
 	}
 	
 	function save_edit(string $whom) {
+		$is_admin = get_name_if_admin_authed() !== null;
+		
 		validate_length("Name", $_POST["name"], 100);
 		validate_length("creators", $_POST["creators"], 300);
 		validate_length("wiki", $_POST["wiki"], 500);
 		validate_length("description", $_POST["description"], 2000);
-		validate_length("image", $_POST["image"], 1000);
 		validate_length("download", $_POST["download"], 500);
-		validate_length("code", $_POST["code"], 500);
+		//validate_length("code", $_POST["code"], 500);
 		validate_length("tags", $_POST["tags"], 300);
 		validate_length("version", $_POST["version"], 100);
-		validate_length("security", $_POST["security"], 200);
+		//validate_length("security", $_POST["security"], 200);
 		validate_length("status", $_POST["status"], 50);
 		validate_length("reason", $_POST["reason"], 400);
 		
@@ -294,16 +299,21 @@ class ModPage {
 		$this->creators = parse_comma_array(htmlspecialchars($_POST["creators"]));
 		$this->wiki = htmlspecialchars($_POST["wiki"]);
 		$this->description = $_POST["description"]; // Rich text feild
-		$this->image = htmlspecialchars($_POST["image"]);
 		$this->download = htmlspecialchars($_POST["download"]);
-		$this->code = htmlspecialchars($_POST["code"]);
+		//$this->code = htmlspecialchars($_POST["code"]);
 		$this->tags = parse_comma_array(htmlspecialchars($_POST["tags"]));
 		$this->version = htmlspecialchars($_POST["version"]);
 		$this->updated = time();
 		$this->author = $whom;
-		$this->security = htmlspecialchars($_POST["security"]);
+		//$this->security = htmlspecialchars($_POST["security"]);
 		$this->status = htmlspecialchars($_POST["status"]);
 		$this->reason = htmlspecialchars($_POST["reason"]);
+		
+		// For some reason I didn't put this behind an adminwall before :skull:
+		if ($is_admin) {
+			validate_length("image", $_POST["image"], 1000);
+			$this->image = htmlspecialchars($_POST["image"]);
+		}
 		
 		$this->save();
 	}
