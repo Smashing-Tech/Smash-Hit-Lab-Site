@@ -592,3 +592,37 @@ $gEndMan->add("user-list", function (Page $page) {
 		$page->info("Sorry", "This endpoint is not available for you.");
 	}
 });
+
+$gEndMan->add("user-update-display", function (Page $page) {
+	$actor = user_get_current();
+	
+	if ($actor && $actor->is_admin() && $actor->has_role("crime")) {
+		if (!$page->has("submit")) {
+			$page->heading(1, "Update display name");
+			
+			$form = new Form("./?a=user-update-display&submit=1");
+			$form->textbox("handle", "Handle", "The handle of the user's display name to change.");
+			$form->textbox("display", "Display name", "New display name for the user.");
+			$form->submit("Update display name");
+			
+			$page->add($form);
+		}
+		else {
+			$handle = $page->get("handle");
+			$display = $page->get("display");
+			
+			if (!user_exists($handle)) {
+				$page->info("User does not exist", "The user @$handle does not exist.");
+			}
+			
+			$user = new User($handle);
+			$user->display = $display;
+			$user->save();
+			
+			$page->info("Display name changed", "The display name for @$handle has been updated.");
+		}
+	}
+	else {
+		$page->info("Please log in!", "Please log in to update your display name.");
+	}
+});
