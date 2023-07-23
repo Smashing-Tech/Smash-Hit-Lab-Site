@@ -152,8 +152,13 @@ function auth_login_action(Page $page) {
 	// Final event for login
 	$gEvents->trigger("user.login.after", $page);
 	
-	// Redirect to homepage
-	$page->redirect("/?u=$handle");
+	// Redirect to user page
+	if ($page->has("redirect")) {
+		$page->redirect($page->get("redirect"));
+	}
+	else {
+		$page->redirect("/?u=$handle");
+	}
 }
 
 $gEndMan->add("auth-login", function($page) {

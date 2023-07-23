@@ -530,14 +530,16 @@ function list_mods() : void {
 		$url = "./?m=" . htmlspecialchars($mp->package);
 		$img = $mp->image ? $mp->image : "./?a=generate-logo-coloured&seed=$title";
 		
-		echo "<a href=\"$url\">
+		echo "
 		<div class=\"mod-card-outer\">
+			<a href=\"$url\">
 			<div class=\"mod-card-image\" style=\"background-image: url('$img');\"></div>
 			<div class=\"mod-card-data\">
 				<h4>$title</h4>
 				<p>$desc</p>
 			</div>
-		</div></a>";
+			</a>
+		</div>";
 	}
 	
 	echo "</div>";

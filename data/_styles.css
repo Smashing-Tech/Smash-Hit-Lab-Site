@@ -704,6 +704,9 @@ blockquote {
 }
 
 .mod-listing {
+	display: grid;
+	grid: auto-flow / repeat(auto-fill, calc(12em + 1.5em));
+	justify-content: space-evenly;
 }
 
 .mod-listing a {
@@ -723,7 +726,6 @@ blockquote {
 	width: 12em;
 	height: 16em;
 	margin: 0.75em;
-	padding: 1px;
 	display: inline-block;
 	overflow: hidden;
 	transition: scale 0.3s;

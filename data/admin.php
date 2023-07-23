@@ -28,6 +28,7 @@ function do_site_config() {
 			echo "<h4>Registering</h4>";
 			edit_feild("register", "select", "Enable registering", "Weather registering of new accounts should be limited or not.", get_config("register", "anyone"), true, array("anyone" => "Anyone can register", "users" => "Only users can register", "admins" => "Only admins can register", "closed" => "Registering is disabled"));
 			edit_feild("email_required", "select", "Require email for registering", "If enabled, this sends passwords to users over email instead of telling them after account registration. Please note that email is not encrypted and could be intercepted.", get_config("email_required", false) ? "true" : "false", true, array("false" => "Do not require email", "true" => "Require email"));
+			edit_feild("require_logins_everywhere", "select", "Require logins for everything", "Requires that users are logged in to access any part of the site.", get_config("require_logins_everywhere", false) ? "true" : "false", true, array("false" => "Don't require login", "true" => "Require login"));
 			
 			echo "<h4>Logging in</h4>";
 			edit_feild("enable_login", "select", "Enable logins", "Allow users to log in to the stie.</p><p><b>Warning:</b> If you set this to completely disabled and all admins are logged out, then you need to wait for Knot126 to fix the site.", get_config("enable_login", "users"), true, array("users" => "All users can log in", "verified" => "Verified users and admins can log in", "admins" => "Only admins can log in", "closed" => "Logging in is disabled"));
@@ -49,6 +50,7 @@ function do_site_config() {
 			// Security
 			set_config("register", $_POST["register"], array("anyone", "users", "admins", "closed"));
 			set_config("email_required", $_POST["email_required"] === "true");
+			set_config("require_logins_everywhere", $_POST["require_logins_everywhere"] === "true");
 			set_config("enable_login", $_POST["enable_login"], array("users", "verified", "admins", "closed"));
 			
 			set_config("discord_webhook", $_POST["discord_webhook"]);

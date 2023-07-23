@@ -101,6 +101,11 @@ function main() {
 		die();
 	}
 	
+	if (get_config("require_logins_everywhere", false) && ((array_key_exists("a", $_GET)) ? (!str_starts_with($_GET["a"], "auth-")) : (true)) && !user_get_current()) {
+		header("Location: /?a=auth-login&redirect=" . urlencode($_SERVER['REQUEST_URI']));
+		die();
+	}
+	
 	if (array_key_exists("a", $_GET)) {
 		handle_action($_GET["a"], $page);
 	}
