@@ -133,7 +133,7 @@ function mod_property($title, $desc, $value, $conditional = false) : void {
 		echo "</div>";
 		echo "<div class=\"mod-property-data\">";
 			if (str_starts_with($value ? $value : "", "https://")) {
-				echo "<p><a href=\"$value\">" . $value . "</a></p>";
+				echo "<p><a href=\"" . htmlspecialchars($value) . "\">" . $value . "</a></p>";
 			} else {
 				echo "<p>" . ($value ? "$value" : "<i>Not available</i>") . "</p>";
 			}

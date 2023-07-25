@@ -75,6 +75,17 @@ function shl_magic_editor_end() {
 }
 
 /**
+ * Basic copy button
+ */
+function shl_copy(data, button_id) {
+	navigator.clipboard.writeText(data);
+	
+	if (button_id) {
+		document.getElementById(button_id).innerHTML = '<span class="material-icons" style="position: relative; top: 5px; margin-right: 3px;">check</span> Copied!';
+	}
+}
+
+/**
  * Generic dialogues
  */
 

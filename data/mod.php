@@ -58,6 +58,7 @@ class ModPage {
 			$this->status = $mod->status;
 			$this->reviews = property_exists($mod, "reviews") ? $mod->reviews : random_discussion_name();
 			$this->image = property_exists($mod, "image") ? $mod->image : "";
+			$this->colour = property_exists($mod, "colour") ? $mod->colour : "";
 			
 			// If there weren't discussions before, save them now.
 			if (!property_exists($mod, "reviews")) {
@@ -86,6 +87,7 @@ class ModPage {
 			$this->status = "Released";
 			$this->reviews = random_discussion_name();
 			$this->image = "";
+			$this->colour = "";
 		}
 	}
 	
@@ -179,7 +181,7 @@ class ModPage {
 		else {
 			$download_content = "
 			<a href=\"$this->download\"><button><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">save_alt</span> Download</button></a>
-			<button class=\"button secondary\" onclick=\"navigator.clipboard.writeText('$this->download')\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">content_copy</span> Copy link</button>";
+			<button id=\"shl-mod-copy-url\" class=\"button secondary\" onclick=\"shl_copy('$this->download', 'shl-mod-copy-url')\"><span class=\"material-icons\" style=\"position: relative; top: 5px; margin-right: 3px;\">content_copy</span> Copy link</button>";
 		}
 		
 		// Creators list
@@ -222,6 +224,10 @@ class ModPage {
 		
 		$disc = new Discussion($this->reviews);
 		$disc->display_reverse("Reviews", "./?m=" . $this->package);
+		
+		if ($this->colour) {
+			echo render_accent_script($this->colour);
+		}
 	}
 	
 	function display_history() {
@@ -242,7 +248,7 @@ class ModPage {
 	}
 	
 	function display_edit() {
-		$is_admin = get_name_if_admin_authed() !== null;
+		$is_mod = get_name_if_mod_authed() !== null;
 		
 		echo "<h1>Editing " . ($this->name ? $this->name : $this->package) . "</h1>";
 		echo "<form action=\"./?a=save_mod&amp;m=$this->package\" method=\"post\">";
@@ -250,10 +256,13 @@ class ModPage {
 		edit_feild("name", "text", "Name", "The name that will be displayed with the mod.", $this->name);
 		edit_feild("description", "textarea", "About", "One or two paragraphs that describe the mod.", htmlspecialchars($this->description));
 		
-		echo "<h3>Basic</h3>";
-		if ($is_admin) {
+		if ($is_mod) {
+			echo "<h3>Appearance (admin only)</h3>";
 			edit_feild("image", "text", "Banner image", "The URL of the banner image to use for this mod.", $this->image);
+			edit_feild("colour", "text", "Colour", "Colourise the appearance of the site for this mod (hex code)", $this->colour);
 		}
+		
+		echo "<h3>Basic</h3>";
 		edit_feild("download", "text", "Download", "A link to where the mod can be downloaded.", $this->download);
 		edit_feild("version", "text", "Version", "The latest version of this mod.", $this->version);
 		edit_feild("creators", "text", "Creators", "The people who created this mod.", create_comma_array($this->creators));
@@ -281,7 +290,7 @@ class ModPage {
 	}
 	
 	function save_edit(string $whom) {
-		$is_admin = get_name_if_admin_authed() !== null;
+		$is_mod = get_name_if_mod_authed() !== null;
 		
 		validate_length("Name", $_POST["name"], 100);
 		validate_length("creators", $_POST["creators"], 300);
@@ -310,9 +319,12 @@ class ModPage {
 		$this->reason = htmlspecialchars($_POST["reason"]);
 		
 		// For some reason I didn't put this behind an adminwall before :skull:
-		if ($is_admin) {
+		if ($is_mod) {
 			validate_length("image", $_POST["image"], 1000);
+			validate_length("colour", $_POST["colour"], 15);
+			
 			$this->image = htmlspecialchars($_POST["image"]);
+			$this->colour = htmlspecialchars($_POST["colour"]);
 		}
 		
 		$this->save();

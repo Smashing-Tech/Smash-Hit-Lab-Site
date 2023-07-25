@@ -85,8 +85,8 @@ function frand() : float {
 	return mt_rand() / mt_getrandmax();
 }
 
-function __js_style_var__(string $var, string $val) {
-	echo "qs.style.setProperty('$var', '$val');";
+function __js_style_var__(string $var, string $val) : string {
+	return "qs.style.setProperty('$var', '$val');";
 }
 
 function render_accent_script(string $colour) {

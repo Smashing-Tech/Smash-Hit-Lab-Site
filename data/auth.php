@@ -368,6 +368,10 @@ $gEndMan->add("auth-logout", function(Page $page) {
 });
 
 $gEndMan->add("auth-reset-password", function(Page $page) {
+	/**
+	 * Note: The site should not respond differently when a user does or doesn't
+	 * exist.
+	 */
 	if (!$page->has("submit")) {
 		$page->heading(1, "Reset password");
 		
@@ -383,7 +387,7 @@ $gEndMan->add("auth-reset-password", function(Page $page) {
 		$code = $page->get("code");
 		
 		if (!user_exists($handle)) {
-			$page->info("Problem", "You don't exist.");
+			$page->info("Reset password", "Unforunately, your password reset did not work. It might be becuase your account does not exist or you typed the code wrong.");
 		}
 		
 		$user = new User($handle);
@@ -394,7 +398,7 @@ $gEndMan->add("auth-reset-password", function(Page $page) {
 			$page->info("Yay!", "Your password was reset! It will be sent to your email.");
 		}
 		else {
-			$page->info("Oh no!", "The password weset didnt wowrk.");
+			$page->info("Reset password", "Unforunately, your password reset did not work. It might be becuase your account does not exist or you typed the code wrong.");
 		}
 	}
 });
