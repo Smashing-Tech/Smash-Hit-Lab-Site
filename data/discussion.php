@@ -209,7 +209,7 @@ class Discussion {
 		$url = $this->get_url();
 		
 		// Notify post followers
-		notify_many($this->followers, "New message from @$author", $url . "#discussion-$this->id-" . (sizeof($this->comments) - 1));
+		notify_many(array_diff($this->followers, [$author]), "New message from @$author", $url . "#discussion-$this->id-" . (sizeof($this->comments) - 1));
 		
 		// Notify any mentioned users
 		notify_scan($body, $url);
